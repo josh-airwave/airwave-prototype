@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="228" fill="#2563EB"/>
+  <circle cx="512" cy="512" r="380" fill="white"/>
+  <path d="M 340 512 C 340 512 400 300 512 300 C 624 300 684 512 684 512 C 684 512 624 724 512 724 C 400 724 340 512 340 512 Z" fill="#2563EB"/>
+  <path d="M 280 620 L 280 512 C 280 512 350 340 440 340 C 480 340 510 380 512 420" stroke="#2563EB" stroke-width="0" fill="none"/>
+  <!-- Simplified wave icon matching the Airwave logo -->
+  <path d="M 320 580 Q 380 320 512 320 Q 644 320 704 580 L 704 620 Q 644 400 512 400 Q 380 400 320 620 Z" fill="#2563EB"/>
+  <path d="M 370 600 Q 420 380 512 380 Q 604 380 654 600 L 654 520 Q 604 340 512 340 Q 420 340 370 520 Z" fill="white"/>
+</svg>
