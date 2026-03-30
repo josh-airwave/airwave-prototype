@@ -10,13 +10,26 @@ export interface User {
 export interface Channel {
   id: string
   name: string
-  type: 'group' | 'dm' | 'channel'
+  type: 'group' | 'dm' | 'channel' | 'blue'
   avatar: string
   lastMessage: string
   lastMessageTime: string
   unreadCount?: number
   members?: User[]
   muted?: boolean
+}
+
+// Blue AI card — generated from shared media
+export interface BlueCard {
+  id: string
+  title: string
+  summary: string
+  mediaPreview?: string[]  // thumbnail URLs for the media mosaic
+  videoUrl?: string        // if the card is from a video
+  fileCount: number
+  sharedBy: User
+  buttons: ('View Report' | 'Share')[]
+  replyCount?: number
 }
 
 export interface Message {
@@ -118,6 +131,7 @@ export const currentUser = users[0]
 
 // --- Mock Channels ---
 export const channels: Channel[] = [
+  { id: 'blue', name: 'Blue', type: 'blue', avatar: '/avatars/blue-avatar.png', lastMessage: 'Daily Blue Testing and Insights report ready', lastMessageTime: '4:11 PM' },
   { id: 'c1', name: 'Backend', type: 'channel', avatar: 'icon:gear', lastMessage: '@Vijai anand  please review...', lastMessageTime: '10:42 PM', members: [users[0], users[2], users[3]] },
   { id: 'c2', name: 'App', type: 'channel', avatar: 'icon:app', lastMessage: 'I would like to know if this...', lastMessageTime: '10:23 PM' },
   { id: 'c3', name: 'Voice to Voice PoC', type: 'channel', avatar: 'icon:waveform', lastMessage: 'The voice options is prett...', lastMessageTime: '9:52 PM', unreadCount: 1 },
@@ -150,6 +164,40 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'v4', senderId: '2', type: 'text', content: 'Latency is around 200ms which is acceptable', timestamp: '9:52 PM' },
   ],
 }
+
+// --- Blue AI Cards ---
+export const blueCards: BlueCard[] = [
+  {
+    id: 'bc1',
+    title: 'Daily Blue Testing and Insights',
+    summary: 'This video transcript details a daily inspection and summary report involving testing Blue with Claude, conducting stress tests, analyzing responses, generating reports, and documenting field observations across multiple job sites during the morning shift.',
+    videoUrl: '/media/videos/video-1.mp4',
+    fileCount: 1,
+    sharedBy: users[0],
+    buttons: ['View Report', 'Share'],
+    replyCount: 3,
+  },
+  {
+    id: 'bc2',
+    title: 'Elevator Inspection Summary',
+    summary: 'Comprehensive review of elevator shaft installation progress, including structural assessment, safety compliance check, and remaining work items for completion. The inspection identified three areas requiring immediate attention before the next phase of construction can proceed.',
+    videoUrl: '/media/videos/video-3.mp4',
+    fileCount: 2,
+    sharedBy: users[0],
+    buttons: ['View Report', 'Share'],
+    replyCount: 1,
+  },
+  {
+    id: 'bc3',
+    title: 'Site Walk-Through Documentation',
+    summary: 'Recorded walk-through of the construction site capturing current progress on framing, electrical rough-in, and plumbing installation across all three floors. Key observations include completed header beams on floor two and pending HVAC ductwork routing on the ground level.',
+    videoUrl: '/media/videos/video-5.mp4',
+    fileCount: 1,
+    sharedBy: users[2],
+    buttons: ['View Report', 'Share'],
+    replyCount: 0,
+  },
+]
 
 // --- Mock Reports (Blue AI) ---
 export const reports: Report[] = [

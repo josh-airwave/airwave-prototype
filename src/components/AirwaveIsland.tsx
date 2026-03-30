@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { colors, fonts } from '../styles/theme'
 import { SmartGlassesBottomSheet } from './SmartGlassesBottomSheet'
 
-type IslandMode = 'home' | 'chat' | 'hidden'
+type IslandMode = 'home' | 'chat' | 'blue' | 'hidden'
 
 interface AirwaveIslandProps {
   mode: IslandMode
-  channelType?: 'group' | 'dm' | 'channel'
+  channelType?: 'group' | 'dm' | 'channel' | 'blue'
   onLeaderboardPress?: () => void
   onRecordPress?: () => void
 }
@@ -15,6 +15,7 @@ export function getIslandMode(screenName: string): IslandMode {
   switch (screenName) {
     case 'ChannelList': return 'home'
     case 'Chat': return 'chat'
+    case 'Blue': return 'blue'
     default: return 'hidden'
   }
 }
@@ -44,7 +45,7 @@ export function AirwaveIsland({ mode, channelType, onLeaderboardPress, onRecordP
     }}>
       {/* Left element */}
       <div style={{ display: 'flex', justifyContent: 'flex-start', zIndex: 1 }}>
-        {mode === 'home' ? (
+        {(mode === 'home' || mode === 'blue') ? (
           <button
             onClick={() => setSheetOpen(true)}
             style={{
@@ -111,28 +112,51 @@ export function AirwaveIsland({ mode, channelType, onLeaderboardPress, onRecordP
         </svg>
       </button>
 
-      {/* Right: Points badge */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', zIndex: 1 }}>
-        <button
-          onClick={onLeaderboardPress}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            background: colors.primary,
-            color: colors.white,
-            fontSize: fonts.size.sm,
-            fontWeight: fonts.weight.bold,
-            padding: '6px 12px',
-            borderRadius: 20,
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '-1px 4px 3px rgba(0,0,0,0.15)',
-          }}
-        >
-          <span style={{ fontSize: '12px' }}>⭐</span>
-          <span>18.27K</span>
-        </button>
+      {/* Right element — changes per mode */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, zIndex: 1 }}>
+        {mode === 'blue' ? (
+          <>
+            {/* Chat bubble */}
+            <button style={{
+              width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1A1A1A">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" />
+              </svg>
+            </button>
+            {/* + button */}
+            <button style={{
+              width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          </>
+        ) : (
+          /* Home + Chat mode: Points badge */
+          <button
+            onClick={onLeaderboardPress}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              background: colors.primary,
+              color: colors.white,
+              fontSize: fonts.size.sm,
+              fontWeight: fonts.weight.bold,
+              padding: '6px 12px',
+              borderRadius: 20,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '-1px 4px 3px rgba(0,0,0,0.15)',
+            }}
+          >
+            <span style={{ fontSize: '12px' }}>⭐</span>
+            <span>18.27K</span>
+          </button>
+        )}
       </div>
     </div>
     </>

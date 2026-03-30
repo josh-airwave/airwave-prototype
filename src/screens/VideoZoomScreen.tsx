@@ -8,6 +8,7 @@ const SPEED_OPTIONS = [1, 1.5, 2, 0.5]
 export function VideoZoomScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
   const itemId = (params?.itemId as string) || galleryItems[0].id
+  const directVideoUrl = params?.videoUrl as string | undefined
   const item = galleryItems.find(i => i.id === itemId) || galleryItems[0]
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -152,7 +153,7 @@ export function VideoZoomScreen({ params }: { params?: Record<string, unknown> }
     return `${m}:${sec.toString().padStart(2, '0')}`
   }
 
-  const videoSrc = item.videoUrl || item.thumbnail
+  const videoSrc = directVideoUrl || item.videoUrl || item.thumbnail
 
   return (
     <div

@@ -84,7 +84,10 @@ export function ChannelListScreen() {
           <ChannelRow
             key={channel.id}
             channel={channel}
-            onPress={() => push('Chat', { channelId: channel.id, channelType: channel.type })}
+            onPress={() => push(
+              channel.type === 'blue' ? 'Blue' : 'Chat',
+              { channelId: channel.id, channelType: channel.type }
+            )}
           />
         ))}
       </div>

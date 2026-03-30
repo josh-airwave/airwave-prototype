@@ -19,6 +19,7 @@ import { GlassesConnectScreen } from './screens/GlassesConnectScreen'
 import { ShareViewScreen } from './screens/ShareViewScreen'
 import { ImageZoomScreen } from './screens/ImageZoomScreen'
 import { VideoZoomScreen } from './screens/VideoZoomScreen'
+import { BlueCardDetailScreen } from './screens/BlueCardDetailScreen'
 
 const screens: Record<string, React.ComponentType<{ params?: Record<string, unknown> }>> = {
   ChannelList: ChannelListScreen,
@@ -38,6 +39,7 @@ const screens: Record<string, React.ComponentType<{ params?: Record<string, unkn
   ShareView: ShareViewScreen,
   ImageZoom: ImageZoomScreen,
   VideoZoom: VideoZoomScreen,
+  BlueCardDetail: BlueCardDetailScreen,
 }
 
 export default function App() {

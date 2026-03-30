@@ -46,7 +46,7 @@ function ChannelIcon({ type, size }: { type: string; size: number }) {
 
 export function Avatar({ emoji, size = 40, online, name }: AvatarProps) {
   const initials = name ? name.split(' ').map(w => w[0]).join('').slice(0, 2) : ''
-  const isUrl = emoji && (emoji.startsWith('http://') || emoji.startsWith('https://'))
+  const isUrl = emoji && (emoji.startsWith('http://') || emoji.startsWith('https://') || emoji.startsWith('/avatars/') || emoji.startsWith('/media/'))
   const isIcon = emoji && emoji.startsWith('icon:')
 
   return (
