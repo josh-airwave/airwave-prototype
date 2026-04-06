@@ -2,6 +2,7 @@ import React from 'react'
 import { PrototypeModeProvider } from './components/PrototypeMode'
 import { PhoneFrame } from './components/PhoneFrame'
 import { Router } from './navigation/Router'
+import { ScreenExporter } from './utils/ScreenExporter'
 import { ChannelListScreen } from './screens/ChannelListScreen'
 import { ChatScreen } from './screens/ChatScreen'
 import { BlueScreen } from './screens/BlueScreen'
@@ -20,6 +21,7 @@ import { ShareViewScreen } from './screens/ShareViewScreen'
 import { ImageZoomScreen } from './screens/ImageZoomScreen'
 import { VideoZoomScreen } from './screens/VideoZoomScreen'
 import { BlueCardDetailScreen } from './screens/BlueCardDetailScreen'
+import { FirmwareUpdateScreen } from './screens/FirmwareUpdateScreen'
 
 const screens: Record<string, React.ComponentType<{ params?: Record<string, unknown> }>> = {
   ChannelList: ChannelListScreen,
@@ -40,6 +42,7 @@ const screens: Record<string, React.ComponentType<{ params?: Record<string, unkn
   ImageZoom: ImageZoomScreen,
   VideoZoom: VideoZoomScreen,
   BlueCardDetail: BlueCardDetailScreen,
+  FirmwareUpdate: FirmwareUpdateScreen,
 }
 
 export default function App() {
@@ -70,7 +73,9 @@ export default function App() {
       </div>
 
       <PhoneFrame>
-        <Router screens={screens} initialScreen="ChannelList" />
+        <Router screens={screens} initialScreen="ChannelList">
+          <ScreenExporter />
+        </Router>
       </PhoneFrame>
 
       {/* Nav helper */}

@@ -29,9 +29,10 @@ export function useNavigation() {
 interface RouterProps {
   screens: Record<string, React.ComponentType<{ params?: RouteParams }>>
   initialScreen: string
+  children?: React.ReactNode
 }
 
-export function Router({ screens, initialScreen }: RouterProps) {
+export function Router({ screens, initialScreen, children }: RouterProps) {
   const [stack, setStack] = useState<RouteEntry[]>([{ screen: initialScreen }])
   const [animating, setAnimating] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null)
@@ -106,13 +107,14 @@ export function Router({ screens, initialScreen }: RouterProps) {
               : 'translateX(0)',
           }}
         >
-          {CurrentScreen && <CurrentScreen params={current.params} />}
+          {CurrentScreen && <CurrentScreen key={current.screen + JSON.stringify(current.params ?? {})} params={current.params} />}
         </div>
         <AirwaveIsland
           mode={getIslandMode(current.screen)}
           channelType={current.params?.channelType as 'group' | 'dm' | 'channel' | undefined}
           onLeaderboardPress={() => push('Leaderboard')}
         />
+        {children}
       </div>
     </NavigationContext.Provider>
   )

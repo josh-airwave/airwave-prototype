@@ -14,6 +14,8 @@
   "dependencies": {
     "@tensorflow-models/blazeface": "^0.1.0",
     "@tensorflow/tfjs": "^4.22.0",
+    "html-to-image": "^1.11.13",
+    "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -45,6 +47,12 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*"
+    ],
+    "asarUnpack": [
+      "dist/media/**/*",
+      "dist/images/**/*",
+      "dist/icons/**/*",
+      "dist/avatars/**/*"
     ]
   }
 }

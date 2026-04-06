@@ -6,15 +6,18 @@ interface PhoneFrameProps {
 
 export function PhoneFrame({ children }: PhoneFrameProps) {
   return (
-    <div style={{
-      width: 393,
-      height: 852,
-      borderRadius: 44,
-      overflow: 'hidden',
-      position: 'relative',
-      background: '#fff',
-      boxShadow: '0 0 0 3px #1a1a2e, 0 25px 80px rgba(0,0,0,0.5)',
-    }}>
+    <div
+      data-screen-export="phone-frame"
+      style={{
+        width: 393,
+        height: 852,
+        borderRadius: 44,
+        overflow: 'hidden',
+        position: 'relative',
+        background: '#fff',
+        boxShadow: '0 0 0 3px #1a1a2e, 0 25px 80px rgba(0,0,0,0.5)',
+      }}
+    >
       {/* Status bar */}
       <div style={{
         height: 54,

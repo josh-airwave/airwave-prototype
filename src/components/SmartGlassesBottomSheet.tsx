@@ -29,16 +29,16 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
           zIndex: 200,
         }}
       />
-      {/* Sheet */}
+      {/* Sheet — full height up to status bar */}
       <div style={{
         position: 'absolute',
+        top: 44,
         bottom: 0,
         left: 0,
         right: 0,
         background: colors.white,
         borderRadius: '20px 20px 0 0',
         zIndex: 201,
-        maxHeight: '85%',
         overflowY: 'auto',
         padding: '12px 24px 24px',
         display: 'flex',
@@ -71,24 +71,56 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
                 AIRWAVE_DA9D
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: colors.success }} />
                 <span style={{ fontSize: fonts.size.lg, color: colors.success, fontWeight: fonts.weight.medium }}>
                   Connected
                 </span>
               </div>
-              <div style={{ fontSize: fonts.size.lg, color: colors.neutral400, marginTop: 4 }}>
-                Battery Level:
+              <div style={{ fontSize: fonts.size.sm, color: colors.neutral400, marginTop: 6 }}>
+                Battery
               </div>
-              <div style={{ fontSize: '20px', fontWeight: fonts.weight.semibold, color: colors.almostBlack }}>
+              <div style={{ fontSize: '24px', fontWeight: fonts.weight.bold, color: colors.almostBlack, lineHeight: 1.1 }}>
                 79%
               </div>
             </div>
           </div>
+
+          {/* Update Firmware button */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              push('FirmwareUpdate')
+              setTimeout(() => onClose(), 100)
+            }}
+            style={{
+              width: '100%',
+              marginTop: 12,
+              padding: '10px 0',
+              borderRadius: 8,
+              background: colors.primary,
+              color: colors.white,
+              fontSize: fonts.size.md,
+              fontWeight: fonts.weight.semibold,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              gap: 6,
+            }}
+            role="button"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Update Firmware
+          </div>
         </div>
 
-        {/* Disconnect button - rounded rectangle */}
+        {/* Disconnect button */}
         <div
           style={{
             width: '100%',
@@ -114,7 +146,7 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
         {/* Files on Glasses */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: '20px', fontWeight: fonts.weight.bold, color: colors.almostBlack }}>
+            <span style={{ fontSize: '20px', fontWeight: fonts.weight.bold, color: colors.almostBlack, whiteSpace: 'nowrap' }}>
               Files on Glasses: 0
             </span>
             <button style={{
@@ -126,6 +158,8 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
               borderRadius: 8,
               background: 'transparent',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}>
               Import All
             </button>
@@ -165,6 +199,8 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
                 borderRadius: 8,
                 background: 'transparent',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
               View All
