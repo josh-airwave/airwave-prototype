@@ -354,7 +354,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
           <div style={{ margin: '0 24px', position: 'relative' }}>
             {/* Video/image container — fixed aspect ratio from Figma: 342x582 (57/97) */}
             <div
-              onClick={() => setFullscreen(true)}
+              onClick={() => { videoRef.current?.pause(); setFullscreen(true) }}
               style={{
                 width: 342, maxWidth: '100%', aspectRatio: '57/97',
                 borderRadius: 8, overflow: 'hidden', background: '#1a1a1a', position: 'relative',
@@ -818,7 +818,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
             </div>
             {/* Close */}
             <button
-              onClick={() => { setFullscreen(false); setFsScale(1); setFsTranslate({ x: 0, y: 0 }) }}
+              onClick={() => { fsVideoRef.current?.pause(); setFullscreen(false); setFsScale(1); setFsTranslate({ x: 0, y: 0 }); setTimeout(() => videoRef.current?.play(), 100) }}
               style={{
                 width: 40, height: 40, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.4)',
