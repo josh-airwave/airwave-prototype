@@ -7,7 +7,6 @@ import { users } from '../data/mock'
 interface MessageBubbleProps {
   message: Message
   isOwn: boolean
-  // Grouping flags — set by ChatScreen based on adjacent messages
   isFirstInGroup?: boolean
   isMiddleInGroup?: boolean
   isLastInGroup?: boolean
@@ -24,223 +23,216 @@ export function MessageBubble({
 }: MessageBubbleProps) {
   const sender = users.find(u => u.id === message.senderId)
 
-  // Show sender name + timestamp only on first-in-group or standalone
-  const showHeader = !isOwn && (isStandalone || isFirstInGroup)
-  // Show avatar only on standalone or last-in-group (positioned at bottom)
+  const showHeader = isStandalone || isFirstInGroup
   const showAvatar = !isOwn && (isStandalone || isLastInGroup)
-  // Tight grouping = no extra vertical padding
   const isGrouped = isFirstInGroup || isMiddleInGroup || isLastInGroup
-
-  // Border radius rules matching the real app
-  // Default: 8px all corners
-  // First in group: normal top, tight bottom (4px)
-  // Middle in group: tight all (4px)
-  // Last in group: tight top (4px), normal bottom
-  // Standalone: normal all (8px)
-  let borderRadius = '8px'
-  if (isFirstInGroup) {
-    borderRadius = isOwn
-      ? '8px 8px 4px 4px'
-      : '8px 8px 4px 4px'
-  } else if (isMiddleInGroup) {
-    borderRadius = '4px'
-  } else if (isLastInGroup) {
-    borderRadius = isOwn
-      ? '4px 4px 8px 8px'
-      : '4px 4px 8px 8px'
-  }
-
-  // Bubble tail: only on standalone or last-in-group
   const showTail = isStandalone || isLastInGroup
+  const isLeft = !isOwn
 
-  // Bubble colors matching production app
+  // Sent as text indicator — voice messages don't get this
+  const isSentAsText = message.type === 'text' || message.type === 'link' || message.type === 'image'
+  // All messages get a play button (voice-first app) unless it's a system message or image-only
+  const showPlayButton = message.type !== 'system' && message.type !== 'image'
+
+  // Border radius: 8px default, 4px tight for grouped
+  let borderRadius = '8px'
+  if (isFirstInGroup) borderRadius = '8px 8px 4px 4px'
+  else if (isMiddleInGroup) borderRadius = '4px'
+  else if (isLastInGroup) borderRadius = '4px 4px 8px 8px'
+
   const bubbleBg = isOwn ? colors.blurpleLightSolid : colors.white
   const textColor = colors.almostBlack
 
+  // Parse @mentions and make them bold
+  const renderMessageText = (text: string) => {
+    if (!text) return null
+    const parts = text.split(/(@\w[\w\s]*?\b)/g)
+    return parts.map((part, i) => {
+      if (part.startsWith('@')) {
+        return <span key={i} style={{ fontWeight: fonts.weight.bold, color: colors.almostBlack }}>{part}</span>
+      }
+      return <span key={i}>{part}</span>
+    })
+  }
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: isOwn ? 'row-reverse' : 'row',
-      gap: 0,
-      padding: isGrouped ? '1px 8px' : '0 8px',
-      paddingTop: (isStandalone || isFirstInGroup) ? 16 : 1,
-      alignItems: 'flex-end',
-    }}>
-      {/* Avatar column — 30px wide, only shows image on standalone/last */}
-      {!isOwn && (
-        <div style={{ width: 30, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-          {showAvatar && <Avatar emoji={sender?.avatar || ''} size={28} name={sender?.name} />}
+    <div>
+      {/* Sender + timestamp header */}
+      {showHeader && (
+        <div style={{
+          padding: '0 12px',
+          paddingTop: 16,
+          paddingBottom: 3,
+          paddingLeft: isLeft ? 42 : 12,
+          textAlign: isOwn ? 'right' : 'left',
+        }}>
+          <span style={{
+            fontSize: fonts.size.sm,
+            fontWeight: fonts.weight.regular,
+            fontFamily: fonts.family,
+            color: '#909090',
+          }}>
+            {isLeft ? `${sender?.name} ` : ''}{message.timestamp}{isSentAsText ? ' (Sent as Text)' : ''}
+          </span>
         </div>
       )}
 
+      {/* Message row */}
       <div style={{
-        maxWidth: isOwn ? '80%' : '83%',
-        marginLeft: isOwn ? 'auto' : 0,
-        marginRight: isOwn ? 4 : 0,
+        display: 'flex',
+        flexDirection: isOwn ? 'row-reverse' : 'row',
+        padding: isGrouped && !isFirstInGroup ? '1px 8px' : '0 8px',
+        alignItems: 'flex-end',
       }}>
-        {/* Sender name + timestamp — above the bubble */}
-        {showHeader && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 6,
-            marginBottom: 3,
-            marginLeft: 4,
-          }}>
-            <span style={{
-              fontSize: fonts.size.md,
-              fontWeight: fonts.weight.medium,
-              fontFamily: fonts.family,
-              color: colors.almostBlack,
-            }}>
-              {sender?.name}
-            </span>
-            <span style={{
-              fontSize: fonts.size.sm,
-              fontWeight: fonts.weight.regular,
-              color: '#909090',
-            }}>
-              {message.timestamp}
-            </span>
-          </div>
-        )}
-
-        {/* Own message timestamp — above bubble, right-aligned */}
-        {isOwn && (isStandalone || isFirstInGroup) && (
-          <div style={{
-            fontSize: fonts.size.sm,
-            color: '#909090',
-            marginBottom: 3,
-            textAlign: 'right',
-            paddingRight: 4,
-          }}>
-            {message.timestamp}
+        {/* Avatar column — 30px wide */}
+        {isLeft && (
+          <div style={{ width: 30, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+            {showAvatar && <Avatar emoji={sender?.avatar || ''} size={28} name={sender?.name} />}
           </div>
         )}
 
         {/* Bubble */}
-        <div style={{ position: 'relative' }}>
+        <div style={{
+          maxWidth: isOwn ? '80%' : '85%',
+          marginLeft: isOwn ? 'auto' : 0,
+          marginRight: isOwn ? 4 : 0,
+          position: 'relative',
+        }}>
           <div style={{
             background: bubbleBg,
             color: textColor,
-            padding: message.type === 'image' ? '4px' : '8px 12px',
             borderRadius,
             fontSize: fonts.size.md,
             fontWeight: fonts.weight.regular,
             fontFamily: fonts.family,
-            lineHeight: '17px',
+            lineHeight: '20px',
             position: 'relative',
+            overflow: 'hidden',
           }}>
-            {/* Text message */}
-            {message.type === 'text' && message.content}
-
-            {/* Audio message */}
-            {message.type === 'audio' && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                minWidth: 180,
-                padding: '2px 0',
-              }}>
-                <button style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: '50%',
-                  background: colors.primary,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-                    <polygon points="6,3 20,12 6,21" />
-                  </svg>
-                </button>
-                <div style={{ flex: 1 }}>
-                  {message.content && (
-                    <div style={{
-                      fontSize: fonts.size.md,
-                      color: textColor,
-                      lineHeight: '17px',
-                      paddingRight: 32,
-                    }}>
-                      {message.content}
-                    </div>
-                  )}
-                </div>
-                <span style={{
-                  fontSize: fonts.size.sm,
-                  color: '#909090',
-                  flexShrink: 0,
-                  alignSelf: 'flex-end',
-                }}>
-                  {message.audioDuration}
-                </span>
-              </div>
-            )}
-
-            {/* Image message */}
-            {message.type === 'image' && (
-              <div style={{
-                borderRadius: 6,
-                overflow: 'hidden',
-              }}>
+            {/* Image messages */}
+            {message.type === 'image' && message.imageUrl && (
+              <div>
                 <img
                   src={message.imageUrl}
                   alt=""
-                  style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}
+                  style={{ width: '100%', height: 220, objectFit: 'cover', display: 'block' }}
                 />
                 {message.content && (
-                  <div style={{ padding: '6px 8px', fontSize: fonts.size.md, color: textColor }}>
-                    {message.content}
+                  <div style={{ padding: '8px 12px', fontSize: fonts.size.md, color: textColor }}>
+                    {renderMessageText(message.content)}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Link preview */}
-            {message.type === 'link' && message.linkPreview && (
-              <div>
-                <div style={{
-                  color: colors.primary,
-                  fontWeight: fonts.weight.bold,
-                  fontSize: fonts.size.md,
-                  marginBottom: 4,
-                  wordBreak: 'break-all',
-                }}>
-                  {message.linkPreview.url}
-                </div>
-                {message.content && (
-                  <div style={{ fontSize: fonts.size.md, color: textColor }}>{message.content}</div>
+            {/* Text / audio / link messages — all get play button layout */}
+            {message.type !== 'image' && message.type !== 'system' && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 0,
+                padding: '6px 4px 6px 4px',
+              }}>
+                {/* Play button */}
+                {showPlayButton && (
+                  <button style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: colors.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    border: 'none',
+                    cursor: 'pointer',
+                    margin: '2px 0 2px 2px',
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                      <polygon points="7,3 21,12 7,21" />
+                    </svg>
+                  </button>
                 )}
+
+                {/* Message content */}
+                <div style={{
+                  flex: 1,
+                  padding: '4px 10px 4px 8px',
+                  minHeight: showPlayButton ? 44 : undefined,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}>
+                  <div style={{ width: '100%' }}>
+                    {/* Link preview */}
+                    {message.type === 'link' && message.linkPreview && (
+                      <div style={{ marginBottom: message.content ? 6 : 0 }}>
+                        <span style={{
+                          color: colors.primary,
+                          fontWeight: fonts.weight.bold,
+                          wordBreak: 'break-all',
+                        }}>
+                          {message.linkPreview.url}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Text content */}
+                    {message.content && (
+                      <div style={{ fontSize: fonts.size.md, lineHeight: '20px' }}>
+                        {renderMessageText(message.content)}
+                      </div>
+                    )}
+
+                    {/* Audio duration badge */}
+                    {message.type === 'audio' && message.audioDuration && (
+                      <div style={{
+                        fontSize: fonts.size.xs,
+                        color: '#909090',
+                        marginTop: 2,
+                      }}>
+                        {message.audioDuration}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Bubble tail — small SVG curve at bottom corner */}
-          {showTail && !isOwn && (
-            <svg
-              width="8" height="12"
-              viewBox="0 0 8 12"
-              style={{ position: 'absolute', bottom: 0, left: -7 }}
-            >
+          {/* Bubble tail */}
+          {showTail && isLeft && (
+            <svg width="8" height="12" viewBox="0 0 8 12" style={{ position: 'absolute', bottom: 0, left: -7 }}>
               <path d="M8 0 C8 6, 4 10, 0 12 L8 12 Z" fill={colors.white} />
             </svg>
           )}
           {showTail && isOwn && (
-            <svg
-              width="8" height="12"
-              viewBox="0 0 8 12"
-              style={{ position: 'absolute', bottom: 0, right: -7 }}
-            >
+            <svg width="8" height="12" viewBox="0 0 8 12" style={{ position: 'absolute', bottom: 0, right: -7 }}>
               <path d="M0 0 C0 6, 4 10, 8 12 L0 12 Z" fill={colors.blurpleLightSolid} />
             </svg>
           )}
         </div>
       </div>
+
+      {/* Read receipts — shown below the last message in a group */}
+      {(isStandalone || isLastInGroup) && (
+        <div style={{
+          display: 'flex',
+          justifyContent: isOwn ? 'flex-end' : 'flex-end',
+          alignItems: 'center',
+          gap: 6,
+          padding: '4px 16px 0',
+          height: 20,
+        }}>
+          {/* Eye icon = read count */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span style={{ fontSize: '11px', color: '#BABABA', fontFamily: fonts.family }}>{Math.floor(Math.random() * 12) + 3}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
