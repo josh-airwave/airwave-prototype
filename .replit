@@ -1,0 +1,7 @@
+run = "npx vite --host --port 5000"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npx vite --host --port 5000"]
