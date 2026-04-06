@@ -149,12 +149,12 @@ export const channels: Channel[] = [
 // --- Mock Messages ---
 export const chatMessages: Record<string, Message[]> = {
   c7: [
-    { id: 'm1', senderId: '2', type: 'image', content: '', timestamp: '9:25 AM', imageUrl: 'https://placehold.co/300x200/e0e7ff/4338ca?text=BES+Progress' },
+    { id: 'm1', senderId: '2', type: 'link', content: '', timestamp: '9:25 AM', linkPreview: { title: 'BES Progress', url: 'web.wvlnth.net/dashboard', image: 'https://placehold.co/400x220/165BC3/ffffff?text=BES+Progress' } },
     { id: 'm2', senderId: '2', type: 'text', content: 'Progress (0, 0, BES Progress: success)', timestamp: '9:25 AM' },
     { id: 'm3', senderId: '2', type: 'text', content: 'Progress (0, 100, BES Progress: update)', timestamp: '9:25 AM' },
     { id: 'm4', senderId: '2', type: 'audio', content: 'BES updated but had to turn off glasses and force close app the first time to get the wifi to connect to the glasses', timestamp: '9:26 AM', audioDuration: '0:24' },
     { id: 'm5', senderId: '1', type: 'text', content: 'Confirmed in the xy app. I will try and update my other glasses now as well', timestamp: '9:27 AM' },
-    { id: 'm6', senderId: '1', type: 'image', content: '', timestamp: '9:27 AM', imageUrl: 'https://placehold.co/300x400/fef3c7/92400e?text=Glasses+Version+Screen' },
+    { id: 'm6', senderId: '1', type: 'image', content: '', timestamp: '9:27 AM', imageUrl: '/media/images/pexels-thisisengineering-3861438.jpg' },
     { id: 'm7', senderId: '1', type: 'audio', content: 'Thank you.', timestamp: '9:28 AM', audioDuration: '0:04' },
   ],
   c3: [

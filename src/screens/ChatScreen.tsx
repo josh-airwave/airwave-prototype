@@ -65,76 +65,8 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
         ))}
       </div>
 
-      {/* Message input — matches iOS app */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: 4,
-        padding: '8px 12px',
-        minHeight: 68,
-        background: colors.white,
-        paddingBottom: 90,
-      }}>
-        {/* Camera button */}
-        <button style={{
-          padding: 4,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 44,
-        }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.gray400} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-        </button>
-
-        {/* Text input */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          border: `1px solid ${colors.lightGrey}`,
-          borderRadius: 18,
-          padding: '0 8px',
-          minHeight: 44,
-        }}>
-          <input
-            type="text"
-            placeholder="Message"
-            style={{
-              border: 'none',
-              background: 'transparent',
-              outline: 'none',
-              fontSize: fonts.size.md,
-              fontFamily: fonts.family,
-              width: '100%',
-              color: colors.textPrimary,
-              padding: '10px 4px',
-            }}
-          />
-        </div>
-
-        {/* Send button */}
-        <button style={{
-          width: 38,
-          height: 38,
-          borderRadius: '50%',
-          background: colors.primary,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          marginBottom: 3,
-          border: 'none',
-          cursor: 'pointer',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
-      </div>
+      {/* Bottom spacer — Airwave Island renders via Router */}
+      <div style={{ height: 80 }} />
     </div>
   )
 }

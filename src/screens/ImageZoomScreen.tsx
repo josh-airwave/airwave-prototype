@@ -6,6 +6,7 @@ import { galleryItems } from '../data/mock'
 export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
   const itemId = (params?.itemId as string) || galleryItems[0].id
+  const directImageUrl = params?.imageUrl as string | undefined
   const item = galleryItems.find(i => i.id === itemId) || galleryItems[0]
 
   const [scale, setScale] = useState(1)
@@ -79,7 +80,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
         onDoubleClick={handleDoubleClick}
       >
         <img
-          src={item.thumbnail}
+          src={directImageUrl || item.thumbnail}
           alt=""
           draggable={false}
           style={{

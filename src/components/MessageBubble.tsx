@@ -3,6 +3,7 @@ import { colors, fonts } from '../styles/theme'
 import { Avatar } from './Avatar'
 import type { Message } from '../data/mock'
 import { users } from '../data/mock'
+import { useNavigation } from '../navigation/Router'
 
 interface MessageBubbleProps {
   message: Message
@@ -21,6 +22,7 @@ export function MessageBubble({
   isLastInGroup = false,
   isStandalone = true,
 }: MessageBubbleProps) {
+  const { push } = useNavigation()
   const sender = users.find(u => u.id === message.senderId)
 
   const showHeader = isStandalone || isFirstInGroup
@@ -29,10 +31,13 @@ export function MessageBubble({
   const showTail = isStandalone || isLastInGroup
   const isLeft = !isOwn
 
-  // Sent as text indicator — voice messages don't get this
-  const isSentAsText = message.type === 'text' || message.type === 'link' || message.type === 'image'
-  // All messages get a play button (voice-first app) unless it's a system message or image-only
-  const showPlayButton = message.type !== 'system' && message.type !== 'image'
+  // Play button logic matches production app: show only if message has audio OR text content
+  // Link-only messages (no text content) and image messages don't get play buttons
+  const hasAudio = message.type === 'audio'
+  const hasTextContent = message.content != null && message.content.length > 0
+  const showPlayButton = message.type !== 'system' && message.type !== 'image' && (hasAudio || hasTextContent)
+  // Sent as text indicator — voice messages don't get this, link-only and image-only messages don't either
+  const isSentAsText = message.type === 'text' || (message.type === 'image' && hasTextContent) || (message.type === 'link' && hasTextContent)
 
   // Border radius: 8px default, 4px tight for grouped
   let borderRadius = '8px'
@@ -109,9 +114,12 @@ export function MessageBubble({
             position: 'relative',
             overflow: 'hidden',
           }}>
-            {/* Image messages */}
+            {/* Image messages — tappable to open in viewer */}
             {message.type === 'image' && message.imageUrl && (
-              <div>
+              <div
+                onClick={() => push('ImageZoom', { itemId: message.id, imageUrl: message.imageUrl })}
+                style={{ cursor: 'pointer' }}
+              >
                 <img
                   src={message.imageUrl}
                   alt=""
@@ -125,8 +133,45 @@ export function MessageBubble({
               </div>
             )}
 
-            {/* Text / audio / link messages — all get play button layout */}
-            {message.type !== 'image' && message.type !== 'system' && (
+            {/* Link preview card — rendered separately, no play button */}
+            {message.type === 'link' && message.linkPreview && (
+              <div style={{
+                overflow: 'hidden',
+              }}>
+                {message.linkPreview.image && (
+                  <img
+                    src={message.linkPreview.image}
+                    alt=""
+                    style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }}
+                  />
+                )}
+                <div style={{ padding: '8px 10px' }}>
+                  <div style={{
+                    fontSize: fonts.size.md,
+                    fontWeight: fonts.weight.medium,
+                    color: colors.almostBlack,
+                  }}>
+                    {message.linkPreview.title}
+                  </div>
+                  <div style={{
+                    fontSize: fonts.size.sm,
+                    color: '#909090',
+                    marginTop: 2,
+                  }}>
+                    {message.linkPreview.url}
+                  </div>
+                </div>
+                {/* Text below link preview if present */}
+                {message.content && (
+                  <div style={{ padding: '0 10px 8px', fontSize: fonts.size.md, lineHeight: '20px' }}>
+                    {renderMessageText(message.content)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Text / audio messages — play button layout */}
+            {message.type !== 'image' && message.type !== 'system' && message.type !== 'link' && (
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -163,19 +208,6 @@ export function MessageBubble({
                   alignItems: 'center',
                 }}>
                   <div style={{ width: '100%' }}>
-                    {/* Link preview */}
-                    {message.type === 'link' && message.linkPreview && (
-                      <div style={{ marginBottom: message.content ? 6 : 0 }}>
-                        <span style={{
-                          color: colors.primary,
-                          fontWeight: fonts.weight.bold,
-                          wordBreak: 'break-all',
-                        }}>
-                          {message.linkPreview.url}
-                        </span>
-                      </div>
-                    )}
-
                     {/* Text content */}
                     {message.content && (
                       <div style={{ fontSize: fonts.size.md, lineHeight: '20px' }}>
