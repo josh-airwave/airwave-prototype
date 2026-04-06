@@ -38,11 +38,16 @@ export interface Message {
   type: 'text' | 'audio' | 'image' | 'video' | 'link' | 'system'
   content: string
   timestamp: string
+  date?: string              // For date separators: 'Friday, Apr 03', 'Today, Apr 06'
   reactions?: { emoji: string; count: number }[]
   audioDuration?: string
   imageUrl?: string
   linkPreview?: { title: string; url: string; image?: string }
   replyTo?: string
+  replyCount?: number        // Thread reply pill count
+  readCount?: number         // Eye icon count
+  heardCount?: number        // Speaker icon count
+  failed?: boolean           // Failed to send indicator
 }
 
 export interface Report {
@@ -132,7 +137,7 @@ export const currentUser = users[0]
 // --- Mock Channels ---
 export const channels: Channel[] = [
   { id: 'blue', name: 'Blue', type: 'blue', avatar: '/avatars/blue-avatar.png', lastMessage: 'Daily Blue Testing and Insights report ready', lastMessageTime: '4:11 PM' },
-  { id: 'c1', name: 'Backend', type: 'channel', avatar: 'icon:gear', lastMessage: '@Vijai anand  please review...', lastMessageTime: '10:42 PM', members: [users[0], users[2], users[3]] },
+  { id: 'c1', name: 'Backend', type: 'group', avatar: 'icon:gear', lastMessage: '@Vijai anand  please review...', lastMessageTime: '10:42 PM', members: Array.from({ length: 19 }, (_, i) => users[i % users.length]) },
   { id: 'c2', name: 'App', type: 'channel', avatar: 'icon:app', lastMessage: 'I would like to know if this...', lastMessageTime: '10:23 PM' },
   { id: 'c3', name: 'Voice to Voice PoC', type: 'channel', avatar: 'icon:waveform', lastMessage: 'The voice options is prett...', lastMessageTime: '9:52 PM', unreadCount: 1 },
   { id: 'c4', name: 'Murali', type: 'dm', avatar: 'https://i.pravatar.cc/80?u=murali', lastMessage: 'Murali reacted 👍 to "Let me..."', lastMessageTime: '9:43 PM' },
@@ -148,6 +153,20 @@ export const channels: Channel[] = [
 
 // --- Mock Messages ---
 export const chatMessages: Record<string, Message[]> = {
+  // Backend channel — matches production app screenshots
+  c1: [
+    // --- Friday, Apr 03 ---
+    { id: 'b1', senderId: '6', type: 'image', content: '@Vijai anand can you pls check? for some question, Blue isn\'t giving the right answers', timestamp: '10:15 PM', date: 'Friday, Apr 03', imageUrl: '/media/images/pexels-cottonbro-4489737.jpg', replyCount: 8, readCount: 15 },
+    { id: 'b2', senderId: '2', type: 'audio', content: 'This is fixed now we upgraded the model to gpt 5 which is more intelligent and follows the prompts correctly so this should be fixed now', timestamp: '10:42 PM', date: 'Friday, Apr 03', readCount: 15 },
+    { id: 'b3', senderId: '1', type: 'text', content: '@Sundar Merged these', timestamp: '10:55 PM', date: 'Friday, Apr 03', readCount: 15 },
+    { id: 'b4', senderId: '6', type: 'image', content: '@vijay am getting summary but i don\'t get the proper responses in DMV @Vijai anand', timestamp: '11:04 PM', date: 'Friday, Apr 03', imageUrl: '/media/images/pexels-jopwell-1325725.jpg', readCount: 15 },
+
+    // --- Today, Apr 06 ---
+    { id: 'b5', senderId: '5', type: 'link', content: '', timestamp: '11:05 PM', date: 'Today, Apr 06', linkPreview: { title: 'stagecoreapi.wvlnth.net', url: 'stagecoreapi.wvlnth.net', image: 'https://placehold.co/400x200/165BC3/165BC3?text=+' } },
+    { id: 'b6', senderId: '5', type: 'text', content: '@Sundar is this the final URL? https://stagecoreapi.wvlnth.net/sg_firmwares', timestamp: '11:05 PM', date: 'Today, Apr 06' },
+    { id: 'b7', senderId: '5', type: 'text', content: 'I\'m getting error 401', timestamp: '11:06 PM', date: 'Today, Apr 06' },
+    { id: 'b8', senderId: '5', type: 'audio', content: 'oh, my mistake, not sending the token... sorry', timestamp: '11:06 PM', date: 'Today, Apr 06', failed: true, readCount: 13, heardCount: 1 },
+  ],
   c7: [
     { id: 'm1', senderId: '2', type: 'link', content: '', timestamp: '9:25 AM', linkPreview: { title: 'BES Progress', url: 'web.wvlnth.net/dashboard', image: 'https://placehold.co/400x220/165BC3/ffffff?text=BES+Progress' } },
     { id: 'm2', senderId: '2', type: 'text', content: 'Progress (0, 0, BES Progress: success)', timestamp: '9:25 AM' },

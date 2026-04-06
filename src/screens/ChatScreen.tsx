@@ -7,22 +7,31 @@ import { channels, chatMessages, currentUser } from '../data/mock'
 
 export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
   const { push } = useNavigation()
-  const channelId = (params?.channelId as string) || 'c7'
+  const channelId = (params?.channelId as string) || 'c1'
   const channel = channels.find(c => c.id === channelId)
-  const messages = chatMessages[channelId] || chatMessages.c7 || []
+  const messages = chatMessages[channelId] || chatMessages.c1 || []
 
   // Compute grouping flags for each message
   const getGrouping = (index: number) => {
     const msg = messages[index]
     const prev = index > 0 ? messages[index - 1] : null
     const next = index < messages.length - 1 ? messages[index + 1] : null
-    const samePrev = prev?.senderId === msg.senderId
-    const sameNext = next?.senderId === msg.senderId
+    const samePrev = prev?.senderId === msg.senderId && prev?.date === msg.date
+    const sameNext = next?.senderId === msg.senderId && next?.date === msg.date
 
     if (samePrev && sameNext) return { isMiddleInGroup: true, isStandalone: false }
     if (!samePrev && sameNext) return { isFirstInGroup: true, isStandalone: false }
     if (samePrev && !sameNext) return { isLastInGroup: true, isStandalone: false }
     return { isStandalone: true }
+  }
+
+  // Check if a message needs a date separator above it
+  const needsDateSeparator = (index: number) => {
+    const msg = messages[index]
+    if (!msg.date) return false
+    if (index === 0) return true
+    const prev = messages[index - 1]
+    return prev.date !== msg.date
   }
 
   return (
@@ -56,12 +65,34 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
         flexDirection: 'column',
       }}>
         {messages.map((msg, i) => (
-          <MessageBubble
-            key={msg.id}
-            message={msg}
-            isOwn={msg.senderId === currentUser.id}
-            {...getGrouping(i)}
-          />
+          <React.Fragment key={msg.id}>
+            {/* Date separator */}
+            {needsDateSeparator(i) && msg.date && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '16px 16px 4px',
+                gap: 10,
+              }}>
+                <div style={{ flex: 1, height: 1, background: colors.neutralGray }} />
+                <span style={{
+                  fontSize: fonts.size.sm,
+                  fontWeight: fonts.weight.regular,
+                  fontFamily: fonts.family,
+                  color: colors.neutral,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {msg.date}
+                </span>
+                <div style={{ flex: 1, height: 1, background: colors.neutralGray }} />
+              </div>
+            )}
+            <MessageBubble
+              message={msg}
+              isOwn={msg.senderId === currentUser.id}
+              {...getGrouping(i)}
+            />
+          </React.Fragment>
         ))}
       </div>
 

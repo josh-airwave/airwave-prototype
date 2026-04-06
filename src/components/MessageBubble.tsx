@@ -32,12 +32,12 @@ export function MessageBubble({
   const isLeft = !isOwn
 
   // Play button logic matches production app: show only if message has audio OR text content
-  // Link-only messages (no text content) and image messages don't get play buttons
   const hasAudio = message.type === 'audio'
   const hasTextContent = message.content != null && message.content.length > 0
-  const showPlayButton = message.type !== 'system' && message.type !== 'image' && (hasAudio || hasTextContent)
-  // Sent as text indicator — voice messages don't get this, link-only and image-only messages don't either
-  const isSentAsText = message.type === 'text' || (message.type === 'image' && hasTextContent) || (message.type === 'link' && hasTextContent)
+  const showPlayButton = message.type !== 'system' && message.type !== 'image' && message.type !== 'link' && (hasAudio || hasTextContent)
+
+  // Sent as text indicator
+  const isSentAsText = !hasAudio && hasTextContent && message.type !== 'link' && message.type !== 'system'
 
   // Border radius: 8px default, 4px tight for grouped
   let borderRadius = '8px'
@@ -48,20 +48,56 @@ export function MessageBubble({
   const bubbleBg = isOwn ? colors.blurpleLightSolid : colors.white
   const textColor = colors.almostBlack
 
-  // Parse @mentions and make them bold
+  // Parse @mentions and URLs — make mentions bold, URLs blue
   const renderMessageText = (text: string) => {
     if (!text) return null
-    const parts = text.split(/(@\w[\w\s]*?\b)/g)
+    // Split on @mentions and URLs
+    const parts = text.split(/(@\w[\w\s]*?\b)|(https?:\/\/[^\s]+)/g)
     return parts.map((part, i) => {
+      if (!part) return null
       if (part.startsWith('@')) {
         return <span key={i} style={{ fontWeight: fonts.weight.bold, color: colors.almostBlack }}>{part}</span>
+      }
+      if (part.startsWith('http')) {
+        return <span key={i} style={{ color: colors.primary, fontWeight: fonts.weight.bold }}>{part}</span>
       }
       return <span key={i}>{part}</span>
     })
   }
 
+  // Read/heard counts — use message data or fallback
+  const readCount = message.readCount != null ? message.readCount : Math.floor(Math.random() * 12) + 3
+  const heardCount = message.heardCount != null ? message.heardCount : 0
+
   return (
     <div>
+      {/* Thread reply pill */}
+      {message.replyCount != null && message.replyCount > 0 && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: '8px 16px 4px',
+        }}>
+          <div style={{
+            background: 'rgba(22, 91, 195, 0.08)',
+            borderRadius: 20,
+            padding: '4px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}>
+            <span style={{
+              fontSize: fonts.size.sm,
+              fontWeight: fonts.weight.medium,
+              color: colors.primary,
+              fontFamily: fonts.family,
+            }}>
+              {message.replyCount} {message.replyCount === 1 ? 'Reply' : 'Replies'}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Sender + timestamp header */}
       {showHeader && (
         <div style={{
@@ -114,20 +150,71 @@ export function MessageBubble({
             position: 'relative',
             overflow: 'hidden',
           }}>
-            {/* Image messages — tappable to open in viewer */}
+            {/* Share icon — top right of bubble */}
+            {!message.failed && (isStandalone || isFirstInGroup) && message.type !== 'system' && (
+              <div style={{
+                position: 'absolute',
+                top: 6,
+                right: 6,
+                zIndex: 2,
+                opacity: 0.3,
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+              </div>
+            )}
+
+            {/* Image messages — tappable, with optional text below */}
             {message.type === 'image' && message.imageUrl && (
-              <div
-                onClick={() => push('ImageZoom', { itemId: message.id, imageUrl: message.imageUrl })}
-                style={{ cursor: 'pointer' }}
-              >
-                <img
-                  src={message.imageUrl}
-                  alt=""
-                  style={{ width: '100%', height: 220, objectFit: 'cover', display: 'block' }}
-                />
+              <div>
+                <div
+                  onClick={() => push('ImageZoom', { itemId: message.id, imageUrl: message.imageUrl })}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <img
+                    src={message.imageUrl}
+                    alt=""
+                    style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }}
+                  />
+                </div>
                 {message.content && (
-                  <div style={{ padding: '8px 12px', fontSize: fonts.size.md, color: textColor }}>
-                    {renderMessageText(message.content)}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 0,
+                    padding: '6px 4px 6px 4px',
+                  }}>
+                    {/* Play button for image+text messages */}
+                    <button style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      background: colors.primary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      border: 'none',
+                      cursor: 'pointer',
+                      margin: '2px 0 2px 2px',
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                        <polygon points="7,3 21,12 7,21" />
+                      </svg>
+                    </button>
+                    <div style={{
+                      flex: 1,
+                      padding: '4px 10px 4px 8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}>
+                      <div style={{ fontSize: fonts.size.md, lineHeight: '20px' }}>
+                        {renderMessageText(message.content)}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -135,9 +222,7 @@ export function MessageBubble({
 
             {/* Link preview card — rendered separately, no play button */}
             {message.type === 'link' && message.linkPreview && (
-              <div style={{
-                overflow: 'hidden',
-              }}>
+              <div style={{ overflow: 'hidden' }}>
                 {message.linkPreview.image && (
                   <img
                     src={message.linkPreview.image}
@@ -161,7 +246,6 @@ export function MessageBubble({
                     {message.linkPreview.url}
                   </div>
                 </div>
-                {/* Text below link preview if present */}
                 {message.content && (
                   <div style={{ padding: '0 10px 8px', fontSize: fonts.size.md, lineHeight: '20px' }}>
                     {renderMessageText(message.content)}
@@ -208,14 +292,11 @@ export function MessageBubble({
                   alignItems: 'center',
                 }}>
                   <div style={{ width: '100%' }}>
-                    {/* Text content */}
                     {message.content && (
                       <div style={{ fontSize: fonts.size.md, lineHeight: '20px' }}>
                         {renderMessageText(message.content)}
                       </div>
                     )}
-
-                    {/* Audio duration badge */}
                     {message.type === 'audio' && message.audioDuration && (
                       <div style={{
                         fontSize: fonts.size.xs,
@@ -231,6 +312,28 @@ export function MessageBubble({
             )}
           </div>
 
+          {/* Failed message indicator (orange !) */}
+          {message.failed && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              [isOwn ? 'left' : 'right']: -24,
+            }}>
+              <div style={{
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                border: `2px solid ${colors.warning}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <span style={{ color: colors.warning, fontSize: '11px', fontWeight: fonts.weight.bold, lineHeight: 1 }}>!</span>
+              </div>
+            </div>
+          )}
+
           {/* Bubble tail */}
           {showTail && isLeft && (
             <svg width="8" height="12" viewBox="0 0 8 12" style={{ position: 'absolute', bottom: 0, left: -7 }}>
@@ -245,24 +348,51 @@ export function MessageBubble({
         </div>
       </div>
 
-      {/* Read receipts — shown below the last message in a group */}
+      {/* Read + Heard receipts — shown below the last message in a group */}
       {(isStandalone || isLastInGroup) && (
         <div style={{
           display: 'flex',
-          justifyContent: isOwn ? 'flex-end' : 'flex-end',
+          justifyContent: 'flex-end',
           alignItems: 'center',
           gap: 6,
           padding: '4px 16px 0',
           height: 20,
         }}>
           {/* Eye icon = read count */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#BABABA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            background: colors.coolMedium,
+            borderRadius: 20,
+            padding: '1px 6px',
+            height: 16,
+          }}>
+            <svg width="13" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.coolText} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
-            <span style={{ fontSize: '11px', color: '#BABABA', fontFamily: fonts.family }}>{Math.floor(Math.random() * 12) + 3}</span>
+            <span style={{ fontSize: '10px', color: colors.coolText, fontFamily: fonts.family, fontWeight: fonts.weight.medium }}>{readCount}</span>
           </div>
+
+          {/* Speaker icon = heard count (only if > 0) */}
+          {heardCount > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+              background: 'rgba(22, 91, 195, 0.12)',
+              borderRadius: 20,
+              padding: '1px 6px',
+              height: 16,
+            }}>
+              <svg width="12" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.almostBlack} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+              <span style={{ fontSize: '10px', color: colors.almostBlack, fontFamily: fonts.family, fontWeight: fonts.weight.medium }}>{heardCount}</span>
+            </div>
+          )}
         </div>
       )}
     </div>

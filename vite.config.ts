@@ -68,6 +68,7 @@ export default defineConfig(({ command }) => {
     base: './',
     server: {
       port: 3000,
+      allowedHosts: true,
     },
   }
 })
