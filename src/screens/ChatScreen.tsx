@@ -11,6 +11,20 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
   const channel = channels.find(c => c.id === channelId)
   const messages = chatMessages[channelId] || chatMessages.c7 || []
 
+  // Compute grouping flags for each message
+  const getGrouping = (index: number) => {
+    const msg = messages[index]
+    const prev = index > 0 ? messages[index - 1] : null
+    const next = index < messages.length - 1 ? messages[index + 1] : null
+    const samePrev = prev?.senderId === msg.senderId
+    const sameNext = next?.senderId === msg.senderId
+
+    if (samePrev && sameNext) return { isMiddleInGroup: true, isStandalone: false }
+    if (!samePrev && sameNext) return { isFirstInGroup: true, isStandalone: false }
+    if (samePrev && !sameNext) return { isLastInGroup: true, isStandalone: false }
+    return { isStandalone: true }
+  }
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: colors.cloudGray }}>
       <Header
@@ -37,21 +51,21 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
       <div style={{
         flex: 1,
         overflowY: 'auto',
-        padding: '12px 0',
+        padding: '4px 0 8px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 4,
       }}>
-        {messages.map(msg => (
+        {messages.map((msg, i) => (
           <MessageBubble
             key={msg.id}
             message={msg}
             isOwn={msg.senderId === currentUser.id}
+            {...getGrouping(i)}
           />
         ))}
       </div>
 
-      {/* Message input - matches iOS app exactly */}
+      {/* Message input — matches iOS app */}
       <div style={{
         display: 'flex',
         alignItems: 'flex-end',
@@ -61,7 +75,7 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
         background: colors.white,
         paddingBottom: 90,
       }}>
-        {/* Attachment/camera button */}
+        {/* Camera button */}
         <button style={{
           padding: 4,
           display: 'flex',
@@ -75,7 +89,7 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
           </svg>
         </button>
 
-        {/* Text input with border */}
+        {/* Text input */}
         <div style={{
           flex: 1,
           display: 'flex',
@@ -93,6 +107,7 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
               background: 'transparent',
               outline: 'none',
               fontSize: fonts.size.md,
+              fontFamily: fonts.family,
               width: '100%',
               color: colors.textPrimary,
               padding: '10px 4px',
@@ -111,6 +126,8 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
           justifyContent: 'center',
           flexShrink: 0,
           marginBottom: 3,
+          border: 'none',
+          cursor: 'pointer',
         }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" y1="2" x2="11" y2="13" />
