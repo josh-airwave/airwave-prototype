@@ -158,10 +158,10 @@ export const chatMessages: Record<string, Message[]> = {
   // Backend channel — matches production app screenshots
   c1: [
     // --- Friday, Apr 03 ---
-    { id: 'b1', senderId: '6', type: 'image', content: '@Vijai anand can you pls check? for some question, Blue isn\'t giving the right answers', timestamp: '10:15 PM', date: 'Friday, Apr 03', imageUrl: '/media/images/pexels-cottonbro-4489737.jpg', replyCount: 8, readCount: 15 },
+    { id: 'b1', senderId: '6', type: 'video', content: '@Vijai anand can you pls check? for some question, Blue isn\'t giving the right answers', timestamp: '10:15 PM', date: 'Friday, Apr 03', videoUrl: '/media/videos/video-1.mp4', videoDuration: '0:50', replyCount: 8, readCount: 15 },
     { id: 'b2', senderId: '2', type: 'audio', content: 'This is fixed now we upgraded the model to gpt 5 which is more intelligent and follows the prompts correctly so this should be fixed now', timestamp: '10:42 PM', date: 'Friday, Apr 03', readCount: 15 },
     { id: 'b3', senderId: '1', type: 'text', content: '@Sundar Merged these', timestamp: '10:55 PM', date: 'Friday, Apr 03', readCount: 15 },
-    { id: 'b4', senderId: '6', type: 'image', content: '@vijay am getting summary but i don\'t get the proper responses in DMV @Vijai anand', timestamp: '11:04 PM', date: 'Friday, Apr 03', imageUrl: '/media/images/pexels-jopwell-1325725.jpg', readCount: 15 },
+    { id: 'b4', senderId: '6', type: 'video', content: '@vijay am getting summary but i don\'t get the proper responses in DMV @Vijai anand', timestamp: '11:04 PM', date: 'Friday, Apr 03', videoUrl: '/media/videos/video-11.mp4', videoDuration: '0:29', readCount: 15 },
 
     // --- Today, Apr 06 ---
     { id: 'b5', senderId: '2', type: 'video', content: 'Here is the firmware OTA update flow recording', timestamp: '10:58 PM', date: 'Today, Apr 06', videoUrl: '/media/videos/video-5.mp4', videoDuration: '0:14', readCount: 15 },
@@ -176,7 +176,7 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'm3', senderId: '2', type: 'text', content: 'Progress (0, 100, BES Progress: update)', timestamp: '9:25 AM' },
     { id: 'm4', senderId: '2', type: 'audio', content: 'BES updated but had to turn off glasses and force close app the first time to get the wifi to connect to the glasses', timestamp: '9:26 AM', audioDuration: '0:24' },
     { id: 'm5', senderId: '1', type: 'text', content: 'Confirmed in the xy app. I will try and update my other glasses now as well', timestamp: '9:27 AM' },
-    { id: 'm6', senderId: '1', type: 'image', content: '', timestamp: '9:27 AM', imageUrl: '/media/images/pexels-thisisengineering-3861438.jpg' },
+    { id: 'm6', senderId: '1', type: 'video', content: '', timestamp: '9:27 AM', videoUrl: '/media/videos/video-12.mp4', videoDuration: '0:22' },
     { id: 'm7', senderId: '1', type: 'audio', content: 'Thank you.', timestamp: '9:28 AM', audioDuration: '0:04' },
   ],
   // App channel
@@ -184,7 +184,7 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'a1', senderId: '3', type: 'text', content: 'I would like to know if this new build fixes the crash on launch', timestamp: '10:10 PM', readCount: 8 },
     { id: 'a2', senderId: '6', type: 'video', content: 'Here is a screen recording of the crash', timestamp: '10:15 PM', videoUrl: '/media/videos/video-4.mp4', videoDuration: '0:35', readCount: 8 },
     { id: 'a3', senderId: '1', type: 'text', content: '@Ram can you try clearing the cache and reinstalling?', timestamp: '10:18 PM', readCount: 8 },
-    { id: 'a4', senderId: '6', type: 'image', content: 'This is the error I see after reinstalling', timestamp: '10:20 PM', imageUrl: '/media/images/pexels-kseniachernaya-5691639.jpg', readCount: 8 },
+    { id: 'a4', senderId: '6', type: 'video', content: 'This is the error I see after reinstalling', timestamp: '10:20 PM', videoUrl: '/media/videos/video-13.mp4', videoDuration: '0:18', readCount: 8 },
     { id: 'a5', senderId: '2', type: 'audio', content: 'Ok I found the issue, it was a missing migration on the database side. Pushing a fix now.', timestamp: '10:23 PM', readCount: 8 },
   ],
   // Voice to Voice PoC channel
@@ -200,13 +200,13 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'd1', senderId: '8', type: 'text', content: 'Hey, I just finished testing the glasses pairing flow', timestamp: '9:30 PM', readCount: 1 },
     { id: 'd2', senderId: '8', type: 'video', content: 'Check out this recording of the pairing sequence', timestamp: '9:32 PM', videoUrl: '/media/videos/video-7.mp4', videoDuration: '0:58', readCount: 1 },
     { id: 'd3', senderId: '1', type: 'text', content: 'Looks good! The animation is smooth', timestamp: '9:35 PM', readCount: 1 },
-    { id: 'd4', senderId: '8', type: 'image', content: '', timestamp: '9:38 PM', imageUrl: '/media/images/pexels-alexazabache-3757147.jpg', readCount: 1 },
+    { id: 'd4', senderId: '8', type: 'video', content: '', timestamp: '9:38 PM', videoUrl: '/media/videos/video-14.mp4', videoDuration: '0:25', readCount: 1 },
     { id: 'd5', senderId: '8', type: 'audio', content: 'Let me know if you want me to test anything else before we ship', timestamp: '9:43 PM', audioDuration: '0:08', readCount: 1 },
   ],
   // Airwave 500
   c5: [
     { id: 'aw1', senderId: '4', type: 'text', content: 'I see - the mobile experience for the leaderboard needs work', timestamp: '9:20 PM', readCount: 12 },
-    { id: 'aw2', senderId: '4', type: 'image', content: 'This is what it looks like on an iPhone SE', timestamp: '9:25 PM', imageUrl: '/media/images/pexels-thiagomobile-2317640.jpg', readCount: 12 },
+    { id: 'aw2', senderId: '4', type: 'video', content: 'This is what it looks like on an iPhone SE', timestamp: '9:25 PM', videoUrl: '/media/videos/video-1.mp4', videoDuration: '0:50', readCount: 12 },
     { id: 'aw3', senderId: '1', type: 'text', content: '@Darcy Bonner good catch, we need to adjust the layout for smaller screens', timestamp: '9:30 PM', readCount: 12 },
     { id: 'aw4', senderId: '7', type: 'video', content: 'Here is the full walkthrough on a small screen', timestamp: '9:35 PM', videoUrl: '/media/videos/video-6.mp4', videoDuration: '1:00', readCount: 12 },
     { id: 'aw5', senderId: '4', type: 'text', content: 'The points breakdown page is especially hard to read', timestamp: '9:39 PM', readCount: 12 },
@@ -214,7 +214,7 @@ export const chatMessages: Record<string, Message[]> = {
   // Sales Insights
   c6: [
     { id: 's1', senderId: '4', type: 'text', content: 'New lead from Delta Faucet - they want a demo next week', timestamp: '8:30 PM', readCount: 6 },
-    { id: 's2', senderId: '4', type: 'image', content: 'Their current warehouse setup', timestamp: '8:33 PM', imageUrl: '/media/images/pexels-tiger-lily-4481532.jpg', readCount: 6 },
+    { id: 's2', senderId: '4', type: 'video', content: 'Their current warehouse setup', timestamp: '8:33 PM', videoUrl: '/media/videos/video-12.mp4', videoDuration: '0:22', readCount: 6 },
     { id: 's3', senderId: '1', type: 'text', content: 'Great, I will set up the call. @Darcy Bonner can you prep the deck?', timestamp: '8:38 PM', readCount: 6 },
     { id: 's4', senderId: '7', type: 'audio', content: 'I spoke with their VP of operations, they are very interested in the hands free documentation feature', timestamp: '8:42 PM', audioDuration: '0:15', readCount: 6 },
   ],
@@ -228,7 +228,7 @@ export const chatMessages: Record<string, Message[]> = {
   // General
   c9: [
     { id: 'g1m', senderId: '6', type: 'text', content: 'Ram reacted 👍 to "@Pankaj Prasad great work on the release"', timestamp: '9:00 AM', readCount: 18 },
-    { id: 'g2m', senderId: '2', type: 'image', content: 'Team lunch today!', timestamp: '9:05 AM', imageUrl: '/media/images/pexels-jacobyclarkephoto-1579356.jpg', readCount: 18 },
+    { id: 'g2m', senderId: '2', type: 'video', content: 'Team lunch today!', timestamp: '9:05 AM', videoUrl: '/media/videos/video-11.mp4', videoDuration: '0:29', readCount: 18 },
     { id: 'g3m', senderId: '5', type: 'video', content: 'Office tour for the new hires', timestamp: '9:10 AM', videoUrl: '/media/videos/video-9.mp4', videoDuration: '0:31', readCount: 18 },
     { id: 'g4m', senderId: '8', type: 'text', content: 'Welcome aboard everyone! 🎉', timestamp: '9:15 AM', readCount: 18 },
     { id: 'g5m', senderId: '1', type: 'audio', content: 'Quick reminder - all hands meeting at 2pm today in the main conference room', timestamp: '9:22 AM', audioDuration: '0:11', readCount: 18 },
@@ -238,13 +238,13 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'db1', senderId: '4', type: 'text', content: 'Hey @Josh - I set up time with the Morgantown team for Thursday', timestamp: '8:50 AM', readCount: 1 },
     { id: 'db2', senderId: '1', type: 'text', content: 'Perfect, I will prep the demo glasses', timestamp: '8:55 AM', readCount: 1 },
     { id: 'db3', senderId: '4', type: 'video', content: 'BTW here is the walkthrough they sent of their facility', timestamp: '9:00 AM', videoUrl: '/media/videos/video-10.mp4', videoDuration: '0:41', readCount: 1 },
-    { id: 'db4', senderId: '4', type: 'image', content: 'And the floor plan', timestamp: '9:05 AM', imageUrl: '/media/images/pexels-cottonbro-4489737.jpg', readCount: 1 },
+    { id: 'db4', senderId: '4', type: 'video', content: 'And the floor plan', timestamp: '9:05 AM', videoUrl: '/media/videos/video-13.mp4', videoDuration: '0:18', readCount: 1 },
     { id: 'db5', senderId: '1', type: 'text', content: 'Got it, thanks! This will help with the demo setup', timestamp: '9:11 AM', readCount: 1 },
   ],
   // Design
   c11: [
     { id: 'de1', senderId: '7', type: 'text', content: 'Updated the mockups for the new settings page', timestamp: '8:30 AM', readCount: 7 },
-    { id: 'de2', senderId: '7', type: 'image', content: 'Here is the new layout', timestamp: '8:32 AM', imageUrl: '/media/images/pexels-thisisengineering-3861438.jpg', readCount: 7 },
+    { id: 'de2', senderId: '7', type: 'video', content: 'Here is the new layout', timestamp: '8:32 AM', videoUrl: '/media/videos/video-14.mp4', videoDuration: '0:25', readCount: 7 },
     { id: 'de3', senderId: '1', type: 'text', content: 'Love the clean look. Can we also update the icons?', timestamp: '8:38 AM', readCount: 7 },
     { id: 'de4', senderId: '7', type: 'video', content: 'Prototype animation of the transition', timestamp: '8:40 AM', videoUrl: '/media/videos/video-2.mp4', videoDuration: '1:18', readCount: 7 },
     { id: 'de5', senderId: '7', type: 'text', content: 'Will update icons in the next pass', timestamp: '8:45 AM', readCount: 7 },
@@ -252,7 +252,7 @@ export const chatMessages: Record<string, Message[]> = {
   // Releases
   c12: [
     { id: 'r1', senderId: '2', type: 'text', content: 'v2.96 deployed to prod. All smoke tests passing.', timestamp: '8:15 AM', readCount: 14 },
-    { id: 'r2', senderId: '2', type: 'image', content: 'Dashboard showing all green', timestamp: '8:18 AM', imageUrl: '/media/images/pexels-jopwell-1325725.jpg', readCount: 14 },
+    { id: 'r2', senderId: '2', type: 'video', content: 'Dashboard showing all green', timestamp: '8:18 AM', videoUrl: '/media/videos/video-1.mp4', videoDuration: '0:50', readCount: 14 },
     { id: 'r3', senderId: '6', type: 'video', content: 'Full regression test recording', timestamp: '8:22 AM', videoUrl: '/media/videos/mma-audit.mp4', videoDuration: '1:23', readCount: 14 },
     { id: 'r4', senderId: '1', type: 'text', content: 'Great work team. Smooth release. 🚀', timestamp: '8:30 AM', readCount: 14 },
   ],
