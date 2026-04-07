@@ -65,6 +65,46 @@ export interface Report {
   tags?: string[]
 }
 
+// --- Video Intelligence Report Types ---
+
+export interface OcrField {
+  id: string
+  label: string
+  value: string
+  confidence: number       // 0-1, Blue's confidence in the reading
+  frameTimestamp: number    // seconds into the video where this was captured
+  frameUrl: string         // source frame image URL
+  edited?: boolean         // tech corrected this field
+  editedValue?: string     // the corrected value
+}
+
+export interface DetectedObject {
+  id: string
+  label: string
+  count: number
+  confidence: number
+  frameTimestamp: number
+  frameUrl: string
+  details?: string         // e.g. "United Rentals" brand, serial number
+}
+
+export interface VideoIntelReport {
+  id: string
+  title: string
+  templateName: string
+  machine?: string
+  location?: string
+  technician: string
+  date: string
+  time: string
+  sourceVideoUrl: string
+  sourceVideoThumbnail: string
+  ocrFields: OcrField[]
+  detectedObjects: DetectedObject[]
+  summary: string
+  status: 'draft' | 'reviewed' | 'submitted'
+}
+
 export interface GalleryItem {
   id: string
   type: 'photo' | 'video'
@@ -465,4 +505,95 @@ export const reportTemplates = [
   { id: 'rt3', name: 'agi.csv', type: 'inspection' as const },
   { id: 'rt4', name: 'm07.csv', type: 'inspection' as const },
   { id: 'rt5', name: 'daily.csv', type: 'inspection' as const },
+]
+
+// --- Video Intelligence Reports ---
+// Mirrors the Delta Faucet Jackson whiteboard: HR | HOURLY GOAL | CUMULATIVE GOAL | HOURLY ACTUAL | CUMULATIVE ACTUAL
+const frameBase = '/media/images/pexels-cottonbro-4489737.jpg' // placeholder for source frames
+
+export const videoIntelReports: VideoIntelReport[] = [
+  {
+    id: 'vr1',
+    title: 'MT 06 Tool 104 — Hourly Production',
+    templateName: 'Hourly Production Tracking',
+    machine: 'MT 06 Tool 104',
+    location: 'Delta Faucet — Jackson, TN',
+    technician: 'Josh Lee',
+    date: 'Apr 07, 2026',
+    time: '3:42 PM CDT',
+    sourceVideoUrl: '/media/videos/video-1.mp4',
+    sourceVideoThumbnail: '/media/videos/video-1.mp4',
+    status: 'draft',
+    summary: 'Blue processed 48s of video from the production whiteboard at MT 06 Tool 104. OCR extracted hourly goal and actual production counts for 8 hours. Cumulative goal on track at 204 units. Hours 3 and 6 actual below target — flagged for review.',
+    ocrFields: [
+      // Hour 1
+      { id: 'ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.2, frameUrl: frameBase },
+      { id: 'ocr2', label: 'HR 1 — Cumulative Goal', value: '26', confidence: 0.82, frameTimestamp: 3.2, frameUrl: frameBase, edited: true, editedValue: '25' },
+      { id: 'ocr3', label: 'HR 1 — Hourly Actual', value: '27', confidence: 0.95, frameTimestamp: 18.4, frameUrl: frameBase },
+      { id: 'ocr4', label: 'HR 1 — Cumulative Actual', value: '27', confidence: 0.96, frameTimestamp: 18.4, frameUrl: frameBase },
+      // Hour 2
+      { id: 'ocr5', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 5.1, frameUrl: frameBase },
+      { id: 'ocr6', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 5.1, frameUrl: frameBase },
+      { id: 'ocr7', label: 'HR 2 — Hourly Actual', value: '26', confidence: 0.93, frameTimestamp: 20.1, frameUrl: frameBase },
+      { id: 'ocr8', label: 'HR 2 — Cumulative Actual', value: '53', confidence: 0.90, frameTimestamp: 20.1, frameUrl: frameBase },
+      // Hour 3
+      { id: 'ocr9', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 7.8, frameUrl: frameBase },
+      { id: 'ocr10', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 7.8, frameUrl: frameBase },
+      { id: 'ocr11', label: 'HR 3 — Hourly Actual', value: '19', confidence: 0.88, frameTimestamp: 22.5, frameUrl: frameBase },
+      { id: 'ocr12', label: 'HR 3 — Cumulative Actual', value: '72', confidence: 0.85, frameTimestamp: 22.5, frameUrl: frameBase },
+      // Hour 4
+      { id: 'ocr13', label: 'HR 4 — Hourly Goal', value: '29', confidence: 0.93, frameTimestamp: 10.3, frameUrl: frameBase },
+      { id: 'ocr14', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 10.3, frameUrl: frameBase },
+      { id: 'ocr15', label: 'HR 4 — Hourly Actual', value: '31', confidence: 0.92, frameTimestamp: 25.0, frameUrl: frameBase },
+      { id: 'ocr16', label: 'HR 4 — Cumulative Actual', value: '103', confidence: 0.79, frameTimestamp: 25.0, frameUrl: frameBase, edited: true, editedValue: '104' },
+      // Hour 5
+      { id: 'ocr17', label: 'HR 5 — Hourly Goal', value: '26', confidence: 0.95, frameTimestamp: 12.6, frameUrl: frameBase },
+      { id: 'ocr18', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.84, frameTimestamp: 12.6, frameUrl: frameBase },
+      { id: 'ocr19', label: 'HR 5 — Hourly Actual', value: '25', confidence: 0.91, frameTimestamp: 28.2, frameUrl: frameBase },
+      { id: 'ocr20', label: 'HR 5 — Cumulative Actual', value: '129', confidence: 0.90, frameTimestamp: 28.2, frameUrl: frameBase },
+      // Hour 6
+      { id: 'ocr21', label: 'HR 6 — Hourly Goal', value: '25', confidence: 0.94, frameTimestamp: 15.0, frameUrl: frameBase },
+      { id: 'ocr22', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.78, frameTimestamp: 15.0, frameUrl: frameBase },
+      { id: 'ocr23', label: 'HR 6 — Hourly Actual', value: '21', confidence: 0.86, frameTimestamp: 31.5, frameUrl: frameBase },
+      { id: 'ocr24', label: 'HR 6 — Cumulative Actual', value: '150', confidence: 0.83, frameTimestamp: 31.5, frameUrl: frameBase },
+      // Hour 7
+      { id: 'ocr25', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 17.4, frameUrl: frameBase },
+      { id: 'ocr26', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 17.4, frameUrl: frameBase },
+      { id: 'ocr27', label: 'HR 7 — Hourly Actual', value: '30', confidence: 0.90, frameTimestamp: 34.0, frameUrl: frameBase },
+      { id: 'ocr28', label: 'HR 7 — Cumulative Actual', value: '180', confidence: 0.88, frameTimestamp: 34.0, frameUrl: frameBase },
+      // Hour 8
+      { id: 'ocr29', label: 'HR 8 — Hourly Goal', value: '26', confidence: 0.93, frameTimestamp: 19.8, frameUrl: frameBase },
+      { id: 'ocr30', label: 'HR 8 — Cumulative Goal', value: '204', confidence: 0.81, frameTimestamp: 19.8, frameUrl: frameBase },
+      { id: 'ocr31', label: 'HR 8 — Hourly Actual', value: '28', confidence: 0.89, frameTimestamp: 37.2, frameUrl: frameBase },
+      { id: 'ocr32', label: 'HR 8 — Cumulative Actual', value: '208', confidence: 0.85, frameTimestamp: 37.2, frameUrl: frameBase },
+    ],
+    detectedObjects: [],
+  },
+  {
+    id: 'vr2',
+    title: 'Yard Equipment Inventory',
+    templateName: 'Equipment Audit',
+    location: 'Jackson Yard — Bay 1-2',
+    technician: 'Josh Lee',
+    date: 'Apr 07, 2026',
+    time: '2:15 PM CDT',
+    sourceVideoUrl: '/media/videos/video-3.mp4',
+    sourceVideoThumbnail: '/media/videos/video-3.mp4',
+    status: 'reviewed',
+    summary: 'Blue processed 32s of video from the equipment yard. Object detection identified 3 scissor lifts, 2 boom lifts, and 1 forklift. OCR captured serial number T169894 from a United Rentals scissor lift and bay numbers 1 and 2.',
+    ocrFields: [
+      { id: 'yocr1', label: 'Bay Number (Left)', value: '2', confidence: 0.98, frameTimestamp: 2.0, frameUrl: frameBase },
+      { id: 'yocr2', label: 'Bay Number (Right)', value: '1', confidence: 0.99, frameTimestamp: 2.0, frameUrl: frameBase },
+      { id: 'yocr3', label: 'Scissor Lift Serial', value: 'T169894', confidence: 0.92, frameTimestamp: 24.5, frameUrl: frameBase },
+      { id: 'yocr4', label: 'Scissor Lift Brand', value: 'United Rentals', confidence: 0.95, frameTimestamp: 24.5, frameUrl: frameBase },
+      { id: 'yocr5', label: 'Dumpster Service', value: 'Republic Services', confidence: 0.97, frameTimestamp: 5.0, frameUrl: frameBase },
+    ],
+    detectedObjects: [
+      { id: 'obj1', label: 'Scissor Lift', count: 3, confidence: 0.94, frameTimestamp: 12.0, frameUrl: frameBase, details: 'Orange/yellow, United Rentals' },
+      { id: 'obj2', label: 'Boom Lift', count: 2, confidence: 0.91, frameTimestamp: 14.5, frameUrl: frameBase, details: 'Blue Genie, Red MEC' },
+      { id: 'obj3', label: 'Forklift', count: 1, confidence: 0.96, frameTimestamp: 3.0, frameUrl: frameBase, details: 'Yellow, near Bay 2' },
+      { id: 'obj4', label: 'Dumpster', count: 1, confidence: 0.98, frameTimestamp: 5.0, frameUrl: frameBase, details: 'Republic Services, blue' },
+      { id: 'obj5', label: 'Traffic Cone', count: 1, confidence: 0.99, frameTimestamp: 4.0, frameUrl: frameBase },
+    ],
+  },
 ]
