@@ -223,7 +223,7 @@ export function MessageBubble({
                       const v = e.currentTarget
                       if (v.duration > 0.5) v.currentTime = 0.5
                     }}
-                    style={{ width: '100%', height: 183, objectFit: 'cover', display: 'block', pointerEvents: 'none', background: '#000' }}
+                    style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block', pointerEvents: 'none', background: '#000' }}
                   />
                   {/* Play button — 40x40, gray, centered (matches production) */}
                   <div style={{

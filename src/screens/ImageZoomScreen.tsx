@@ -22,8 +22,18 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const videoSrc = directVideoUrl || item.videoUrl
   const imageSrc = directImageUrl || item.thumbnail
 
+  // Freeze params for screen export
+  const freezeState = params?.freezeState as boolean | undefined
+  const initialScale = (params?.initialScale as number) ?? 1
+  const initialSpeed = (params?.initialSpeed as number) ?? 1
+  const initialPaused = params?.initialPaused as boolean | undefined
+  const initialMuted = params?.initialMuted as boolean | undefined
+  const initialReversed = params?.initialReversed as boolean | undefined
+  const initialProgress = (params?.initialProgress as number) ?? 0
+  const initialDuration = (params?.initialDuration as number) ?? 48
+
   // Zoom & pan
-  const [scale, setScale] = useState(1)
+  const [scale, setScale] = useState(freezeState ? initialScale : 1)
   const [translate, setTranslate] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef({ x: 0, y: 0 })
@@ -33,14 +43,14 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const videoRef = useRef<HTMLVideoElement>(null)
   const scrubRef = useRef<HTMLDivElement>(null)
   const reverseIntervalRef = useRef<number>(0)
-  const [isPlaying, setIsPlaying] = useState(true)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [isMuted, setIsMuted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(freezeState ? !initialPaused : true)
+  const [currentTime, setCurrentTime] = useState(freezeState ? initialProgress * initialDuration : 0)
+  const [duration, setDuration] = useState(freezeState ? initialDuration : 0)
+  const [progress, setProgress] = useState(freezeState ? initialProgress : 0)
+  const [isMuted, setIsMuted] = useState(freezeState ? !!initialMuted : false)
   const [isScrubbing, setIsScrubbing] = useState(false)
-  const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  const [isReversed, setIsReversed] = useState(false)
+  const [playbackSpeed, setPlaybackSpeed] = useState(freezeState ? initialSpeed : 1)
+  const [isReversed, setIsReversed] = useState(freezeState ? !!initialReversed : false)
 
   const cycleSpeed = () => {
     const idx = SPEEDS.indexOf(playbackSpeed)
@@ -153,15 +163,21 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           <video
             ref={videoRef}
             src={videoSrc}
-            autoPlay
+            autoPlay={!freezeState}
             playsInline
-            muted={isMuted}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
+            muted={isMuted || !!freezeState}
+            onPlay={() => { if (!freezeState) setIsPlaying(true) }}
+            onPause={() => { if (!freezeState) setIsPlaying(false) }}
             onEnded={() => setIsPlaying(false)}
             onLoadedMetadata={() => {
               if (videoRef.current) {
-                setDuration(videoRef.current.duration)
+                if (freezeState) {
+                  videoRef.current.pause()
+                  videoRef.current.currentTime = initialProgress * (videoRef.current.duration || initialDuration)
+                  setDuration(videoRef.current.duration || initialDuration)
+                } else {
+                  setDuration(videoRef.current.duration)
+                }
                 videoRef.current.playbackRate = playbackSpeed
               }
             }}
