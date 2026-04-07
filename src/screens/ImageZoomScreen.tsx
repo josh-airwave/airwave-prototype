@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { colors } from '../styles/theme'
+import React, { useState, useRef } from 'react'
+import { colors, fonts, radius } from '../styles/theme'
 import { useNavigation } from '../navigation/Router'
 import { galleryItems } from '../data/mock'
 
@@ -8,6 +8,8 @@ function formatTime(s: number) {
   const sec = Math.floor(s % 60)
   return `${m}:${String(sec).padStart(2, '0')}`
 }
+
+const SPEEDS = [1, 1.5, 2, 0.5]
 
 export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
@@ -20,97 +22,59 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const videoSrc = directVideoUrl || item.videoUrl
   const imageSrc = directImageUrl || item.thumbnail
 
+  // Zoom & pan
   const [scale, setScale] = useState(1)
   const [translate, setTranslate] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
+  const dragStart = useRef({ x: 0, y: 0 })
+  const translateStart = useRef({ x: 0, y: 0 })
+
+  // Video state
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const scrubRef = useRef<HTMLDivElement>(null)
+  const reverseIntervalRef = useRef<number>(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [progress, setProgress] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
   const [isScrubbing, setIsScrubbing] = useState(false)
-  const [showControls, setShowControls] = useState(true)
-  const dragStart = useRef({ x: 0, y: 0 })
-  const translateStart = useRef({ x: 0, y: 0 })
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const scrubRef = useRef<HTMLDivElement>(null)
-  const controlsTimer = useRef<number>(0)
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [isReversed, setIsReversed] = useState(false)
 
-  // Auto-hide controls after 3 seconds of inactivity
-  useEffect(() => {
-    if (!isVideo) return
-    const resetTimer = () => {
-      setShowControls(true)
-      clearTimeout(controlsTimer.current)
-      controlsTimer.current = window.setTimeout(() => {
-        if (isPlaying) setShowControls(false)
-      }, 3000)
-    }
-    resetTimer()
-    return () => clearTimeout(controlsTimer.current)
-  }, [isPlaying, isVideo])
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault()
-    const delta = e.deltaY > 0 ? -0.1 : 0.1
-    setScale(prev => Math.max(1, Math.min(5, prev + delta)))
+  const cycleSpeed = () => {
+    const idx = SPEEDS.indexOf(playbackSpeed)
+    const next = SPEEDS[(idx + 1) % SPEEDS.length]
+    setPlaybackSpeed(next)
+    if (videoRef.current) videoRef.current.playbackRate = next
   }
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale <= 1) return
-    setIsDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY }
-    translateStart.current = { ...translate }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      const dx = e.clientX - dragStart.current.x
-      const dy = e.clientY - dragStart.current.y
-      setTranslate({
-        x: translateStart.current.x + dx,
-        y: translateStart.current.y + dy,
-      })
-    }
-    if (isScrubbing && scrubRef.current && videoRef.current) {
-      const rect = scrubRef.current.getBoundingClientRect()
-      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-      setProgress(x)
-      videoRef.current.currentTime = x * (videoRef.current.duration || 0)
-      setCurrentTime(videoRef.current.currentTime)
-    }
-    // Show controls on mouse move
-    if (isVideo) {
-      setShowControls(true)
-      clearTimeout(controlsTimer.current)
-      controlsTimer.current = window.setTimeout(() => {
-        if (isPlaying) setShowControls(false)
-      }, 3000)
-    }
-  }
-
-  const handleMouseUp = () => {
-    setIsDragging(false)
-    setIsScrubbing(false)
-  }
-
-  const handleDoubleClick = () => {
-    if (scale > 1) {
-      setScale(1)
-      setTranslate({ x: 0, y: 0 })
-    } else if (!isVideo) {
-      setScale(2.5)
-    }
-  }
-
-  const handleMediaClick = () => {
-    if (scale > 1) return
-    if (isVideo && videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause()
-      } else {
-        videoRef.current.play()
+  const startReverseInterval = (v: HTMLVideoElement, speed: number) => {
+    clearInterval(reverseIntervalRef.current)
+    const step = 1 / 30
+    reverseIntervalRef.current = window.setInterval(() => {
+      if (v.currentTime <= 0) {
+        clearInterval(reverseIntervalRef.current)
+        setIsPlaying(false)
+        return
       }
+      v.currentTime = Math.max(0, v.currentTime - step * speed)
+      setCurrentTime(v.currentTime)
+      setProgress(v.duration ? v.currentTime / v.duration : 0)
+    }, 1000 / 30)
+  }
+
+  const toggleReverse = () => {
+    const v = videoRef.current
+    if (!v) return
+    if (isReversed) {
+      clearInterval(reverseIntervalRef.current)
+      setIsReversed(false)
+      if (isPlaying) v.play()
+    } else {
+      v.pause()
+      setIsReversed(true)
+      if (isPlaying) startReverseInterval(v, playbackSpeed)
     }
   }
 
@@ -122,12 +86,25 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : isVideo ? 'pointer' : 'zoom-in',
         userSelect: 'none',
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseMove={(e) => {
+        if (isDragging) {
+          setTranslate({
+            x: translateStart.current.x + (e.clientX - dragStart.current.x),
+            y: translateStart.current.y + (e.clientY - dragStart.current.y),
+          })
+        }
+        if (isScrubbing && scrubRef.current && videoRef.current) {
+          const rect = scrubRef.current.getBoundingClientRect()
+          const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+          setProgress(x)
+          videoRef.current.currentTime = x * (videoRef.current.duration || 0)
+          setCurrentTime(videoRef.current.currentTime)
+        }
+      }}
+      onMouseUp={() => { setIsDragging(false); setIsScrubbing(false) }}
+      onMouseLeave={() => { setIsDragging(false); setIsScrubbing(false) }}
     >
       {/* Media area */}
       <div
@@ -138,11 +115,39 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
         }}
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onDoubleClick={handleDoubleClick}
-        onClick={handleMediaClick}
+        onWheel={(e) => {
+          e.preventDefault()
+          const delta = e.deltaY > 0 ? -0.15 : 0.15
+          setScale(prev => Math.max(1, Math.min(5, prev + delta)))
+        }}
+        onDoubleClick={() => {
+          if (scale > 1) { setScale(1); setTranslate({ x: 0, y: 0 }) }
+          else { setScale(2.5) }
+        }}
+        onMouseDown={(e) => {
+          if (scale > 1) {
+            setIsDragging(true)
+            dragStart.current = { x: e.clientX, y: e.clientY }
+            translateStart.current = { ...translate }
+          }
+        }}
+        onClick={() => {
+          if (scale <= 1 && isVideo && videoRef.current) {
+            if (isReversed) {
+              if (isPlaying) {
+                clearInterval(reverseIntervalRef.current)
+                setIsPlaying(false)
+              } else {
+                startReverseInterval(videoRef.current, playbackSpeed)
+                setIsPlaying(true)
+              }
+            } else {
+              if (isPlaying) { videoRef.current.pause() } else { videoRef.current.play() }
+            }
+          }
+        }}
       >
         {isVideo && videoSrc ? (
           <video
@@ -155,7 +160,10 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             onPause={() => setIsPlaying(false)}
             onEnded={() => setIsPlaying(false)}
             onLoadedMetadata={() => {
-              if (videoRef.current) setDuration(videoRef.current.duration)
+              if (videoRef.current) {
+                setDuration(videoRef.current.duration)
+                videoRef.current.playbackRate = playbackSpeed
+              }
             }}
             onTimeUpdate={() => {
               const v = videoRef.current
@@ -165,9 +173,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
               }
             }}
             style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-              objectFit: 'contain',
+              width: '100%', height: '100%', objectFit: 'cover',
               transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
               transition: isDragging ? 'none' : 'transform 0.2s ease-out',
             }}
@@ -178,212 +184,190 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             alt=""
             draggable={false}
             style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-              objectFit: 'contain',
+              maxWidth: '100%', maxHeight: '100%', objectFit: 'contain',
               transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
               transition: isDragging ? 'none' : 'transform 0.2s ease-out',
             }}
           />
         )}
 
-        {/* Pause overlay */}
-        {isVideo && !isPlaying && (
+        {/* Timecode — top right, matching ShareView */}
+        {isVideo && duration > 0 && (
           <div style={{
-            position: 'absolute',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: 'absolute', top: 6, right: 6, background: '#1A1A1A', color: colors.white,
+            fontSize: '24px', fontFamily: fonts.family, fontWeight: fonts.weight.semibold,
+            padding: '4px 12px', borderRadius: 8, textAlign: 'right', lineHeight: 'normal',
             pointerEvents: 'none',
           }}>
-            <div style={{
-              width: 64, height: 64, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-                <polygon points="7,3 21,12 7,21" />
-              </svg>
-            </div>
+            {formatTime(duration - currentTime)}
           </div>
         )}
-      </div>
 
-      {/* Video controls bar */}
-      {isVideo && (
-        <div style={{
-          position: 'absolute',
-          bottom: 70,
-          left: 0,
-          right: 0,
-          padding: '0 16px',
-          opacity: showControls ? 1 : 0,
-          transition: 'opacity 0.3s',
-          pointerEvents: showControls ? 'auto' : 'none',
-        }}>
-          {/* Scrubber bar */}
+        {/* Scrubber — matching ShareView style */}
+        {isVideo && (
           <div
             ref={scrubRef}
             onMouseDown={(e) => {
               e.stopPropagation()
               setIsScrubbing(true)
-              const rect = scrubRef.current!.getBoundingClientRect()
-              const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-              setProgress(x)
-              if (videoRef.current) {
+              if (scrubRef.current && videoRef.current) {
+                const rect = scrubRef.current.getBoundingClientRect()
+                const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+                setProgress(x)
                 videoRef.current.currentTime = x * (videoRef.current.duration || 0)
                 setCurrentTime(videoRef.current.currentTime)
               }
             }}
+            onClick={(e) => e.stopPropagation()}
             style={{
-              height: 20,
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
+              position: 'absolute', bottom: 24, left: 16, right: 16, height: 20,
+              borderRadius: 100, cursor: 'pointer', zIndex: 5,
             }}
           >
             <div style={{
-              width: '100%',
-              height: 3,
-              background: 'rgba(255,255,255,0.3)',
-              borderRadius: 2,
-              position: 'relative',
+              position: 'absolute', inset: 0, background: colors.white,
+              border: `2px solid ${colors.primary}`, borderRadius: 100,
+            }} />
+            <div style={{
+              position: 'absolute', top: 0, left: 0, bottom: 0,
+              width: `${progress * 100}%`, minWidth: 4,
+              background: '#2D81FF', border: '2px solid #ADCEFF',
+              borderRadius: '100px 0 0 100px',
+            }} />
+            <div style={{
+              position: 'absolute', top: -12,
+              left: `calc(${progress * 100}% - 8px)`,
+              width: 16, height: 44, borderRadius: 10,
+              background: '#F2F5F9', border: '2px solid white',
+              boxShadow: '0 4px 4px rgba(0,0,0,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <div style={{
-                width: `${progress * 100}%`,
-                height: '100%',
-                background: colors.white,
-                borderRadius: 2,
-              }} />
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: `${progress * 100}%`,
-                transform: 'translate(-50%, -50%)',
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: colors.white,
-                boxShadow: '0 0 4px rgba(0,0,0,0.5)',
-              }} />
+              <div style={{ width: 2, height: 28, background: '#DFDFDF' }} />
             </div>
           </div>
+        )}
 
-          {/* Controls row */}
+        {/* Zoom indicator */}
+        {scale > 1 && (
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '4px 0',
+            position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: 13,
+            padding: '4px 12px', borderRadius: 12, pointerEvents: 'none',
           }}>
-            {/* Left: play/pause + timecode */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (videoRef.current) {
-                    if (isPlaying) videoRef.current.pause()
-                    else videoRef.current.play()
-                  }
-                }}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  padding: 4, display: 'flex', alignItems: 'center',
-                }}
-              >
-                {isPlaying ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <rect x="5" y="3" width="5" height="18" rx="1" />
-                    <rect x="14" y="3" width="5" height="18" rx="1" />
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                    <polygon points="6,3 20,12 6,21" />
-                  </svg>
-                )}
-              </button>
-              <span style={{
-                color: 'rgba(255,255,255,0.8)',
-                fontSize: 12,
-                fontFamily: "'Outfit', sans-serif",
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
-            </div>
+            {Math.round(scale * 100)}%
+          </div>
+        )}
+      </div>
 
-            {/* Right: mute */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsMuted(!isMuted)
-                if (videoRef.current) videoRef.current.muted = !isMuted
-              }}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: 4, display: 'flex', alignItems: 'center',
-              }}
-            >
+      {/* Bottom controls — matching ShareView exactly */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '8px 20px 32px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Play/Pause */}
+          {isVideo && (
+            <button onClick={() => {
+              const v = videoRef.current; if (!v) return
+              if (isPlaying) {
+                if (isReversed) clearInterval(reverseIntervalRef.current)
+                else v.pause()
+                setIsPlaying(false)
+              } else {
+                if (isReversed) startReverseInterval(v, playbackSpeed)
+                else v.play()
+                setIsPlaying(true)
+              }
+            }} style={{
+              width: 40, height: 40, borderRadius: radius.md, background: colors.primary,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none', cursor: 'pointer',
+            }}>
+              {isPlaying ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+              )}
+            </button>
+          )}
+          {/* Speed */}
+          {isVideo && (
+            <button onClick={cycleSpeed} style={{
+              height: 40, borderRadius: radius.md, paddingInline: 10,
+              background: playbackSpeed !== 1 ? colors.primary : 'rgba(255,255,255,0.15)',
+              color: 'white', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 13, fontWeight: fonts.weight.bold, gap: 4,
+              fontFamily: fonts.family,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+              {playbackSpeed}x
+            </button>
+          )}
+          {/* Reverse */}
+          {isVideo && (
+            <button onClick={toggleReverse} style={{
+              width: 40, height: 40, borderRadius: radius.md,
+              background: isReversed ? colors.primary : 'rgba(255,255,255,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none', cursor: 'pointer',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="19,20 9,12 19,4" />
+                <line x1="5" y1="4" x2="5" y2="20" />
+              </svg>
+            </button>
+          )}
+          {/* Mute/Unmute */}
+          {isVideo && (
+            <button onClick={() => {
+              const next = !isMuted
+              setIsMuted(next)
+              if (videoRef.current) videoRef.current.muted = next
+            }} style={{
+              width: 40, height: 40, borderRadius: radius.md,
+              background: 'rgba(255,255,255,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none', cursor: 'pointer',
+            }}>
               {isMuted ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                   <line x1="23" y1="9" x2="17" y2="15" />
                   <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="white" />
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
                 </svg>
               )}
             </button>
-          </div>
+          )}
         </div>
-      )}
-
-      {/* Close button */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '16px 0 36px',
-      }}>
+        {/* Close */}
         <button
-          onClick={(e) => { e.stopPropagation(); videoRef.current?.pause(); pop() }}
+          onClick={(e) => { e.stopPropagation(); clearInterval(reverseIntervalRef.current); videoRef.current?.pause(); pop() }}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.15)',
-            border: '2px solid rgba(255,255,255,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            width: 40, height: 40, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
-
-      {/* Zoom indicator (images only) */}
-      {!isVideo && scale > 1 && (
-        <div style={{
-          position: 'absolute',
-          top: 60,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(0,0,0,0.6)',
-          color: colors.white,
-          fontSize: 13,
-          padding: '4px 12px',
-          borderRadius: 12,
-        }}>
-          {Math.round(scale * 100)}%
-        </div>
-      )}
     </div>
   )
 }

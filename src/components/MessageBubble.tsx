@@ -150,22 +150,6 @@ export function MessageBubble({
             position: 'relative',
             overflow: 'hidden',
           }}>
-            {/* Share icon — top right of bubble */}
-            {!message.failed && (isStandalone || isFirstInGroup) && message.type !== 'system' && (
-              <div style={{
-                position: 'absolute',
-                top: 6,
-                right: 6,
-                zIndex: 2,
-                opacity: 0.3,
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                  <polyline points="16 6 12 2 8 6" />
-                  <line x1="12" y1="2" x2="12" y2="15" />
-                </svg>
-              </div>
-            )}
 
             {/* Image messages — tappable, with optional text below */}
             {message.type === 'image' && message.imageUrl && (
@@ -220,36 +204,57 @@ export function MessageBubble({
               </div>
             )}
 
-            {/* Video messages — thumbnail with play overlay, tap opens ShareView */}
-            {message.type === 'video' && message.imageUrl && (
+            {/* Video messages — video thumbnail with play overlay, tap opens fullscreen */}
+            {message.type === 'video' && message.videoUrl && (
               <div>
                 <div
                   onClick={() => {
                     push('ImageZoom', { itemId: message.id, videoUrl: message.videoUrl, imageUrl: message.imageUrl })
                   }}
-                  style={{ cursor: 'pointer', position: 'relative' }}
+                  style={{ cursor: 'pointer', position: 'relative', borderRadius: 8, overflow: 'hidden' }}
                 >
-                  <img
-                    src={message.imageUrl}
-                    alt=""
-                    style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }}
+                  <video
+                    src={message.videoUrl}
+                    muted
+                    playsInline
+                    preload="metadata"
+                    onLoadedData={(e) => {
+                      // Seek to 0.5s to get a representative frame as thumbnail
+                      const v = e.currentTarget
+                      if (v.duration > 0.5) v.currentTime = 0.5
+                    }}
+                    style={{ width: '100%', height: 183, objectFit: 'cover', display: 'block', pointerEvents: 'none', background: '#000' }}
                   />
-                  {/* Play overlay */}
+                  {/* Play button — 40x40, gray, centered (matches production) */}
                   <div style={{
                     position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.25)',
                   }}>
                     <div style={{
-                      width: 52, height: 52, borderRadius: '50%',
-                      background: 'rgba(0,0,0,0.5)',
+                      width: 40, height: 40, borderRadius: '50%',
+                      background: 'rgba(128,128,128,0.7)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 1,
                     }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
                         <polygon points="7,3 21,12 7,21" />
                       </svg>
                     </div>
                   </div>
+                  {/* Duration label — bottom right (matches production) */}
+                  {message.videoDuration && (
+                    <div style={{
+                      position: 'absolute', bottom: 8, right: 8,
+                      background: 'rgba(0,0,0,0.6)',
+                      borderRadius: 4, padding: '2px 6px',
+                      zIndex: 2,
+                    }}>
+                      <span style={{
+                        color: '#fff', fontSize: 12, fontWeight: 500,
+                        fontFamily: fonts.family,
+                      }}>{message.videoDuration}</span>
+                    </div>
+                  )}
                 </div>
                 {message.content && (
                   <div style={{

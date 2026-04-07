@@ -28,16 +28,30 @@ function pauseAllVideos() {
 }
 
 export function ScreenExporter() {
+  try {
+    return <ScreenExporterInner />
+  } catch (e) {
+    console.warn('[ScreenExporter] render error, skipping:', e)
+    return null
+  }
+}
+
+function ScreenExporterInner() {
   const { reset } = useNavigation()
   const [exporting, setExporting] = useState(false)
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
+  const [error, setError] = useState(false)
   const busyRef = useRef(false)
+
+  // If we've errored, just bail
+  if (error) return null
 
   const doExport = useCallback(async () => {
     if (busyRef.current) return
-    const { feature, screens } = CURRENT_EXPORT
-    if (screens.length === 0) return
+    try {
+      const { feature, screens } = CURRENT_EXPORT
+      if (screens.length === 0) return
 
     busyRef.current = true
     setExporting(true)
@@ -117,6 +131,12 @@ export function ScreenExporter() {
     reset('ChannelList')
     setExporting(false)
     busyRef.current = false
+    } catch (err) {
+      console.warn('[ScreenExporter] export error:', err)
+      setError(true)
+      setExporting(false)
+      busyRef.current = false
+    }
   }, [reset])
 
   useEffect(() => {

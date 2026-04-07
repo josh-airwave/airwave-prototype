@@ -43,6 +43,7 @@ export interface Message {
   audioDuration?: string
   imageUrl?: string
   videoUrl?: string             // Video URL for video messages
+  videoDuration?: string        // Duration label for video thumbnail e.g. "0:48"
   linkPreview?: { title: string; url: string; image?: string }
   replyTo?: string
   replyCount?: number        // Thread reply pill count
@@ -163,10 +164,11 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'b4', senderId: '6', type: 'image', content: '@vijay am getting summary but i don\'t get the proper responses in DMV @Vijai anand', timestamp: '11:04 PM', date: 'Friday, Apr 03', imageUrl: '/media/images/pexels-jopwell-1325725.jpg', readCount: 15 },
 
     // --- Today, Apr 06 ---
-    { id: 'b5', senderId: '5', type: 'link', content: '', timestamp: '11:05 PM', date: 'Today, Apr 06', linkPreview: { title: 'stagecoreapi.wvlnth.net', url: 'stagecoreapi.wvlnth.net', image: 'https://placehold.co/400x200/165BC3/165BC3?text=+' } },
-    { id: 'b6', senderId: '5', type: 'text', content: '@Sundar is this the final URL? https://stagecoreapi.wvlnth.net/sg_firmwares', timestamp: '11:05 PM', date: 'Today, Apr 06' },
-    { id: 'b7', senderId: '5', type: 'text', content: 'I\'m getting error 401', timestamp: '11:06 PM', date: 'Today, Apr 06' },
-    { id: 'b8', senderId: '5', type: 'audio', content: 'oh, my mistake, not sending the token... sorry', timestamp: '11:06 PM', date: 'Today, Apr 06', failed: true, readCount: 13, heardCount: 1 },
+    { id: 'b5', senderId: '2', type: 'video', content: 'Here is the firmware OTA update flow recording', timestamp: '10:58 PM', date: 'Today, Apr 06', videoUrl: '/media/videos/video-5.mp4', videoDuration: '0:14', readCount: 15 },
+    { id: 'b6', senderId: '5', type: 'link', content: '', timestamp: '11:05 PM', date: 'Today, Apr 06', linkPreview: { title: 'stagecoreapi.wvlnth.net', url: 'stagecoreapi.wvlnth.net', image: 'https://placehold.co/400x200/165BC3/165BC3?text=+' } },
+    { id: 'b7', senderId: '5', type: 'text', content: '@Sundar is this the final URL? https://stagecoreapi.wvlnth.net/sg_firmwares', timestamp: '11:05 PM', date: 'Today, Apr 06' },
+    { id: 'b8', senderId: '5', type: 'text', content: 'I\'m getting error 401', timestamp: '11:06 PM', date: 'Today, Apr 06' },
+    { id: 'b9', senderId: '5', type: 'audio', content: 'oh, my mistake, not sending the token... sorry', timestamp: '11:06 PM', date: 'Today, Apr 06', failed: true, readCount: 13, heardCount: 1 },
   ],
   c7: [
     { id: 'm1', senderId: '2', type: 'link', content: '', timestamp: '9:25 AM', linkPreview: { title: 'BES Progress', url: 'web.wvlnth.net/dashboard', image: 'https://placehold.co/400x220/165BC3/ffffff?text=BES+Progress' } },
@@ -180,7 +182,7 @@ export const chatMessages: Record<string, Message[]> = {
   // App channel
   c2: [
     { id: 'a1', senderId: '3', type: 'text', content: 'I would like to know if this new build fixes the crash on launch', timestamp: '10:10 PM', readCount: 8 },
-    { id: 'a2', senderId: '6', type: 'video', content: 'Here is a screen recording of the crash', timestamp: '10:15 PM', imageUrl: '/media/images/pexels-tiger-lily-4481258.jpg', videoUrl: '/media/videos/video-4.mp4', readCount: 8 },
+    { id: 'a2', senderId: '6', type: 'video', content: 'Here is a screen recording of the crash', timestamp: '10:15 PM', videoUrl: '/media/videos/video-4.mp4', videoDuration: '0:35', readCount: 8 },
     { id: 'a3', senderId: '1', type: 'text', content: '@Ram can you try clearing the cache and reinstalling?', timestamp: '10:18 PM', readCount: 8 },
     { id: 'a4', senderId: '6', type: 'image', content: 'This is the error I see after reinstalling', timestamp: '10:20 PM', imageUrl: '/media/images/pexels-kseniachernaya-5691639.jpg', readCount: 8 },
     { id: 'a5', senderId: '2', type: 'audio', content: 'Ok I found the issue, it was a missing migration on the database side. Pushing a fix now.', timestamp: '10:23 PM', readCount: 8 },
@@ -189,14 +191,14 @@ export const chatMessages: Record<string, Message[]> = {
   c3: [
     { id: 'v1', senderId: '1', type: 'text', content: 'Could you please remember to test the voice latency with the new endpoint?', timestamp: '9:31 AM', readCount: 5 },
     { id: 'v2', senderId: '2', type: 'text', content: 'Yes, testing now. The voice options are pretty good actually.', timestamp: '9:45 PM', readCount: 5 },
-    { id: 'v3', senderId: '5', type: 'video', content: 'Quick demo of the voice response time', timestamp: '9:48 PM', imageUrl: '/media/images/pexels-cottonbro-4489765.jpg', videoUrl: '/media/videos/video-3.mp4', readCount: 5 },
+    { id: 'v3', senderId: '5', type: 'video', content: 'Quick demo of the voice response time', timestamp: '9:48 PM', videoUrl: '/media/videos/video-3.mp4', videoDuration: '0:15', readCount: 5 },
     { id: 'v4', senderId: '5', type: 'audio', content: 'Quick update on the voice testing', timestamp: '9:50 PM', audioDuration: '0:32', readCount: 5 },
     { id: 'v5', senderId: '2', type: 'text', content: 'Latency is around 200ms which is acceptable', timestamp: '9:52 PM', readCount: 5 },
   ],
   // Murali DM
   c4: [
     { id: 'd1', senderId: '8', type: 'text', content: 'Hey, I just finished testing the glasses pairing flow', timestamp: '9:30 PM', readCount: 1 },
-    { id: 'd2', senderId: '8', type: 'video', content: 'Check out this recording of the pairing sequence', timestamp: '9:32 PM', imageUrl: '/media/images/pexels-watorious-4025501.jpg', videoUrl: '/media/videos/video-7.mp4', readCount: 1 },
+    { id: 'd2', senderId: '8', type: 'video', content: 'Check out this recording of the pairing sequence', timestamp: '9:32 PM', videoUrl: '/media/videos/video-7.mp4', videoDuration: '0:58', readCount: 1 },
     { id: 'd3', senderId: '1', type: 'text', content: 'Looks good! The animation is smooth', timestamp: '9:35 PM', readCount: 1 },
     { id: 'd4', senderId: '8', type: 'image', content: '', timestamp: '9:38 PM', imageUrl: '/media/images/pexels-alexazabache-3757147.jpg', readCount: 1 },
     { id: 'd5', senderId: '8', type: 'audio', content: 'Let me know if you want me to test anything else before we ship', timestamp: '9:43 PM', audioDuration: '0:08', readCount: 1 },
@@ -206,7 +208,7 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'aw1', senderId: '4', type: 'text', content: 'I see - the mobile experience for the leaderboard needs work', timestamp: '9:20 PM', readCount: 12 },
     { id: 'aw2', senderId: '4', type: 'image', content: 'This is what it looks like on an iPhone SE', timestamp: '9:25 PM', imageUrl: '/media/images/pexels-thiagomobile-2317640.jpg', readCount: 12 },
     { id: 'aw3', senderId: '1', type: 'text', content: '@Darcy Bonner good catch, we need to adjust the layout for smaller screens', timestamp: '9:30 PM', readCount: 12 },
-    { id: 'aw4', senderId: '7', type: 'video', content: 'Here is the full walkthrough on a small screen', timestamp: '9:35 PM', imageUrl: '/media/images/pexels-tiger-lily-4483608.jpg', videoUrl: '/media/videos/video-6.mp4', readCount: 12 },
+    { id: 'aw4', senderId: '7', type: 'video', content: 'Here is the full walkthrough on a small screen', timestamp: '9:35 PM', videoUrl: '/media/videos/video-6.mp4', videoDuration: '1:00', readCount: 12 },
     { id: 'aw5', senderId: '4', type: 'text', content: 'The points breakdown page is especially hard to read', timestamp: '9:39 PM', readCount: 12 },
   ],
   // Sales Insights
@@ -220,14 +222,14 @@ export const chatMessages: Record<string, Message[]> = {
   c8: [
     { id: 'va1', senderId: '3', type: 'text', content: 'Side note, is there a way you can make Blue respond faster for the enterprise clients?', timestamp: '9:00 AM', readCount: 1 },
     { id: 'va2', senderId: '1', type: 'text', content: 'Yes, we are working on edge caching for the most common queries', timestamp: '9:10 AM', readCount: 1 },
-    { id: 'va3', senderId: '3', type: 'video', content: 'Watch this - the response takes 4 seconds on JCI', timestamp: '9:15 AM', imageUrl: '/media/images/pexels-marosmarkovic-1451416.jpg', videoUrl: '/media/videos/video-8.mp4', readCount: 1 },
+    { id: 'va3', senderId: '3', type: 'video', content: 'Watch this - the response takes 4 seconds on JCI', timestamp: '9:15 AM', videoUrl: '/media/videos/video-8.mp4', videoDuration: '0:15', readCount: 1 },
     { id: 'va4', senderId: '1', type: 'text', content: 'That is too slow. Let me look into it today', timestamp: '9:22 AM', readCount: 1 },
   ],
   // General
   c9: [
     { id: 'g1m', senderId: '6', type: 'text', content: 'Ram reacted 👍 to "@Pankaj Prasad great work on the release"', timestamp: '9:00 AM', readCount: 18 },
     { id: 'g2m', senderId: '2', type: 'image', content: 'Team lunch today!', timestamp: '9:05 AM', imageUrl: '/media/images/pexels-jacobyclarkephoto-1579356.jpg', readCount: 18 },
-    { id: 'g3m', senderId: '5', type: 'video', content: 'Office tour for the new hires', timestamp: '9:10 AM', imageUrl: '/media/images/pexels-jibarofoto-1659747.jpg', videoUrl: '/media/videos/video-9.mp4', readCount: 18 },
+    { id: 'g3m', senderId: '5', type: 'video', content: 'Office tour for the new hires', timestamp: '9:10 AM', videoUrl: '/media/videos/video-9.mp4', videoDuration: '0:31', readCount: 18 },
     { id: 'g4m', senderId: '8', type: 'text', content: 'Welcome aboard everyone! 🎉', timestamp: '9:15 AM', readCount: 18 },
     { id: 'g5m', senderId: '1', type: 'audio', content: 'Quick reminder - all hands meeting at 2pm today in the main conference room', timestamp: '9:22 AM', audioDuration: '0:11', readCount: 18 },
   ],
@@ -235,7 +237,7 @@ export const chatMessages: Record<string, Message[]> = {
   c10: [
     { id: 'db1', senderId: '4', type: 'text', content: 'Hey @Josh - I set up time with the Morgantown team for Thursday', timestamp: '8:50 AM', readCount: 1 },
     { id: 'db2', senderId: '1', type: 'text', content: 'Perfect, I will prep the demo glasses', timestamp: '8:55 AM', readCount: 1 },
-    { id: 'db3', senderId: '4', type: 'video', content: 'BTW here is the walkthrough they sent of their facility', timestamp: '9:00 AM', imageUrl: '/media/images/pexels-umaraffan499-190417.jpg', videoUrl: '/media/videos/video-10.mp4', readCount: 1 },
+    { id: 'db3', senderId: '4', type: 'video', content: 'BTW here is the walkthrough they sent of their facility', timestamp: '9:00 AM', videoUrl: '/media/videos/video-10.mp4', videoDuration: '0:41', readCount: 1 },
     { id: 'db4', senderId: '4', type: 'image', content: 'And the floor plan', timestamp: '9:05 AM', imageUrl: '/media/images/pexels-cottonbro-4489737.jpg', readCount: 1 },
     { id: 'db5', senderId: '1', type: 'text', content: 'Got it, thanks! This will help with the demo setup', timestamp: '9:11 AM', readCount: 1 },
   ],
@@ -244,14 +246,14 @@ export const chatMessages: Record<string, Message[]> = {
     { id: 'de1', senderId: '7', type: 'text', content: 'Updated the mockups for the new settings page', timestamp: '8:30 AM', readCount: 7 },
     { id: 'de2', senderId: '7', type: 'image', content: 'Here is the new layout', timestamp: '8:32 AM', imageUrl: '/media/images/pexels-thisisengineering-3861438.jpg', readCount: 7 },
     { id: 'de3', senderId: '1', type: 'text', content: 'Love the clean look. Can we also update the icons?', timestamp: '8:38 AM', readCount: 7 },
-    { id: 'de4', senderId: '7', type: 'video', content: 'Prototype animation of the transition', timestamp: '8:40 AM', imageUrl: '/media/images/pexels-cottonbro-4489765.jpg', videoUrl: '/media/videos/video-2.mp4', readCount: 7 },
+    { id: 'de4', senderId: '7', type: 'video', content: 'Prototype animation of the transition', timestamp: '8:40 AM', videoUrl: '/media/videos/video-2.mp4', videoDuration: '1:18', readCount: 7 },
     { id: 'de5', senderId: '7', type: 'text', content: 'Will update icons in the next pass', timestamp: '8:45 AM', readCount: 7 },
   ],
   // Releases
   c12: [
     { id: 'r1', senderId: '2', type: 'text', content: 'v2.96 deployed to prod. All smoke tests passing.', timestamp: '8:15 AM', readCount: 14 },
     { id: 'r2', senderId: '2', type: 'image', content: 'Dashboard showing all green', timestamp: '8:18 AM', imageUrl: '/media/images/pexels-jopwell-1325725.jpg', readCount: 14 },
-    { id: 'r3', senderId: '6', type: 'video', content: 'Full regression test recording', timestamp: '8:22 AM', imageUrl: '/media/images/mma-audit-thumb.jpg', videoUrl: '/media/videos/mma-audit.mp4', readCount: 14 },
+    { id: 'r3', senderId: '6', type: 'video', content: 'Full regression test recording', timestamp: '8:22 AM', videoUrl: '/media/videos/mma-audit.mp4', videoDuration: '1:23', readCount: 14 },
     { id: 'r4', senderId: '1', type: 'text', content: 'Great work team. Smooth release. 🚀', timestamp: '8:30 AM', readCount: 14 },
   ],
 }
