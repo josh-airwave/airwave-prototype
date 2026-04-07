@@ -44,6 +44,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
   const fsScrubRef = useRef<HTMLDivElement>(null)
   const fsDragStart = useRef({ x: 0, y: 0 })
   const fsTranslateStart = useRef({ x: 0, y: 0 })
+  const fsSyncTime = useRef(0)  // sync currentTime between preview ↔ fullscreen
 
   const selectedItems = galleryItems.filter(i => selectedIds.has(i.id))
   const activeItem = galleryItems.find(i => i.id === activeId) || selectedItems[0] || galleryItems[0]
@@ -354,7 +355,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
           <div style={{ margin: '0 24px', position: 'relative' }}>
             {/* Video/image container — fixed aspect ratio from Figma: 342x582 (57/97) */}
             <div
-              onClick={() => { videoRef.current?.pause(); setFullscreen(true) }}
+              onClick={() => { fsSyncTime.current = videoRef.current?.currentTime || 0; videoRef.current?.pause(); setFullscreen(true) }}
               style={{
                 width: 342, maxWidth: '100%', aspectRatio: '57/97',
                 borderRadius: 8, overflow: 'hidden', background: '#1a1a1a', position: 'relative',
@@ -632,6 +633,10 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                   if (fsVideoRef.current) {
                     setFsDuration(fsVideoRef.current.duration)
                     fsVideoRef.current.playbackRate = playbackSpeed
+                    // Sync to preview video's position so it doesn't restart
+                    if (fsSyncTime.current > 0) {
+                      fsVideoRef.current.currentTime = fsSyncTime.current
+                    }
                   }
                 }}
                 onPlay={() => setFsPlaying(true)}
@@ -818,7 +823,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
             </div>
             {/* Close */}
             <button
-              onClick={() => { fsVideoRef.current?.pause(); setFullscreen(false); setFsScale(1); setFsTranslate({ x: 0, y: 0 }); setTimeout(() => videoRef.current?.play(), 100) }}
+              onClick={() => { const t = fsVideoRef.current?.currentTime || 0; fsVideoRef.current?.pause(); setFullscreen(false); setFsScale(1); setFsTranslate({ x: 0, y: 0 }); if (videoRef.current) { videoRef.current.currentTime = t }; setTimeout(() => videoRef.current?.play(), 100) }}
               style={{
                 width: 40, height: 40, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.4)',
