@@ -84,7 +84,8 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
     } else {
       v.pause()
       setIsReversed(true)
-      if (isPlaying) startReverseInterval(v, playbackSpeed)
+      setPlaybackSpeed(0.5)
+      if (isPlaying) startReverseInterval(v, 0.5)
     }
   }
 

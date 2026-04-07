@@ -21,7 +21,7 @@ export const CURRENT_EXPORT = {
     { screen: 'ImageZoom', name: 'video-speed-0.5x', params: { videoUrl: '/media/videos/video-3.mp4', freezeState: true, initialPaused: false, initialSpeed: 0.5, initialProgress: 0.25, initialDuration: 15 }, delay: 2500 },
 
     // ── Reverse playback ──
-    { screen: 'ImageZoom', name: 'video-reverse', params: { videoUrl: '/media/videos/video-5.mp4', freezeState: true, initialReversed: true, initialProgress: 0.7, initialDuration: 14 }, delay: 2500 },
+    { screen: 'ImageZoom', name: 'video-reverse', params: { videoUrl: '/media/videos/video-5.mp4', freezeState: true, initialReversed: true, initialSpeed: 0.5, initialProgress: 0.7, initialDuration: 14 }, delay: 2500 },
 
     // ── Muted ──
     { screen: 'ImageZoom', name: 'video-muted', params: { videoUrl: '/media/videos/video-5.mp4', freezeState: true, initialMuted: true, initialProgress: 0.45, initialDuration: 14 }, delay: 2500 },
