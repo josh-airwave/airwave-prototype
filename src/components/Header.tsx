@@ -15,6 +15,9 @@ interface HeaderProps {
 export function Header({ title, subtitle, showBack, showMenu, showCompose, rightAction, onBack }: HeaderProps) {
   const { pop, setDrawerOpen, canGoBack } = useNavigation()
 
+  const hasLeftAction = (showBack && canGoBack) || showMenu
+  const hasRightAction = showCompose || !!rightAction
+
   return (
     <div style={{
       display: 'flex',
@@ -25,7 +28,8 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
       borderBottom: `1px solid ${colors.border}`,
       minHeight: 40,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+      {/* Left slot */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 30 }}>
         {showBack && canGoBack && (
           <button onClick={onBack || pop} style={{ fontSize: 22, color: colors.primary, padding: 4 }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -38,28 +42,32 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
             <img src="/icons/hamburger-menu.png" alt="Menu" style={{ width: 22, height: 22, objectFit: 'contain' }} />
           </button>
         )}
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontSize: subtitle ? fonts.size.lg : fonts.size.lg,
-            fontWeight: fonts.weight.bold,
-            textAlign: showBack || showMenu ? 'center' : 'left',
-            color: colors.black,
-          }}>
-            {title}
-          </div>
-          {subtitle && (
-            <div style={{
-              fontSize: fonts.size.md,
-              fontWeight: fonts.weight.regular,
-              color: colors.primary,
-              textAlign: showBack || showMenu ? 'center' : 'left',
-            }}>
-              {subtitle}
-            </div>
-          )}
-        </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+      {/* Center title */}
+      <div style={{ flex: 1 }}>
+        <div style={{
+          fontSize: fonts.size.lg,
+          fontWeight: fonts.weight.bold,
+          textAlign: hasLeftAction ? 'center' : 'left',
+          color: colors.black,
+        }}>
+          {title}
+        </div>
+        {subtitle && (
+          <div style={{
+            fontSize: fonts.size.md,
+            fontWeight: fonts.weight.regular,
+            color: colors.primary,
+            textAlign: hasLeftAction ? 'center' : 'left',
+          }}>
+            {subtitle}
+          </div>
+        )}
+      </div>
+
+      {/* Right slot — matches left width for centering */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 30, justifyContent: 'flex-end' }}>
         {showCompose && (
           <button style={{ padding: 4, display: 'flex', alignItems: 'center' }}>
             <img src="/icons/ic_new_message.png" alt="Compose" style={{ width: 24, height: 24, objectFit: 'contain' }} />

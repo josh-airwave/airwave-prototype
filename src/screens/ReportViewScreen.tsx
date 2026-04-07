@@ -140,16 +140,9 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
             <div style={{
               background: 'rgba(255,255,255,0.15)', borderRadius: 4,
               padding: '3px 8px', fontSize: 11, color: 'rgba(255,255,255,0.7)',
-              fontFamily: fonts.family, fontWeight: 500,
+              fontFamily: fonts.family, fontWeight: 500, textTransform: 'uppercase',
             }}>
-              {report.status.toUpperCase()}
-            </div>
-            <div style={{
-              background: 'rgba(73,174,123,0.2)', borderRadius: 4,
-              padding: '3px 8px', fontSize: 11, color: colors.success,
-              fontFamily: fonts.family, fontWeight: 500,
-            }}>
-              AI Generated
+              {report.status}
             </div>
           </div>
           <h1 style={{
@@ -169,7 +162,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
           </div>
         </div>
 
-        {/* Source video thumbnail */}
+        {/* Source video — portrait orientation */}
         <div style={{ padding: '12px 16px 0' }}>
           <div
             onClick={() => push('ImageZoom', { videoUrl: report.sourceVideoUrl })}
@@ -182,28 +175,27 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
               src={report.sourceVideoUrl}
               muted playsInline preload="metadata"
               onLoadedData={(e) => { const v = e.currentTarget; if (v.duration > 1) v.currentTime = 1 }}
-              style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
+              style={{ width: '100%', aspectRatio: '9/16', objectFit: 'contain', display: 'block', pointerEvents: 'none', background: '#000' }}
             />
             <div style={{
               position: 'absolute', inset: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.3)',
             }}>
               <div style={{
-                width: 36, height: 36, borderRadius: '50%',
+                width: 44, height: 44, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.9)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill={colors.almostBlack}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={colors.almostBlack}>
                   <polygon points="7,3 21,12 7,21" />
                 </svg>
               </div>
             </div>
             <div style={{
-              position: 'absolute', bottom: 6, left: 8,
+              position: 'absolute', bottom: 8, left: 8,
               fontSize: 11, color: colors.white, fontFamily: fonts.family,
               fontWeight: 500, background: 'rgba(0,0,0,0.6)',
-              padding: '2px 6px', borderRadius: 3,
+              padding: '2px 8px', borderRadius: 4,
             }}>
               Source Video
             </div>
@@ -420,35 +412,21 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
       {/* Bottom action bar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: 12, padding: '10px 16px 28px',
+        padding: '10px 16px 28px',
         borderTop: `1px solid ${colors.border}`,
         background: colors.white,
       }}>
         <button style={{
           background: colors.primary, color: colors.white,
-          padding: '10px 24px', borderRadius: radius.full,
-          fontSize: 14, fontWeight: 600, fontFamily: fonts.family,
-          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '12px 32px', borderRadius: radius.full,
+          fontSize: 15, fontWeight: 600, fontFamily: fonts.family,
+          display: 'flex', alignItems: 'center', gap: 8,
           border: 'none', cursor: 'pointer',
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
             <polyline points="20 6 9 17 4 12" />
           </svg>
           Submit Report
-        </button>
-        <button style={{
-          background: colors.coolLight, color: colors.almostBlack,
-          padding: '10px 16px', borderRadius: radius.full,
-          fontSize: 14, fontWeight: 500, fontFamily: fonts.family,
-          display: 'flex', alignItems: 'center', gap: 6,
-          border: `1px solid ${colors.neutralGray}`, cursor: 'pointer',
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.almostBlack} strokeWidth="2">
-            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-            <polyline points="16 6 12 2 8 6" />
-            <line x1="12" y1="2" x2="12" y2="15" />
-          </svg>
-          Share
         </button>
       </div>
     </div>
