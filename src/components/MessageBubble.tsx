@@ -2,7 +2,7 @@ import React from 'react'
 import { colors, fonts } from '../styles/theme'
 import { Avatar } from './Avatar'
 import type { Message } from '../data/mock'
-import { users, galleryItems } from '../data/mock'
+import { users } from '../data/mock'
 import { useNavigation } from '../navigation/Router'
 
 interface MessageBubbleProps {
@@ -225,8 +225,7 @@ export function MessageBubble({
               <div>
                 <div
                   onClick={() => {
-                    const match = galleryItems.find(g => g.videoUrl === message.videoUrl)
-                    push('ShareView', { itemId: match?.id || 'g1' })
+                    push('ImageZoom', { itemId: message.id, videoUrl: message.videoUrl, imageUrl: message.imageUrl })
                   }}
                   style={{ cursor: 'pointer', position: 'relative' }}
                 >
