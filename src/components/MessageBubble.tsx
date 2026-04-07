@@ -2,7 +2,7 @@ import React from 'react'
 import { colors, fonts } from '../styles/theme'
 import { Avatar } from './Avatar'
 import type { Message } from '../data/mock'
-import { users } from '../data/mock'
+import { users, galleryItems } from '../data/mock'
 import { useNavigation } from '../navigation/Router'
 
 interface MessageBubbleProps {
@@ -34,7 +34,7 @@ export function MessageBubble({
   // Play button logic matches production app: show only if message has audio OR text content
   const hasAudio = message.type === 'audio'
   const hasTextContent = message.content != null && message.content.length > 0
-  const showPlayButton = message.type !== 'system' && message.type !== 'image' && message.type !== 'link' && (hasAudio || hasTextContent)
+  const showPlayButton = message.type !== 'system' && message.type !== 'image' && message.type !== 'video' && message.type !== 'link' && (hasAudio || hasTextContent)
 
   // Sent as text indicator
   const isSentAsText = !hasAudio && hasTextContent && message.type !== 'link' && message.type !== 'system'
@@ -220,6 +220,69 @@ export function MessageBubble({
               </div>
             )}
 
+            {/* Video messages — thumbnail with play overlay, tap opens ShareView */}
+            {message.type === 'video' && message.imageUrl && (
+              <div>
+                <div
+                  onClick={() => {
+                    const match = galleryItems.find(g => g.videoUrl === message.videoUrl)
+                    push('ShareView', { itemId: match?.id || 'g1' })
+                  }}
+                  style={{ cursor: 'pointer', position: 'relative' }}
+                >
+                  <img
+                    src={message.imageUrl}
+                    alt=""
+                    style={{ width: '100%', height: 200, objectFit: 'cover', display: 'block' }}
+                  />
+                  {/* Play overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.25)',
+                  }}>
+                    <div style={{
+                      width: 52, height: 52, borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.5)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                        <polygon points="7,3 21,12 7,21" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {message.content && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 0,
+                    padding: '6px 4px 6px 4px',
+                  }}>
+                    <button style={{
+                      width: 44, height: 44, borderRadius: '50%',
+                      background: colors.primary,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, border: 'none', cursor: 'pointer',
+                      margin: '2px 0 2px 2px',
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                        <polygon points="7,3 21,12 7,21" />
+                      </svg>
+                    </button>
+                    <div style={{
+                      flex: 1, padding: '4px 10px 4px 8px',
+                      display: 'flex', alignItems: 'center',
+                    }}>
+                      <div style={{ fontSize: fonts.size.md, lineHeight: '20px' }}>
+                        {renderMessageText(message.content)}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Link preview card — rendered separately, no play button */}
             {message.type === 'link' && message.linkPreview && (
               <div style={{ overflow: 'hidden' }}>
@@ -255,7 +318,7 @@ export function MessageBubble({
             )}
 
             {/* Text / audio messages — play button layout */}
-            {message.type !== 'image' && message.type !== 'system' && message.type !== 'link' && (
+            {message.type !== 'image' && message.type !== 'video' && message.type !== 'system' && message.type !== 'link' && (
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
