@@ -320,6 +320,29 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
           <polyline points="16 6 12 2 8 6" />
           <line x1="12" y1="2" x2="12" y2="15" />
         </svg>
+        <button
+          onClick={() => reset('ChannelList')}
+          style={{
+            padding: '3px 8px',
+            background: '#E5E5EA',
+            border: 'none',
+            borderRadius: 6,
+            color: '#8E8E93',
+            fontSize: 11,
+            fontWeight: 600,
+            fontFamily: font,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+          </svg>
+          Restart
+        </button>
       </div>
 
       {/* Scrollable report content */}
