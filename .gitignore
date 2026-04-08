@@ -1,7 +1,11 @@
 node_modules/
 dist/
 dist-electron/
+electron/
 release/
+.claude/
+media to use/
+patches/
 .DS_Store
 *.mp4
 *.mov
