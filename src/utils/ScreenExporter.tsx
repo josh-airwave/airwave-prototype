@@ -88,6 +88,16 @@ function ScreenExporterInner() {
         reset(s.screen, s.params)
       }
       await waitForRender(s.delay ?? 1200)
+
+      // Scroll to bottom if requested (for sticky feedback sections etc)
+      if (s.scrollToBottom) {
+        const scrollable = document.querySelector('[data-screen-export="phone-frame"] [data-scrollable]') as HTMLElement
+        if (scrollable) {
+          scrollable.scrollTop = scrollable.scrollHeight
+          await waitForRender(400)
+        }
+      }
+
       pauseAllVideos()
       await waitForRender(400)
 
@@ -95,16 +105,15 @@ function ScreenExporterInner() {
       if (!el) continue
 
       try {
-        // Get exact rendered dimensions
-        const rect = el.getBoundingClientRect()
+        // Use fixed phone frame dimensions (393x852) to avoid scale transform issues
         const pixelRatio = 2
 
         // 1x1 gray pixel as fallback for cross-origin images that fail CORS
         const PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN88P/BfwAJhAPk3KFb1AAAAABJRU5ErkJggg=='
 
         const opts = {
-          width: rect.width,
-          height: rect.height,
+          width: 393,
+          height: 852,
           pixelRatio,
           cacheBust: true,
           skipFonts: true,

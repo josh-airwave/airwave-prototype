@@ -346,7 +346,7 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
       </div>
 
       {/* Scrollable report content */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      <div data-scrollable style={{ flex: 1, overflow: 'auto' }}>
       {/* Dark navy header */}
       <div style={{
         background: rc.darkHeader, padding: '14px 16px',
