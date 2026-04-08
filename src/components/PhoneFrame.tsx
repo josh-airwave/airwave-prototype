@@ -5,7 +5,12 @@ interface PhoneFrameProps {
 }
 
 export function PhoneFrame({ children }: PhoneFrameProps) {
+  // Scale down on smaller screens so the full phone is always visible
+  const maxH = typeof window !== 'undefined' ? window.innerHeight - 80 : 852
+  const scaleFactor = Math.min(1, maxH / 852)
+
   return (
+    <div style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}>
     <div
       data-screen-export="phone-frame"
       style={{
@@ -65,6 +70,7 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
       }}>
         {children}
       </div>
+    </div>
     </div>
   )
 }
