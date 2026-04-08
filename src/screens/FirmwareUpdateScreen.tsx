@@ -3,73 +3,75 @@ import { colors, fonts, radius } from '../styles/theme'
 import { useNavigation } from '../navigation/Router'
 
 /**
- * Firmware Update Screen
+ * Firmware Update Screen — Multi-update sequential flow
  *
- * One button, one seamless flow. Handles APP + BES behind the scenes.
- * User just sees: Downloading → Updating → Glasses Restarting → Reconnecting → Done
+ * Handles up to 3 sequential firmware updates:
+ *   1. MTK (Android system) — rare, complex
+ *   2. APP (glasses Android application) — no restart required
+ *   3. BES (BES microcontroller firmware) — requires glasses restart
+ *
+ * Shows clear progress per update (1 of 3, 2 of 3, etc.)
+ * Handles interruptions with reassurance messaging about partial completion.
  *
  * Tap the glasses image during any step to simulate a failure.
  */
 
+// ── Types ──
+
 type FailureType = 'download_failed' | 'bluetooth_lost' | 'update_interrupted' | 'reconnect_failed' | null
 
-interface StepConfig {
+interface UpdateStep {
+  id: string
+  phases: PhaseConfig[]
+}
+
+interface PhaseConfig {
   key: string
   label: string
   sublabel: string
   duration: number
-  progressRange: [number, number]
 }
 
-const STEPS: StepConfig[] = [
-  {
-    key: 'downloading',
-    label: 'Downloading Update',
-    sublabel: 'Grabbing the latest software from the server...',
-    duration: 4000,
-    progressRange: [0, 25],
-  },
-  {
-    key: 'updating_app',
-    label: 'Updating Your Glasses',
-    sublabel: 'Installing software update. Keep your glasses nearby.',
-    duration: 6000,
-    progressRange: [25, 60],
-  },
-  {
-    key: 'updating_firmware',
-    label: 'Updating Your Glasses',
-    sublabel: 'Almost there — finishing up the update...',
-    duration: 5000,
-    progressRange: [60, 85],
-  },
-  {
-    key: 'restarting',
-    label: 'Glasses Restarting',
-    sublabel: 'Your glasses are rebooting. This is normal — just a moment.',
-    duration: 4000,
-    progressRange: [85, 93],
-  },
-  {
-    key: 'reconnecting',
-    label: 'Reconnecting',
-    sublabel: 'Waiting for your glasses to reconnect to the app...',
-    duration: 3000,
-    progressRange: [93, 99],
-  },
-  {
-    key: 'done',
-    label: "You're All Set!",
-    sublabel: 'Your glasses are updated and ready to go.',
-    duration: 0,
-    progressRange: [100, 100],
-  },
+// What's new in this update — shown to the tech
+const WHATS_NEW = [
+  'Improved wake word tuning',
+  'Voice to Voice conversations with Blue from your glasses',
+  'Performance and stability improvements',
 ]
+
+// ── Update step definitions (internal, not shown to tech) ──
+
+function makeSteps(count: number): UpdateStep[] {
+  // The last update always includes restart/reconnect (BES)
+  const steps: UpdateStep[] = []
+  for (let i = 0; i < count; i++) {
+    const isLast = i === count - 1
+    const phases: PhaseConfig[] = [
+      { key: 'downloading', label: 'Downloading Update', sublabel: 'Grabbing the latest software from the server...', duration: 3000 + Math.random() * 2000 },
+      { key: 'installing', label: 'Installing Update', sublabel: 'Keep your glasses nearby while we install.', duration: 4000 + Math.random() * 3000 },
+    ]
+    if (isLast) {
+      phases.push(
+        { key: 'restarting', label: 'Glasses Restarting', sublabel: 'Your glasses are rebooting. This is normal.', duration: 4000 },
+        { key: 'reconnecting', label: 'Reconnecting', sublabel: 'Waiting for your glasses to reconnect...', duration: 3000 },
+      )
+    }
+    steps.push({ id: `step-${i}`, phases })
+  }
+  return steps
+}
+
+// Preset update scenarios
+const UPDATE_PRESETS: Record<string, UpdateStep[]> = {
+  '2_updates': makeSteps(2),
+  '3_updates': makeSteps(3),
+  '1_update': makeSteps(1),
+}
 
 const FAILURE_CONFIG: Record<string, { title: string; message: string }> = {
   download_failed: {
     title: 'Download Failed',
-    message: 'We couldn\'t reach the server. Check your internet connection and try again.',
+    message: 'We couldn\'t reach the server. Check your Wi-Fi or internet connection and try again.',
   },
   bluetooth_lost: {
     title: 'Connection Lost',
@@ -77,7 +79,7 @@ const FAILURE_CONFIG: Record<string, { title: string; message: string }> = {
   },
   update_interrupted: {
     title: 'Update Interrupted',
-    message: 'The update was interrupted. Don\'t worry — your glasses are safe. Please try again.',
+    message: 'The update was interrupted, but don\'t worry — your glasses are safe.',
   },
   reconnect_failed: {
     title: 'Couldn\'t Reconnect',
@@ -85,76 +87,119 @@ const FAILURE_CONFIG: Record<string, { title: string; message: string }> = {
   },
 }
 
+// ── Component ──
+
 export function FirmwareUpdateScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
 
-  // Export freeze mode: when params.freezeState is true, skip all timers/animation
-  // and render the exact state specified by params
+  // Which updates to run
+  const preset = (params?.updatePreset as string) || '2_updates'
+  const updates = UPDATE_PRESETS[preset] || UPDATE_PRESETS['2_updates']
+  const totalUpdates = updates.length
+
+  // Freeze mode for screen exports
   const freezeState = params?.freezeState === true
-  const initialStepIndex = typeof params?.initialStepIndex === 'number' ? params.initialStepIndex : 0
+  const initialUpdateIndex = typeof params?.initialUpdateIndex === 'number' ? params.initialUpdateIndex : 0
+  const initialPhaseIndex = typeof params?.initialPhaseIndex === 'number' ? params.initialPhaseIndex : 0
   const initialProgress = typeof params?.initialProgress === 'number' ? params.initialProgress : 0
   const initialFailure = (params?.initialFailure as FailureType) ?? null
-  const initialRetrying = params?.initialRetrying === true
+  const initialCompletedUpdates = typeof params?.initialCompletedUpdates === 'number' ? params.initialCompletedUpdates : 0
 
-  const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex)
+  // State
+  const [currentUpdateIndex, setCurrentUpdateIndex] = useState(initialUpdateIndex)
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(initialPhaseIndex)
   const [progress, setProgress] = useState(freezeState ? initialProgress : 0)
   const [failure, setFailure] = useState<FailureType>(initialFailure)
-  const [isRetrying, setIsRetrying] = useState(initialRetrying)
+  const [completedUpdates, setCompletedUpdates] = useState(initialCompletedUpdates)
+  const [isRetrying, setIsRetrying] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
+  const [allDone, setAllDone] = useState(false)
   const animRef = useRef<number>(0)
-  const stepTimerRef = useRef<number>(0)
+  const phaseTimerRef = useRef<number>(0)
 
-  const currentStep = STEPS[currentStepIndex] || STEPS[0]
-  const isDone = currentStep.key === 'done'
+  const currentUpdate = updates[currentUpdateIndex]
+  const currentPhase = currentUpdate?.phases[currentPhaseIndex]
   const isFailed = failure != null
-  const isRestartPhase = currentStep.key === 'restarting' || currentStep.key === 'reconnecting'
+  const isRestartPhase = currentPhase?.key === 'restarting' || currentPhase?.key === 'reconnecting'
+  const remainingUpdates = totalUpdates - completedUpdates
 
-  // Animate progress within the current step (skipped in freeze mode)
+  // Calculate overall progress across all updates
+  const getOverallProgress = () => {
+    if (allDone) return 100
+    const progressPerUpdate = 100 / totalUpdates
+    const completedProgress = completedUpdates * progressPerUpdate
+
+    if (!currentUpdate) return completedProgress
+
+    const totalPhases = currentUpdate.phases.length
+    const phaseProgress = currentPhaseIndex / totalPhases
+    const withinPhaseProgress = progress / 100 / totalPhases
+    const currentUpdateProgress = (phaseProgress + withinPhaseProgress) * progressPerUpdate
+
+    return Math.round(completedProgress + currentUpdateProgress)
+  }
+
+  const overallProgress = getOverallProgress()
+
+  // Animate progress within current phase
   useEffect(() => {
-    if (freezeState) return
-    if (isDone || isFailed) {
-      if (isDone) setProgress(100)
-      return
-    }
+    if (freezeState || allDone || isFailed || !currentPhase) return
 
-    const [start, end] = currentStep.progressRange
-    const stepDuration = currentStep.duration
+    const { duration } = currentPhase
     const startTime = Date.now()
 
     const animate = () => {
       const elapsed = Date.now() - startTime
-      const t = Math.min(1, elapsed / stepDuration)
+      const t = Math.min(1, elapsed / duration)
       const eased = 1 - Math.pow(1 - t, 2)
-      const value = Math.round(start + (end - start) * eased)
-      setProgress(value)
+      setProgress(Math.round(eased * 100))
 
       if (t < 1) {
         animRef.current = requestAnimationFrame(animate)
       }
     }
 
+    setProgress(0)
     animRef.current = requestAnimationFrame(animate)
 
-    stepTimerRef.current = window.setTimeout(() => {
-      if (currentStepIndex < STEPS.length - 1) {
-        setCurrentStepIndex(prev => prev + 1)
+    // When phase completes, move to next phase or next update
+    phaseTimerRef.current = window.setTimeout(() => {
+      const nextPhaseIndex = currentPhaseIndex + 1
+      if (nextPhaseIndex < currentUpdate.phases.length) {
+        // Next phase within same update
+        setCurrentPhaseIndex(nextPhaseIndex)
+      } else {
+        // Current update complete
+        const newCompleted = completedUpdates + 1
+        setCompletedUpdates(newCompleted)
+        const nextUpdateIndex = currentUpdateIndex + 1
+        if (nextUpdateIndex < updates.length) {
+          // Move to next update
+          setCurrentUpdateIndex(nextUpdateIndex)
+          setCurrentPhaseIndex(0)
+        } else {
+          // All updates done
+          setAllDone(true)
+          setProgress(100)
+        }
       }
-    }, stepDuration)
+    }, duration)
 
     return () => {
       cancelAnimationFrame(animRef.current)
-      clearTimeout(stepTimerRef.current)
+      clearTimeout(phaseTimerRef.current)
     }
-  }, [currentStepIndex, failure, retryKey, freezeState])
+  }, [currentUpdateIndex, currentPhaseIndex, failure, retryKey, freezeState, allDone])
 
+  // Simulate failure on glasses tap
   const simulateFailure = () => {
-    if (isDone || isFailed || isRetrying) return
+    if (allDone || isFailed || isRetrying) return
     cancelAnimationFrame(animRef.current)
-    clearTimeout(stepTimerRef.current)
+    clearTimeout(phaseTimerRef.current)
 
-    const key = currentStep.key
+    const key = currentPhase?.key
     if (key === 'downloading') setFailure('download_failed')
-    else if (key === 'updating_app' || key === 'updating_firmware') setFailure('update_interrupted')
+    else if (key === 'installing') setFailure('update_interrupted')
     else if (key === 'restarting' || key === 'reconnecting') setFailure('reconnect_failed')
   }
 
@@ -163,15 +208,16 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
     setFailure(null)
     setTimeout(() => {
       setIsRetrying(false)
+      setCurrentPhaseIndex(0) // Restart current update from beginning
       setRetryKey(prev => prev + 1)
     }, 1000)
   }
 
-  // Ring & colors
-  const ringColor = isFailed ? colors.danger : isDone ? colors.success : isRestartPhase ? '#F5A623' : colors.primary
+  // Colors based on state
+  const ringColor = isFailed ? colors.danger : allDone ? colors.success : isRestartPhase ? '#F5A623' : colors.primary
   const bgTint = isFailed
     ? 'rgba(255, 59, 48, 0.06)'
-    : isDone
+    : allDone
       ? 'rgba(73, 174, 123, 0.08)'
       : isRestartPhase
         ? 'rgba(245, 166, 35, 0.08)'
@@ -179,22 +225,14 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
 
   const failureInfo = failure ? FAILURE_CONFIG[failure] : null
 
-  // Simplified 4-dot indicator: Download → Update → Restart → Done
-  const dots = ['Download', 'Update', 'Restart', 'Done']
-  const getDotState = (dotIndex: number) => {
-    // Map dots to step ranges
-    const dotToStepRange: [number, number][] = [
-      [0, 0],    // Download = step 0
-      [1, 2],    // Update = steps 1-2
-      [3, 4],    // Restart = steps 3-4
-      [5, 5],    // Done = step 5
-    ]
-    const [rangeStart, rangeEnd] = dotToStepRange[dotIndex]
-
-    if (isFailed && currentStepIndex >= rangeStart && currentStepIndex <= rangeEnd) return 'failed'
-    if (currentStepIndex > rangeEnd) return 'complete'
-    if (currentStepIndex >= rangeStart && currentStepIndex <= rangeEnd) return isDone ? 'complete' : 'active'
-    return 'pending'
+  // Build reassurance message for partial failures
+  const getFailureReassurance = () => {
+    if (completedUpdates === 0) {
+      return `We'll pick up right where we left off. ${totalUpdates === 1 ? 'Your update' : `All ${totalUpdates} updates`} will resume when you retry.`
+    }
+    const done = completedUpdates
+    const left = totalUpdates - completedUpdates
+    return `${done} of ${totalUpdates} update${done > 1 ? 's' : ''} already completed successfully. ${left} update${left > 1 ? 's' : ''} remaining — we'll continue right where we left off.`
   }
 
   return (
@@ -213,18 +251,12 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
         position: 'relative',
         borderBottom: `1px solid ${colors.coolMedium}`,
       }}>
-        {(isDone || isFailed) && (
+        {(allDone || isFailed) && (
           <button
             onClick={pop}
             style={{
-              position: 'absolute',
-              left: 16,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 4,
+              position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
             }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={colors.almostBlack} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -249,25 +281,41 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 24px',
-        gap: 24,
+        padding: '24px 24px',
+        gap: 20,
       }}>
+
+        {/* Update counter badge */}
+        {totalUpdates > 1 && !allDone && (
+          <div style={{
+            background: isFailed ? colors.dangerLight : colors.primaryLight15,
+            padding: '6px 16px',
+            borderRadius: 20,
+          }}>
+            <span style={{
+              fontSize: fonts.size.sm,
+              fontWeight: fonts.weight.bold,
+              fontFamily: fonts.family,
+              color: isFailed ? colors.danger : colors.primary,
+            }}>
+              {isFailed
+                ? `${completedUpdates} of ${totalUpdates} complete`
+                : `Update ${currentUpdateIndex + 1} of ${totalUpdates}`
+              }
+            </span>
+          </div>
+        )}
 
         {/* Glasses with status ring */}
         <div
           onClick={simulateFailure}
-          title={undefined} // simulateFailure still works on click, tooltip hidden
           style={{
-            width: 160,
-            height: 160,
-            borderRadius: '50%',
+            width: 160, height: 160, borderRadius: '50%',
             background: bgTint,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             position: 'relative',
             transition: 'background 0.5s ease',
-            cursor: !isDone && !isFailed ? 'pointer' : 'default',
+            cursor: !allDone && !isFailed ? 'pointer' : 'default',
           }}
         >
           {/* Progress ring */}
@@ -279,7 +327,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
               stroke={ringColor}
               strokeWidth="3"
               strokeDasharray={`${2 * Math.PI * 76}`}
-              strokeDashoffset={`${2 * Math.PI * 76 * (1 - progress / 100)}`}
+              strokeDashoffset={`${2 * Math.PI * 76 * (1 - overallProgress / 100)}`}
               strokeLinecap="round"
               transform="rotate(-90 80 80)"
               style={{ transition: 'stroke-dashoffset 0.3s ease-out, stroke 0.5s ease' }}
@@ -287,7 +335,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
           </svg>
 
           {/* Center content */}
-          {isDone ? (
+          {allDone ? (
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
               <circle cx="32" cy="32" r="28" fill={colors.success} />
               <polyline points="20,32 28,40 44,24" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
@@ -314,7 +362,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
           )}
 
           {/* Spinning accent ring */}
-          {!isDone && !isFailed && !isRetrying && !isRestartPhase && (
+          {!allDone && !isFailed && !isRetrying && !isRestartPhase && (
             <div style={{
               position: 'absolute', inset: -2, borderRadius: '50%',
               border: '2px solid transparent', borderTopColor: colors.primary,
@@ -325,14 +373,14 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
 
         {/* Progress percentage */}
         <div style={{
-          fontSize: '52px',
+          fontSize: '48px',
           fontWeight: fonts.weight.bold,
           fontFamily: fonts.family,
-          color: isFailed ? colors.danger : isDone ? colors.success : isRestartPhase ? '#F5A623' : colors.primary,
+          color: isFailed ? colors.danger : allDone ? colors.success : isRestartPhase ? '#F5A623' : colors.primary,
           lineHeight: 1,
           transition: 'color 0.5s ease',
         }}>
-          {isFailed ? '' : `${progress}%`}
+          {isFailed ? '' : `${overallProgress}%`}
         </div>
 
         {/* Label */}
@@ -341,10 +389,10 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             fontSize: fonts.size.xxl,
             fontWeight: fonts.weight.semibold,
             fontFamily: fonts.family,
-            color: isFailed ? colors.danger : isRestartPhase ? '#F5A623' : colors.almostBlack,
+            color: isFailed ? colors.danger : allDone ? colors.success : isRestartPhase ? '#F5A623' : colors.almostBlack,
             marginBottom: 8,
           }}>
-            {isFailed ? failureInfo?.title : isRetrying ? 'Retrying...' : currentStep.label}
+            {allDone ? "You're All Set!" : isFailed ? failureInfo?.title : isRetrying ? 'Retrying...' : currentPhase?.label}
           </div>
           <div style={{
             fontSize: fonts.size.md,
@@ -354,47 +402,132 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             maxWidth: 300,
             margin: '0 auto',
           }}>
-            {isFailed ? failureInfo?.message : isRetrying ? 'Reconnecting and restarting...' : currentStep.sublabel}
+            {allDone
+              ? `${totalUpdates === 1 ? 'Your update is' : `All ${totalUpdates} updates are`} installed and your glasses are ready to go.`
+              : isFailed
+                ? failureInfo?.message
+                : isRetrying
+                  ? 'Reconnecting and restarting...'
+                  : currentPhase?.sublabel
+            }
           </div>
         </div>
 
-        {/* Step indicators — 4 clean dots */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 4 }}>
-          {dots.map((label, i) => {
-            const state = getDotState(i)
-            const dotColor = state === 'failed' ? colors.danger
-              : state === 'complete' ? colors.success
-              : state === 'active' ? (isRestartPhase && i === 2 ? '#F5A623' : colors.primary)
-              : colors.neutralGray
-            const icon = state === 'failed' ? '!' : state === 'complete' ? '\u2713' : String(i + 1)
-
-            return (
-              <React.Fragment key={label}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%', background: dotColor,
-                  color: state === 'pending' ? colors.neutral400 : colors.white,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: fonts.size.sm, fontWeight: fonts.weight.bold, fontFamily: fonts.family,
-                  transition: 'all 0.4s ease',
+        {/* What's New — shown when done */}
+        {allDone && (
+          <div style={{
+            background: colors.coolLight,
+            borderRadius: 12,
+            padding: '14px 18px',
+            maxWidth: 320,
+            width: '100%',
+          }}>
+            <div style={{
+              fontSize: fonts.size.sm,
+              fontWeight: fonts.weight.bold,
+              fontFamily: fonts.family,
+              color: colors.almostBlack,
+              marginBottom: 8,
+            }}>
+              What's New
+            </div>
+            {WHATS_NEW.map((item, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                gap: 8,
+                alignItems: 'flex-start',
+                marginBottom: i < WHATS_NEW.length - 1 ? 6 : 0,
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span style={{
+                  fontSize: fonts.size.sm,
+                  fontFamily: fonts.family,
+                  color: colors.neutral,
+                  lineHeight: 1.4,
                 }}>
-                  {icon}
-                </div>
-                {i < dots.length - 1 && (
-                  <div style={{
-                    width: 40, height: 3, borderRadius: 2,
-                    background: state === 'failed' ? colors.danger
-                      : state === 'complete' ? colors.success
-                      : colors.neutralGray,
-                    transition: 'background 0.4s ease',
-                  }} />
-                )}
-              </React.Fragment>
-            )
-          })}
-        </div>
+                  {item}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* Tap hint (prototype only, hidden during export) */}
-        {!isDone && !isFailed && (
+        {/* Failure reassurance card */}
+        {isFailed && (
+          <div style={{
+            background: '#FFF8F0',
+            border: '1px solid #FFE0B2',
+            borderRadius: 12,
+            padding: '12px 16px',
+            maxWidth: 320,
+            display: 'flex',
+            gap: 10,
+            alignItems: 'flex-start',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+              <path d="M12 8v4" />
+              <path d="M12 16h.01" />
+            </svg>
+            <span style={{
+              fontSize: fonts.size.sm,
+              fontFamily: fonts.family,
+              color: '#7A5400',
+              lineHeight: 1.5,
+            }}>
+              {getFailureReassurance()}
+            </span>
+          </div>
+        )}
+
+        {/* Update step indicators */}
+        {!allDone && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 4 }}>
+            {updates.map((update, i) => {
+              const state = isFailed && i === currentUpdateIndex ? 'failed'
+                : i < completedUpdates ? 'complete'
+                : (i === currentUpdateIndex && !isFailed) ? 'active'
+                : 'pending'
+
+              const dotColor = state === 'failed' ? colors.danger
+                : state === 'complete' ? colors.success
+                : state === 'active' ? (isRestartPhase ? '#F5A623' : colors.primary)
+                : colors.neutralGray
+
+              const icon = state === 'failed' ? '!'
+                : state === 'complete' ? '\u2713'
+                : String(i + 1)
+
+              return (
+                <React.Fragment key={update.id}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%', background: dotColor,
+                    color: state === 'pending' ? colors.neutral400 : colors.white,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: fonts.size.sm, fontWeight: fonts.weight.bold, fontFamily: fonts.family,
+                    transition: 'all 0.4s ease',
+                  }}>
+                    {icon}
+                  </div>
+                  {i < updates.length - 1 && (
+                    <div style={{
+                      width: 36, height: 3, borderRadius: 2,
+                      background: i < completedUpdates ? colors.success
+                        : (isFailed && i === currentUpdateIndex) ? colors.danger
+                        : colors.neutralGray,
+                      transition: 'background 0.4s ease',
+                    }} />
+                  )}
+                </React.Fragment>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Tap hint (prototype only) */}
+        {!allDone && !isFailed && (
           <div data-prototype-only style={{
             fontSize: fonts.size.xs, color: colors.neutral400,
             fontFamily: fonts.family, fontStyle: 'italic',
@@ -406,7 +539,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
 
       {/* Bottom buttons */}
       <div style={{ padding: '16px 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {isDone ? (
+        {allDone ? (
           <button
             onClick={pop}
             style={{
