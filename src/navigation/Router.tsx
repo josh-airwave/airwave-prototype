@@ -66,6 +66,7 @@ export function Router({ screens, initialScreen, children }: RouterProps) {
 
   const reset = useCallback((screen: string, params?: RouteParams) => {
     feedbackStore.clear()
+    setAnimating(false)
     setStack([{ screen, params }])
     setSlideDirection(null)
   }, [])

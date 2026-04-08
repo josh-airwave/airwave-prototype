@@ -57,7 +57,7 @@ export function BlueScreen() {
       </div>
 
       {/* Card feed */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', paddingTop: 16, paddingBottom: 120 }}>
+      <div ref={scrollRef} data-scrollable style={{ flex: 1, overflowY: 'auto', paddingTop: 16, paddingBottom: 120 }}>
         {blueCards.map(card => (
           <BlueCard
             key={card.id}

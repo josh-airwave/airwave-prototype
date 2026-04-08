@@ -26,17 +26,17 @@ export const CURRENT_EXPORT = {
     // ── 4. Share Externally — native share sheet ──
     { screen: 'ShareFlow', name: 'share-sheet', params: { reportId, initialStep: 'share_sheet' }, base: blueBase, delay: 1500 },
 
-    // ── 5. iMessage compose — before sending ──
-    { screen: 'ShareFlow', name: 'imessage-compose', params: { reportId, initialStep: 'imessage' }, base: blueBase, delay: 1500 },
+    // ── 5. iMessage compose — before sending (full screen, no base needed) ──
+    { screen: 'ShareFlow', name: 'imessage-compose', params: { reportId, initialStep: 'imessage' }, delay: 2000 },
 
-    // ── 6. iMessage sent — delivered message ──
-    { screen: 'ShareFlow', name: 'imessage-sent', params: { reportId, initialStep: 'done', initialSent: true }, base: blueBase, delay: 1500 },
+    // ── 6. iMessage sent — delivered message (full screen) ──
+    { screen: 'ShareFlow', name: 'imessage-sent', params: { reportId, initialStep: 'done', initialSent: true }, delay: 2000 },
 
-    // ── 7. Report viewed notification ──
-    { screen: 'ShareFlow', name: 'notif-viewed', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true }, base: blueBase, delay: 1500 },
+    // ── 7. Report viewed notification (full screen) ──
+    { screen: 'ShareFlow', name: 'notif-viewed', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true }, delay: 2000 },
 
-    // ── 8. Helpful feedback notification ──
-    { screen: 'ShareFlow', name: 'notif-feedback', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true, initialShowFeedback: true }, base: blueBase, delay: 1500 },
+    // ── 8. Helpful feedback notification (full screen) ──
+    { screen: 'ShareFlow', name: 'notif-feedback', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true, initialShowFeedback: true }, delay: 2000 },
 
     // ── 9. External Report — top of page ──
     { screen: 'ExternalReport', name: 'report-top', params: { reportId, skipLoading: true }, delay: 2000 },
@@ -57,6 +57,6 @@ export const CURRENT_EXPORT = {
     { screen: 'ExternalReport', name: 'report-not-helpful-submitted', params: { reportId, skipLoading: true, initialFeedbackState: 'submitted' }, delay: 2000, scrollToBottom: true },
 
     // ── 15. Blue Feed — Not Helpful feedback card visible ──
-    { screen: 'Blue', name: 'blue-feed-with-feedback', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500, seedFeedback: { reportId: 'vr4', name: 'Sarah Chen', message: 'The hourly actuals for hours 5-8 are hard to read. Could you re-record that section of the board?' } },
+    { screen: 'Blue', name: 'blue-feed-with-feedback', params: { channelId: 'blue', channelType: 'blue' }, delay: 3000, scrollToBottom: true, seedFeedback: { reportId: 'vr4', name: 'Sarah Chen', message: 'The hourly actuals for hours 5-8 are hard to read. Could you re-record that section of the board?' } },
   ] as { screen: string; name: string; params?: Record<string, unknown>; delay?: number; base?: { screen: string; params?: Record<string, unknown> }; seedFeedback?: { reportId: string; name: string; message: string }; scrollToBottom?: boolean }[],
 }
