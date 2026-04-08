@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface PhoneFrameProps {
   children: React.ReactNode
 }
 
 export function PhoneFrame({ children }: PhoneFrameProps) {
-  // Scale down on smaller screens so the full phone is always visible
-  const maxH = typeof window !== 'undefined' ? window.innerHeight - 80 : 852
-  const scaleFactor = Math.min(1, maxH / 852)
+  const computeScale = () => Math.min(1, (window.innerHeight - 80) / 852, (window.innerWidth - 40) / 393)
+  const [scaleFactor, setScaleFactor] = useState(computeScale)
+
+  useEffect(() => {
+    const onResize = () => setScaleFactor(computeScale())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   return (
     <div style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}>
