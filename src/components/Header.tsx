@@ -8,12 +8,13 @@ interface HeaderProps {
   showBack?: boolean
   showMenu?: boolean
   showCompose?: boolean
+  showRestart?: boolean
   rightAction?: React.ReactNode
   onBack?: () => void
 }
 
-export function Header({ title, subtitle, showBack, showMenu, showCompose, rightAction, onBack }: HeaderProps) {
-  const { pop, setDrawerOpen, canGoBack } = useNavigation()
+export function Header({ title, subtitle, showBack, showMenu, showCompose, showRestart, rightAction, onBack }: HeaderProps) {
+  const { pop, reset, setDrawerOpen, canGoBack } = useNavigation()
 
   const hasLeftAction = (showBack && canGoBack) || showMenu
   const hasRightAction = showCompose || !!rightAction
@@ -75,6 +76,31 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
           </button>
         )}
         {rightAction}
+        {showRestart && (
+          <button
+            onClick={() => reset('ChannelList')}
+            style={{
+              padding: '3px 8px',
+              background: colors.coolGray,
+              border: 'none',
+              borderRadius: 6,
+              color: colors.textTertiary,
+              fontSize: 11,
+              fontWeight: 600,
+              fontFamily: fonts.family,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.textTertiary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+            </svg>
+            Restart
+          </button>
+        )}
       </div>
     </div>
   )

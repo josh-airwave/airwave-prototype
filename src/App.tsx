@@ -59,42 +59,13 @@ export default function App() {
       alignItems: 'center',
       justifyContent: 'center',
       background: '#1a1a2e',
-      position: 'relative',
     }}>
-      {/* Screen label */}
-      <div style={{
-        position: 'absolute',
-        top: 20,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 14,
-        fontFamily: "'Outfit', sans-serif",
-        letterSpacing: 2,
-        textTransform: 'uppercase',
-      }}>
-        Airwave Prototype
-      </div>
-
       <PhoneFrame>
         <Router screens={screens} initialScreen="ChannelList">
           <ScreenExporter />
         </Router>
       </PhoneFrame>
 
-      {/* Nav helper */}
-      <div style={{
-        position: 'absolute',
-        bottom: 20,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        color: 'rgba(255,255,255,0.3)',
-        fontSize: 12,
-        fontFamily: "'Outfit', sans-serif",
-        textAlign: 'center',
-      }}>
-        Click channels, menus, and buttons to navigate
-      </div>
     </div>
     </PrototypeModeProvider>
   )

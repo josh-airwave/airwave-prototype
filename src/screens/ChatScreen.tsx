@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { colors, fonts } from '../styles/theme'
 import { Header } from '../components/Header'
 import { MessageBubble } from '../components/MessageBubble'
@@ -10,6 +10,14 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
   const channelId = (params?.channelId as string) || 'c1'
   const channel = channels.find(c => c.id === channelId)
   const messages = chatMessages[channelId] || chatMessages.c1 || []
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to bottom to show newest messages
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
+    })
+  }, [channelId])
 
   // Compute grouping flags for each message
   const getGrouping = (index: number) => {
@@ -57,7 +65,7 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
       />
 
       {/* Messages */}
-      <div style={{
+      <div ref={scrollRef} style={{
         flex: 1,
         overflowY: 'auto',
         padding: '4px 0 8px',

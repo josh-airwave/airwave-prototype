@@ -50,6 +50,7 @@ export function ChannelListScreen() {
         subtitle="6 People Online ›"
         showMenu
         showCompose
+        showRestart
       />
       <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 90 }}>
         <SearchBar />

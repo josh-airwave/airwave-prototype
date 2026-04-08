@@ -31,7 +31,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
   // Drawer step — "Share to Chat" / "Share Externally"
   if (step === 'drawer') {
     return (
-      <div style={{ height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 10 }}
         onClick={() => pop()}
       >
         <div style={{
@@ -329,17 +329,11 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
               cursor: 'pointer',
             }}
           >
-            <div style={{
-              width: 36, height: 36, borderRadius: 8,
-              background: colors.primary,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </div>
+            <img
+              src="/images/airwave-app-icon.png"
+              alt="Airwave"
+              style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }}
+            />
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, fontFamily: fonts.family, color: colors.almostBlack }}>Airwave</div>
               <div style={{ fontSize: 12, fontFamily: fonts.family, color: colors.coolText }}>
@@ -365,17 +359,11 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
               cursor: 'pointer',
             }}
           >
-            <div style={{
-              width: 36, height: 36, borderRadius: 8,
-              background: colors.success,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z" />
-                <path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
-              </svg>
-            </div>
+            <img
+              src="/images/airwave-app-icon.png"
+              alt="Airwave"
+              style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }}
+            />
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, fontFamily: fonts.family, color: colors.almostBlack }}>Airwave</div>
               <div style={{ fontSize: 12, fontFamily: fonts.family, color: colors.coolText }}>
@@ -545,22 +533,6 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
           </div>
         </div>
 
-        {/* Restart prototype button - shown after sending */}
-        {sent && (
-          <div
-            onClick={() => reset('ChannelList')}
-            style={{
-              position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)',
-              padding: '8px 20px', borderRadius: 8,
-              background: '#fff', border: `1px dashed ${colors.neutralGray}`,
-              cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              fontFamily: fonts.family, color: colors.primary,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            Restart Prototype
-          </div>
-        )}
 
         <style>{`
           @keyframes slideDown {
