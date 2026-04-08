@@ -65,9 +65,9 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
             fontSize: 14, fontWeight: 400, fontFamily: fonts.family,
             color: colors.coolText, lineHeight: 1.5, margin: '0 0 20px', whiteSpace: 'pre-line',
           }}>
-            <strong>Share to Chat</strong> sends the video and report to anyone in your workspace.
+            <strong>Share to Chat</strong> posts the video and report directly to a channel in your workspace.
             {'\n\n'}
-            <strong>Share Externally</strong> sends only the report. The video stays in your workspace and is never shared outside.
+            <strong>Share Externally</strong> creates a public link to the report that anyone with the link can view. Only the report is shared. Your video is not included.
           </p>
 
           {/* Share to Chat — outline pill */}
