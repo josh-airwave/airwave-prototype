@@ -597,7 +597,8 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
             </div>
             <textarea
               value={feedbackMessage}
-              onChange={e => setFeedbackMessage(e.target.value)}
+              onChange={e => { if (e.target.value.length <= 160) setFeedbackMessage(e.target.value) }}
+              maxLength={160}
               placeholder="Tell us what would make this more useful..."
               style={{
                 width: '100%', minHeight: 64, padding: 8, borderRadius: 6,
@@ -608,6 +609,9 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
               onFocus={e => e.target.style.borderColor = rc.navy}
               onBlur={e => e.target.style.borderColor = rc.borderLight}
             />
+            <div style={{ fontSize: 11, color: feedbackMessage.length >= 160 ? rc.red : rc.textMed, fontFamily: font, textAlign: 'right', marginTop: 2 }}>
+              {feedbackMessage.length}/160
+            </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
               <button
                 onClick={() => {
