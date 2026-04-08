@@ -200,7 +200,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
   const [summary, setSummary] = useState(report.summary)
   const [editMode, setEditMode] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(report.status === 'submitted' || report.status === 'reviewed')
   const [showAddContext, setShowAddContext] = useState(false)
   const [addingContext, setAddingContext] = useState(false)
 
@@ -770,7 +770,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
       }}>
         {submitted ? (
           <button
-            onClick={() => { /* TODO: share flow */ }}
+            onClick={() => push('ShareFlow', { reportId: report.id })}
             style={{
               background: colors.white, color: colors.primary,
               padding: '12px 32px', borderRadius: 10,

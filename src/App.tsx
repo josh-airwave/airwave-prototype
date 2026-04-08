@@ -22,6 +22,8 @@ import { ImageZoomScreen } from './screens/ImageZoomScreen'
 import { VideoZoomScreen } from './screens/VideoZoomScreen'
 import { BlueCardDetailScreen } from './screens/BlueCardDetailScreen'
 import { FirmwareUpdateScreen } from './screens/FirmwareUpdateScreen'
+import { ShareFlowScreen } from './screens/ShareFlowScreen'
+import { ExternalReportScreen } from './screens/ExternalReportScreen'
 
 const screens: Record<string, React.ComponentType<{ params?: Record<string, unknown> }>> = {
   ChannelList: ChannelListScreen,
@@ -43,6 +45,8 @@ const screens: Record<string, React.ComponentType<{ params?: Record<string, unkn
   VideoZoom: VideoZoomScreen,
   BlueCardDetail: BlueCardDetailScreen,
   FirmwareUpdate: FirmwareUpdateScreen,
+  ShareFlow: ShareFlowScreen,
+  ExternalReport: ExternalReportScreen,
 }
 
 export default function App() {
