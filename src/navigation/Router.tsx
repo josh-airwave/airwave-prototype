@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import { AirwaveIsland, getIslandMode } from '../components/AirwaveIsland'
+import { feedbackStore } from '../data/feedbackStore'
 
 type RouteParams = Record<string, unknown>
 
@@ -64,6 +65,7 @@ export function Router({ screens, initialScreen, children }: RouterProps) {
   }, [])
 
   const reset = useCallback((screen: string, params?: RouteParams) => {
+    feedbackStore.clear()
     setStack([{ screen, params }])
     setSlideDirection(null)
   }, [])
