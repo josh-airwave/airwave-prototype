@@ -65,9 +65,23 @@ function ScreenExporterInner() {
       setStep(i + 1)
       setName(s.name)
 
-      // Seed feedback store if needed for this screen
+      // Force unmount previous screen by navigating to a blank state first.
+      // Without this, React reuses the component instance and useState
+      // ignores new initial values from params.
+      reset('ChannelList')
+      await waitForRender(300)
+
+      // For overlay screens, first navigate to the base screen, then push the overlay
+      if (s.base) {
+        reset(s.base.screen, s.base.params)
+        await waitForRender(800)
+        push(s.screen, s.params)
+      } else {
+        reset(s.screen, s.params)
+      }
+
+      // Seed feedback store AFTER navigation (reset clears the store)
       if (s.seedFeedback) {
-        feedbackStore.clear()
         const report = videoIntelReports.find(r => r.id === s.seedFeedback.reportId)
         if (report) {
           feedbackStore.add({
@@ -77,15 +91,6 @@ function ScreenExporterInner() {
             message: s.seedFeedback.message,
           })
         }
-      }
-
-      // For overlay screens, first navigate to the base screen, then push the overlay
-      if (s.base) {
-        reset(s.base.screen, s.base.params)
-        await waitForRender(800)
-        push(s.screen, s.params)
-      } else {
-        reset(s.screen, s.params)
       }
       await waitForRender(s.delay ?? 1200)
 
