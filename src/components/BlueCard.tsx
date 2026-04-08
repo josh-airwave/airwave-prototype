@@ -39,13 +39,15 @@ export function BlueCard({ card, onCardPress, onVideoPress, onViewReport, onShar
             padding: 0, border: 'none', cursor: 'pointer', display: 'block',
           }}
         >
-          <video src={card.videoUrl + '#t=0.5'} preload="metadata" muted playsInline
+          <video src={card.videoUrl} preload="metadata" muted playsInline
+            onLoadedMetadata={e => { const v = e.currentTarget; v.currentTime = Math.min(2, Math.max(0.1, v.duration - 0.1)) }}
             style={{
               position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
               objectFit: 'cover', filter: 'blur(20px) brightness(0.6)', transform: 'scale(1.2)',
             }}
           />
-          <video src={card.videoUrl + '#t=0.5'} preload="metadata" muted playsInline
+          <video src={card.videoUrl} preload="metadata" muted playsInline
+            onLoadedMetadata={e => { const v = e.currentTarget; v.currentTime = Math.min(2, Math.max(0.1, v.duration - 0.1)) }}
             style={{
               position: 'absolute', top: '50%', left: '50%',
               transform: 'translate(-50%, -50%)', height: '100%',

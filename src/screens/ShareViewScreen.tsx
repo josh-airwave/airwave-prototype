@@ -316,7 +316,8 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                   border: activeId === item.id ? '2px solid #2D81FF' : '2px solid transparent', padding: 0,
                 }}>
                   {item.type === 'video' && item.videoUrl ? (
-                    <video src={item.videoUrl + '#t=0.5'} muted preload="metadata" playsInline
+                    <video src={item.videoUrl} muted preload="metadata" playsInline
+                      onLoadedMetadata={e => { const v = e.currentTarget; v.currentTime = Math.min(2, Math.max(0.1, v.duration - 0.1)) }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
                   ) : (
                     <img src={item.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

@@ -399,10 +399,11 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
               width: 'fit-content',
             }}>
               <video
-                src={report.sourceVideoUrl + '#t=0.1'}
+                src={report.sourceVideoUrl}
                 controls
                 preload="metadata"
                 playsInline
+                onLoadedMetadata={e => { const v = e.currentTarget; v.currentTime = Math.min(2, Math.max(0.1, v.duration - 0.1)) }}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
             </div>
