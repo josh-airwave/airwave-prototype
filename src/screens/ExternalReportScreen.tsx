@@ -257,7 +257,7 @@ function StatusBadge({ label, count, color, bg }: { label: string, count: number
 }
 
 export function ExternalReportScreen({ params }: { params?: Record<string, unknown> }) {
-  const { reset } = useNavigation()
+  const { reset, push } = useNavigation()
   const reportId = (params?.reportId as string) || 'vr3'
   const report = videoIntelReports.find(r => r.id === reportId) || videoIntelReports[0]
   const { sections, reportSummary, statusCounts } = getInspectionData(reportId)
@@ -665,6 +665,23 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
             <div style={{ fontSize: 11, color: rc.textMed, fontFamily: font, marginTop: 2 }}>
               The technician will be notified.
             </div>
+            <button
+              onClick={() => push('Blue', { channelId: 'blue', channelType: 'blue' })}
+              style={{
+                marginTop: 10,
+                padding: '8px 20px',
+                background: rc.navy,
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: font,
+                cursor: 'pointer',
+              }}
+            >
+              View in Blue Feed
+            </button>
           </div>
         )}
       </div>
