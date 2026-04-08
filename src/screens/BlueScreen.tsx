@@ -156,7 +156,7 @@ export function BlueScreen() {
                 paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10,
                 borderRadius: 8, background: colors.coolGray, border: 'none',
                 fontSize: fonts.size.md, fontWeight: fonts.weight.semibold,
-                color: colors.neutral500, cursor: 'pointer', minWidth: 100,
+                color: colors.neutral500, cursor: 'pointer', whiteSpace: 'nowrap',
               }}
             >
               View Report
