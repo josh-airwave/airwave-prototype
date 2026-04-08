@@ -63,9 +63,11 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
           </div>
           <p style={{
             fontSize: 14, fontWeight: 400, fontFamily: fonts.family,
-            color: colors.coolText, lineHeight: 1.5, margin: '0 0 20px',
+            color: colors.coolText, lineHeight: 1.5, margin: '0 0 20px', whiteSpace: 'pre-line',
           }}>
-            Share to Chat let's you share to anyone in your workspace, while Share Externally allows you to share this file outside your workspace.
+            <strong>Share to Chat</strong> sends the video and report to anyone in your workspace.
+            {'\n\n'}
+            <strong>Share Externally</strong> sends only the report. The video stays in your workspace and is never shared outside.
           </p>
 
           {/* Share to Chat — outline pill */}
