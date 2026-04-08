@@ -11,6 +11,8 @@ import { useNavigation } from '../navigation/Router'
 import { toPng } from 'html-to-image'
 import JSZip from 'jszip'
 import { CURRENT_EXPORT } from './export-screens'
+import { feedbackStore } from '../data/feedbackStore'
+import { videoIntelReports } from '../data/mock'
 
 function waitForRender(ms = 600): Promise<void> {
   return new Promise(resolve => {
@@ -62,6 +64,20 @@ function ScreenExporterInner() {
       const s = screens[i]
       setStep(i + 1)
       setName(s.name)
+
+      // Seed feedback store if needed for this screen
+      if (s.seedFeedback) {
+        feedbackStore.clear()
+        const report = videoIntelReports.find(r => r.id === s.seedFeedback.reportId)
+        if (report) {
+          feedbackStore.add({
+            reportId: report.id,
+            reportTitle: report.title,
+            name: s.seedFeedback.name,
+            message: s.seedFeedback.message,
+          })
+        }
+      }
 
       // For overlay screens, first navigate to the base screen, then push the overlay
       if (s.base) {

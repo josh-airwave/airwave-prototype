@@ -13,10 +13,10 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
 
   const [step, setStep] = useState<FlowStep>((params?.initialStep as FlowStep) || 'drawer')
   const [copied, setCopied] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [showViewedNotif, setShowViewedNotif] = useState(false)
-  const [showFeedbackNotif, setShowFeedbackNotif] = useState(false)
+  const [sending, setSending] = useState(!!params?.initialSending)
+  const [sent, setSent] = useState(!!params?.initialSent)
+  const [showViewedNotif, setShowViewedNotif] = useState(!!params?.initialShowViewed)
+  const [showFeedbackNotif, setShowFeedbackNotif] = useState(!!params?.initialShowFeedback)
   const [sharedTo, setSharedTo] = useState<string | null>(null)
 
   // Auto-advance: after sending iMessage, show "viewed" notification, then "helpful" feedback
