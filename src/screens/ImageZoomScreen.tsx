@@ -18,9 +18,19 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const directVideoUrl = params?.videoUrl as string | undefined
   const item = galleryItems.find(i => i.id === itemId) || galleryItems[0]
 
-  const isVideo = !!directVideoUrl || item.type === 'video'
+  const isVideo = !!directVideoUrl || (!directImageUrl && item.type === 'video')
   const videoSrc = directVideoUrl || item.videoUrl
   const imageSrc = directImageUrl || item.thumbnail
+
+  // Source frame mode — opened from a report source badge
+  const sourceTime = params?.sourceTime as number | undefined
+  const sourceLabel = params?.sourceLabel as string | undefined
+  const sourceValue = params?.sourceValue as string | undefined
+  const sourceConfidence = params?.sourceConfidence as number | undefined
+  const sourceBbox = params?.sourceBbox as { x: number; y: number; w: number; h: number } | undefined
+  const isSourceMode = sourceTime != null || (directImageUrl != null && sourceLabel != null)
+  const [sourceEditing, setSourceEditing] = useState(false)
+  const [sourceEditValue, setSourceEditValue] = useState(sourceValue || '')
 
   // Freeze params for screen export
   const freezeState = params?.freezeState as boolean | undefined
@@ -31,6 +41,28 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const initialReversed = params?.initialReversed as boolean | undefined
   const initialProgress = (params?.initialProgress as number) ?? 0
   const initialDuration = (params?.initialDuration as number) ?? 48
+
+  // Video content rect — where the actual video renders within the container (for object-fit: contain)
+  const mediaContainerRef = useRef<HTMLDivElement>(null)
+  const [videoContentRect, setVideoContentRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null)
+
+  // Source mode zoom — compute transform-origin mapped to element coords (accounting for object-fit: contain)
+  const sourceOrigin = (() => {
+    if (!isSourceMode || !sourceBbox) return undefined
+    const bboxCenterX = sourceBbox.x + sourceBbox.w / 2
+    const bboxCenterY = sourceBbox.y + sourceBbox.h / 2
+    if (videoContentRect) {
+      const container = mediaContainerRef.current
+      if (container) {
+        const cW = container.clientWidth
+        const cH = container.clientHeight
+        const px = videoContentRect.left + bboxCenterX * videoContentRect.width
+        const py = videoContentRect.top + bboxCenterY * videoContentRect.height
+        return `${(px / cW) * 100}% ${(py / cH) * 100}%`
+      }
+    }
+    return `${bboxCenterX * 100}% ${bboxCenterY * 100}%`
+  })()
 
   // Zoom & pan
   const [scale, setScale] = useState(freezeState ? initialScale : 1)
@@ -43,7 +75,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const videoRef = useRef<HTMLVideoElement>(null)
   const scrubRef = useRef<HTMLDivElement>(null)
   const reverseIntervalRef = useRef<number>(0)
-  const [isPlaying, setIsPlaying] = useState(freezeState ? !initialPaused : true)
+  const [isPlaying, setIsPlaying] = useState(isSourceMode ? false : (freezeState ? !initialPaused : true))
   const [currentTime, setCurrentTime] = useState(freezeState ? initialProgress * initialDuration : 0)
   const [duration, setDuration] = useState(freezeState ? initialDuration : 0)
   const [progress, setProgress] = useState(freezeState ? initialProgress : 0)
@@ -119,6 +151,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
     >
       {/* Media area */}
       <div
+        ref={mediaContainerRef}
         style={{
           flex: 1,
           overflow: 'hidden',
@@ -164,7 +197,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           <video
             ref={videoRef}
             src={videoSrc}
-            autoPlay={!freezeState}
+            autoPlay={!freezeState && !isSourceMode}
             playsInline
             muted={isMuted || !!freezeState}
             onPlay={() => { if (!freezeState) setIsPlaying(true) }}
@@ -172,7 +205,13 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             onEnded={() => setIsPlaying(false)}
             onLoadedMetadata={() => {
               if (videoRef.current) {
-                if (freezeState) {
+                if (isSourceMode && sourceTime != null) {
+                  videoRef.current.pause()
+                  videoRef.current.currentTime = sourceTime
+                  setDuration(videoRef.current.duration)
+                  setCurrentTime(sourceTime)
+                  setProgress(videoRef.current.duration ? sourceTime / videoRef.current.duration : 0)
+                } else if (freezeState) {
                   videoRef.current.pause()
                   videoRef.current.currentTime = initialProgress * (videoRef.current.duration || initialDuration)
                   setDuration(videoRef.current.duration || initialDuration)
@@ -180,6 +219,30 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
                   setDuration(videoRef.current.duration)
                 }
                 videoRef.current.playbackRate = playbackSpeed
+                // Compute where the video content actually renders within the container (for bbox alignment)
+                if (isSourceMode && sourceBbox && mediaContainerRef.current) {
+                  const v = videoRef.current
+                  const container = mediaContainerRef.current
+                  const cW = container.clientWidth
+                  const cH = container.clientHeight
+                  const vW = v.videoWidth
+                  const vH = v.videoHeight
+                  if (vW && vH) {
+                    const containerRatio = cW / cH
+                    const videoRatio = vW / vH
+                    let rLeft = 0, rTop = 0, rWidth = cW, rHeight = cH
+                    if (videoRatio > containerRatio) {
+                      // Video is wider — letterbox top/bottom
+                      rHeight = cW / videoRatio
+                      rTop = (cH - rHeight) / 2
+                    } else {
+                      // Video is taller — letterbox left/right
+                      rWidth = cH * videoRatio
+                      rLeft = (cW - rWidth) / 2
+                    }
+                    setVideoContentRect({ left: rLeft, top: rTop, width: rWidth, height: rHeight })
+                  }
+                }
               }
             }}
             onTimeUpdate={() => {
@@ -190,8 +253,9 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
               }
             }}
             style={{
-              width: '100%', height: '100%', objectFit: 'cover',
+              width: '100%', height: '100%', objectFit: isSourceMode ? 'contain' : 'cover',
               transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
+              transformOrigin: sourceOrigin || 'center center',
               transition: isDragging ? 'none' : 'transform 0.2s ease-out',
             }}
           />
@@ -200,12 +264,67 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             src={imageSrc}
             alt=""
             draggable={false}
+            onLoad={(e) => {
+              if (isSourceMode && sourceBbox && mediaContainerRef.current) {
+                const img = e.currentTarget
+                const container = mediaContainerRef.current
+                const cW = container.clientWidth
+                const cH = container.clientHeight
+                const iW = img.naturalWidth
+                const iH = img.naturalHeight
+                if (iW && iH) {
+                  const containerRatio = cW / cH
+                  const imgRatio = iW / iH
+                  let rLeft = 0, rTop = 0, rWidth = cW, rHeight = cH
+                  if (imgRatio > containerRatio) {
+                    rHeight = cW / imgRatio
+                    rTop = (cH - rHeight) / 2
+                  } else {
+                    rWidth = cH * imgRatio
+                    rLeft = (cW - rWidth) / 2
+                  }
+                  setVideoContentRect({ left: rLeft, top: rTop, width: rWidth, height: rHeight })
+                }
+              }
+            }}
             style={{
               maxWidth: '100%', maxHeight: '100%', objectFit: 'contain',
               transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
+              transformOrigin: sourceOrigin || 'center center',
               transition: isDragging ? 'none' : 'transform 0.2s ease-out',
             }}
           />
+        )}
+
+        {/* Bounding box highlight overlay — positioned within actual video content area */}
+        {isSourceMode && sourceBbox && videoContentRect && (
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            transform: `scale(${scale}) translate(${translate.x / scale}px, ${translate.y / scale}px)`,
+            transformOrigin: sourceOrigin || 'center center',
+            transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+          }}>
+            {/* Inner wrapper matches video content area (accounts for letterboxing) */}
+            <div style={{
+              position: 'absolute',
+              left: videoContentRect ? videoContentRect.left : 0,
+              top: videoContentRect ? videoContentRect.top : 0,
+              width: videoContentRect ? videoContentRect.width : '100%',
+              height: videoContentRect ? videoContentRect.height : '100%',
+            }}>
+              <div style={{
+                position: 'absolute',
+                left: `${sourceBbox.x * 100}%`,
+                top: `${sourceBbox.y * 100}%`,
+                width: `${sourceBbox.w * 100}%`,
+                height: `${sourceBbox.h * 100}%`,
+                border: '2px solid #60A5FA',
+                borderRadius: 3,
+                boxShadow: '0 0 0 2000px rgba(0,0,0,0.4)',
+                background: 'rgba(96,165,250,0.08)',
+              }} />
+            </div>
+          </div>
         )}
 
         {/* Timecode — top right, matching ShareView */}
@@ -275,6 +394,85 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           </div>
         )}
       </div>
+
+      {/* Source frame card — verify and edit what Blue read */}
+      {isSourceMode && sourceLabel && (
+        <div style={{
+          padding: '10px 16px 6px',
+        }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: 12, padding: '14px 16px',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+              marginBottom: 8,
+            }}>
+              <div style={{
+                fontSize: 11, color: 'rgba(255,255,255,0.5)',
+                fontFamily: fonts.family, fontWeight: 500,
+                textTransform: 'uppercase', letterSpacing: 0.5,
+              }}>
+                {sourceLabel}
+              </div>
+              {sourceConfidence != null && (
+                <div style={{
+                  fontSize: 10, fontFamily: fonts.family, fontWeight: 600,
+                  padding: '2px 6px', borderRadius: 4,
+                  background: sourceConfidence >= 0.9 ? 'rgba(73,174,123,0.2)' : sourceConfidence >= 0.8 ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)',
+                  color: sourceConfidence >= 0.9 ? '#6EE7A0' : sourceConfidence >= 0.8 ? '#FCD34D' : '#FCA5A5',
+                }}>
+                  {Math.round(sourceConfidence * 100)}% confidence
+                </div>
+              )}
+            </div>
+
+            <div
+              onClick={() => { if (!sourceEditing) setSourceEditing(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                cursor: sourceEditing ? 'default' : 'pointer',
+                height: 36,
+              }}
+            >
+              {sourceEditing ? (
+                <input
+                  autoFocus
+                  value={sourceEditValue}
+                  onChange={(e) => setSourceEditValue(e.target.value)}
+                  onBlur={() => setSourceEditing(false)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setSourceEditing(false) }}
+                  style={{
+                    fontSize: 22, fontWeight: 700, color: 'white',
+                    fontFamily: fonts.family, background: 'transparent',
+                    border: 'none', borderBottom: '2px solid #60A5FA',
+                    padding: 0, outline: 'none', width: '100%',
+                  }}
+                />
+              ) : (
+                <span style={{
+                  fontSize: 22, fontWeight: 700, color: 'white',
+                  fontFamily: fonts.family,
+                }}>
+                  {sourceEditValue || '—'}
+                </span>
+              )}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={sourceEditing ? '#60A5FA' : 'rgba(255,255,255,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </div>
+
+            <div style={{
+              fontSize: 11, color: 'rgba(255,255,255,0.35)',
+              fontFamily: fonts.family, marginTop: 6,
+            }}>
+              Tap value to correct{sourceTime != null ? <> &bull; Blue read at {formatTime(sourceTime)}</> : null}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom controls — matching ShareView exactly */}
       <div style={{

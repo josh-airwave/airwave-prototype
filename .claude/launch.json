@@ -5,8 +5,7 @@
       "name": "dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 3003,
-      "cwd": "/Users/joshlee/Documents/airwave-prototype"
+      "port": 5173
     }
   ]
 }

@@ -50,7 +50,7 @@ export function BlueScreen() {
             card={card}
             onCardPress={() => push('BlueCardDetail', { cardId: card.id })}
             onVideoPress={() => push('VideoZoom', { videoUrl: card.videoUrl })}
-            onViewReport={() => push('ReportView', { reportId: card.id })}
+            onViewReport={() => push('ReportView', { reportId: card.reportId || card.id })}
             onShare={() => push('BlueCardDetail', { cardId: card.id, openShare: true })}
             onReply={(text) => push('BlueCardDetail', { cardId: card.id, initialReply: text })}
           />

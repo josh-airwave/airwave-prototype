@@ -20,16 +20,17 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
 
   return (
     <div style={{
+      position: 'relative',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       padding: '8px 16px',
       background: colors.white,
       borderBottom: `1px solid ${colors.border}`,
       minHeight: 40,
     }}>
-      {/* Left slot */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 30 }}>
+      {/* Left slot — absolute so it doesn't affect title centering */}
+      <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 12 }}>
         {showBack && canGoBack && (
           <button onClick={onBack || pop} style={{ fontSize: 22, color: colors.primary, padding: 4 }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -44,12 +45,12 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
         )}
       </div>
 
-      {/* Center title */}
-      <div style={{ flex: 1 }}>
+      {/* Center title — always centered */}
+      <div>
         <div style={{
           fontSize: fonts.size.lg,
           fontWeight: fonts.weight.bold,
-          textAlign: hasLeftAction ? 'center' : 'left',
+          textAlign: 'center',
           color: colors.black,
         }}>
           {title}
@@ -59,15 +60,15 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, right
             fontSize: fonts.size.md,
             fontWeight: fonts.weight.regular,
             color: colors.primary,
-            textAlign: hasLeftAction ? 'center' : 'left',
+            textAlign: 'center',
           }}>
             {subtitle}
           </div>
         )}
       </div>
 
-      {/* Right slot — matches left width for centering */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 30, justifyContent: 'flex-end' }}>
+      {/* Right slot — absolute so it doesn't affect title centering */}
+      <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 8 }}>
         {showCompose && (
           <button style={{ padding: 4, display: 'flex', alignItems: 'center' }}>
             <img src="/icons/ic_new_message.png" alt="Compose" style={{ width: 24, height: 24, objectFit: 'contain' }} />

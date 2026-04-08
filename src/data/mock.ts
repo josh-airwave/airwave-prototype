@@ -30,6 +30,7 @@ export interface BlueCard {
   sharedBy: User
   buttons: ('View Report' | 'Share')[]
   replyCount?: number
+  reportId?: string        // links to a VideoIntelReport
 }
 
 export interface Message {
@@ -76,6 +77,7 @@ export interface OcrField {
   frameUrl: string         // source frame image URL
   edited?: boolean         // tech corrected this field
   editedValue?: string     // the corrected value
+  bbox?: { x: number; y: number; w: number; h: number }  // normalized 0-1 coords for highlight box
 }
 
 export interface DetectedObject {
@@ -86,6 +88,7 @@ export interface DetectedObject {
   frameTimestamp: number
   frameUrl: string
   details?: string         // e.g. "United Rentals" brand, serial number
+  bbox?: { x: number; y: number; w: number; h: number }  // normalized 0-1 coords for highlight box
 }
 
 export interface VideoIntelReport {
@@ -172,6 +175,7 @@ export const users: User[] = [
   { id: '13', name: 'Rajesh', avatar: 'https://i.pravatar.cc/80?u=rajesh', title: 'Full Stack Developer', online: false },
   { id: '14', name: 'Heather Rees', avatar: 'https://i.pravatar.cc/80?u=heather', online: true },
   { id: '15', name: 'David Triana', avatar: 'https://i.pravatar.cc/80?u=david', online: false },
+  { id: '16', name: 'Kelli Harper', avatar: 'https://i.pravatar.cc/80?u=kelli', title: 'Production Tech', online: false },
 ]
 
 export const currentUser = users[0]
@@ -302,33 +306,47 @@ export const chatMessages: Record<string, Message[]> = {
 export const blueCards: BlueCard[] = [
   {
     id: 'bc1',
-    title: 'Daily Blue Testing and Insights',
-    summary: 'This video transcript details a daily inspection and summary report involving testing Blue with Claude, conducting stress tests, analyzing responses, generating reports, and documenting field observations across multiple job sites during the morning shift.',
-    videoUrl: '/media/videos/video-1.mp4',
+    title: 'MT 06 Tool 104 219 — Machine Audit',
+    summary: 'Blue processed 1:23 of video from the injection molding controller display at MT 06 Tool 104 219. OCR extracted cycle parameters including injection speed, pressure, cushion time, fill time, plasticizing time, and cycle time from the Nissei controller screen.',
+    videoUrl: '/media/videos/mma-audit.mp4',
     fileCount: 1,
     sharedBy: users[0],
     buttons: ['View Report', 'Share'],
-    replyCount: 3,
+    replyCount: 2,
+    reportId: 'vr1',
   },
   {
     id: 'bc2',
-    title: 'Elevator Inspection Summary',
-    summary: 'Comprehensive review of elevator shaft installation progress, including structural assessment, safety compliance check, and remaining work items for completion. The inspection identified three areas requiring immediate attention before the next phase of construction can proceed.',
-    videoUrl: '/media/videos/video-3.mp4',
-    fileCount: 2,
+    title: 'Production Whiteboard — Shift Tracking',
+    summary: 'Blue processed video of the hour-by-hour production whiteboard at Delta Faucet Jackson. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for all 8 hours of the shift from the handwritten tracking board.',
+    videoUrl: '/media/videos/whiteboard.mp4',
+    fileCount: 1,
     sharedBy: users[0],
     buttons: ['View Report', 'Share'],
     replyCount: 1,
+    reportId: 'vr2',
   },
   {
     id: 'bc3',
-    title: 'Site Walk-Through Documentation',
-    summary: 'Recorded walk-through of the construction site capturing current progress on framing, electrical rough-in, and plumbing installation across all three floors. Key observations include completed header beams on floor two and pending HVAC ductwork routing on the ground level.',
-    videoUrl: '/media/videos/video-5.mp4',
+    title: 'Yard Equipment Inventory',
+    summary: 'Blue processed video from the equipment yard at Bay 1-2. Object detection identified scissor lifts, boom lifts, a forklift, and a dumpster. OCR captured serial numbers and brand labels from United Rentals and Republic Services equipment.',
+    videoUrl: '/media/videos/machine-yard.mp4',
     fileCount: 1,
     sharedBy: users[2],
     buttons: ['View Report', 'Share'],
     replyCount: 0,
+    reportId: 'vr3',
+  },
+  {
+    id: 'bc4',
+    title: 'Hour-by-Hour Production Sheet — Kelli Harper',
+    summary: 'Blue processed video of the hour-by-hour production sheet recorded by Kelli Harper at Delta Faucet Jackson. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for all 8 hours of the shift.',
+    videoUrl: '/media/videos/hour-by-hour-sheet.mp4',
+    fileCount: 1,
+    sharedBy: users[15],
+    buttons: ['View Report', 'Share'],
+    replyCount: 0,
+    reportId: 'vr4',
   },
 ]
 
@@ -408,8 +426,8 @@ export const galleryItems: GalleryItem[] = [
   { id: 'g14', type: 'photo', thumbnail: '/media/images/pexels-thiagomobile-2317640.jpg', date: 'Mar 13, 2026', time: '9:01 PM' },
   // Mar 8, 2026 batch
   { id: 'g15', type: 'video', thumbnail: '/media/images/mma-audit-thumb.jpg', videoUrl: '/media/videos/mma-audit.mp4', duration: '01:23', date: 'Mar 8, 2026', time: '2:15 PM' },
-  { id: 'g16', type: 'video', thumbnail: '/media/images/pexels-umaraffan499-190417.jpg', videoUrl: '/media/videos/video-10.mp4', duration: '00:41', date: 'Mar 8, 2026', time: '2:15 PM' },
-  { id: 'g17', type: 'video', thumbnail: '/media/images/pexels-cottonbro-4489737.jpg', videoUrl: '/media/videos/video-11.mp4', duration: '00:29', date: 'Mar 8, 2026', time: '2:15 PM' },
+  { id: 'g16', type: 'video', videoUrl: '/media/videos/whiteboard.mp4', thumbnail: '/media/videos/whiteboard.mp4', duration: '00:41', date: 'Mar 8, 2026', time: '2:15 PM' },
+  { id: 'g17', type: 'video', videoUrl: '/media/videos/machine-yard.mp4', thumbnail: '/media/videos/machine-yard.mp4', duration: '00:29', date: 'Mar 8, 2026', time: '2:15 PM' },
   { id: 'g18', type: 'photo', thumbnail: '/media/images/pexels-thisisengineering-3861438.jpg', date: 'Mar 8, 2026', time: '2:15 PM' },
 ]
 
@@ -508,92 +526,154 @@ export const reportTemplates = [
 ]
 
 // --- Video Intelligence Reports ---
-// Mirrors the Delta Faucet Jackson whiteboard: HR | HOURLY GOAL | CUMULATIVE GOAL | HOURLY ACTUAL | CUMULATIVE ACTUAL
 const frameBase = '/media/images/pexels-cottonbro-4489737.jpg' // placeholder for source frames
 
 export const videoIntelReports: VideoIntelReport[] = [
+  // --- vr1: MMA Machine Controller Display ---
   {
     id: 'vr1',
-    title: 'MT 06 Tool 104 — Hourly Production',
-    templateName: 'Hourly Production Tracking',
-    machine: 'MT 06 Tool 104',
+    title: 'MT 06 Tool 104 219 — Machine Audit',
+    templateName: 'Injection Molding Machine Audit',
+    machine: 'MT 06 Tool 104 219',
     location: 'Delta Faucet — Jackson, TN',
     technician: 'Josh Lee',
     date: 'Apr 07, 2026',
     time: '3:42 PM CDT',
-    sourceVideoUrl: '/media/videos/video-1.mp4',
-    sourceVideoThumbnail: '/media/videos/video-1.mp4',
+    sourceVideoUrl: '/media/videos/mma-audit.mp4',
+    sourceVideoThumbnail: '/media/videos/mma-audit.mp4',
     status: 'draft',
-    summary: 'Blue processed 48s of video from the production whiteboard at MT 06 Tool 104. OCR extracted hourly goal and actual production counts for 8 hours. Cumulative goal on track at 204 units. Hours 3 and 6 actual below target — flagged for review.',
+    summary: 'Blue processed 1:23 of video from the Nissei SI-200-6S H450E Φ46 controller (No. 62, Monitor Data screen) at MT 06 Tool 104 219. OCR extracted cycle parameters, process settings, and 227 shots of cycle data from the controller screen.',
     ocrFields: [
-      // Hour 1
-      { id: 'ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.2, frameUrl: frameBase },
-      { id: 'ocr2', label: 'HR 1 — Cumulative Goal', value: '26', confidence: 0.82, frameTimestamp: 3.2, frameUrl: frameBase, edited: true, editedValue: '25' },
-      { id: 'ocr3', label: 'HR 1 — Hourly Actual', value: '27', confidence: 0.95, frameTimestamp: 18.4, frameUrl: frameBase },
-      { id: 'ocr4', label: 'HR 1 — Cumulative Actual', value: '27', confidence: 0.96, frameTimestamp: 18.4, frameUrl: frameBase },
-      // Hour 2
-      { id: 'ocr5', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 5.1, frameUrl: frameBase },
-      { id: 'ocr6', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 5.1, frameUrl: frameBase },
-      { id: 'ocr7', label: 'HR 2 — Hourly Actual', value: '26', confidence: 0.93, frameTimestamp: 20.1, frameUrl: frameBase },
-      { id: 'ocr8', label: 'HR 2 — Cumulative Actual', value: '53', confidence: 0.90, frameTimestamp: 20.1, frameUrl: frameBase },
-      // Hour 3
-      { id: 'ocr9', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 7.8, frameUrl: frameBase },
-      { id: 'ocr10', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 7.8, frameUrl: frameBase },
-      { id: 'ocr11', label: 'HR 3 — Hourly Actual', value: '19', confidence: 0.88, frameTimestamp: 22.5, frameUrl: frameBase },
-      { id: 'ocr12', label: 'HR 3 — Cumulative Actual', value: '72', confidence: 0.85, frameTimestamp: 22.5, frameUrl: frameBase },
-      // Hour 4
-      { id: 'ocr13', label: 'HR 4 — Hourly Goal', value: '29', confidence: 0.93, frameTimestamp: 10.3, frameUrl: frameBase },
-      { id: 'ocr14', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 10.3, frameUrl: frameBase },
-      { id: 'ocr15', label: 'HR 4 — Hourly Actual', value: '31', confidence: 0.92, frameTimestamp: 25.0, frameUrl: frameBase },
-      { id: 'ocr16', label: 'HR 4 — Cumulative Actual', value: '103', confidence: 0.79, frameTimestamp: 25.0, frameUrl: frameBase, edited: true, editedValue: '104' },
-      // Hour 5
-      { id: 'ocr17', label: 'HR 5 — Hourly Goal', value: '26', confidence: 0.95, frameTimestamp: 12.6, frameUrl: frameBase },
-      { id: 'ocr18', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.84, frameTimestamp: 12.6, frameUrl: frameBase },
-      { id: 'ocr19', label: 'HR 5 — Hourly Actual', value: '25', confidence: 0.91, frameTimestamp: 28.2, frameUrl: frameBase },
-      { id: 'ocr20', label: 'HR 5 — Cumulative Actual', value: '129', confidence: 0.90, frameTimestamp: 28.2, frameUrl: frameBase },
-      // Hour 6
-      { id: 'ocr21', label: 'HR 6 — Hourly Goal', value: '25', confidence: 0.94, frameTimestamp: 15.0, frameUrl: frameBase },
-      { id: 'ocr22', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.78, frameTimestamp: 15.0, frameUrl: frameBase },
-      { id: 'ocr23', label: 'HR 6 — Hourly Actual', value: '21', confidence: 0.86, frameTimestamp: 31.5, frameUrl: frameBase },
-      { id: 'ocr24', label: 'HR 6 — Cumulative Actual', value: '150', confidence: 0.83, frameTimestamp: 31.5, frameUrl: frameBase },
-      // Hour 7
-      { id: 'ocr25', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 17.4, frameUrl: frameBase },
-      { id: 'ocr26', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 17.4, frameUrl: frameBase },
-      { id: 'ocr27', label: 'HR 7 — Hourly Actual', value: '30', confidence: 0.90, frameTimestamp: 34.0, frameUrl: frameBase },
-      { id: 'ocr28', label: 'HR 7 — Cumulative Actual', value: '180', confidence: 0.88, frameTimestamp: 34.0, frameUrl: frameBase },
-      // Hour 8
-      { id: 'ocr29', label: 'HR 8 — Hourly Goal', value: '26', confidence: 0.93, frameTimestamp: 19.8, frameUrl: frameBase },
-      { id: 'ocr30', label: 'HR 8 — Cumulative Goal', value: '204', confidence: 0.81, frameTimestamp: 19.8, frameUrl: frameBase },
-      { id: 'ocr31', label: 'HR 8 — Hourly Actual', value: '28', confidence: 0.89, frameTimestamp: 37.2, frameUrl: frameBase },
-      { id: 'ocr32', label: 'HR 8 — Cumulative Actual', value: '208', confidence: 0.85, frameTimestamp: 37.2, frameUrl: frameBase },
+      // Row 1 — top parameter bar on controller display
+      { id: 'ocr-screw-pos', label: 'Screw Position', value: '2.057 in', confidence: 0.95, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.20, y: 0.20, w: 0.35, h: 0.06 } },
+      { id: 'ocr-inj-speed', label: 'Injection Speed', value: '-0.11 in/s', confidence: 0.96, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.20, y: 0.20, w: 0.35, h: 0.06 } },
+      { id: 'ocr-inj-pressure', label: 'Injection Pressure', value: '125 in/10Pa', confidence: 0.78, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.38, y: 0.12, w: 0.25, h: 0.06 } },
+      { id: 'ocr-rev', label: 'REV', value: '35 rpm', confidence: 0.97, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.64, y: 0.12, w: 0.12, h: 0.06 } },
+      { id: 'ocr-clamp-pos', label: 'Clamp Position', value: '0.000 in', confidence: 0.87, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.77, y: 0.06, w: 0.18, h: 0.05 } },
+      { id: 'ocr-ej-pos', label: 'Ejector Position', value: '0.000 in', confidence: 0.97, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.77, y: 0.12, w: 0.18, h: 0.06 } },
+      // Row 2 — second parameter bar
+      { id: 'ocr-cycle-time', label: 'Cycle Time (Objective)', value: '59.34s', confidence: 0.95, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.05, y: 0.19, w: 0.18, h: 0.06 } },
+      { id: 'ocr-cushion-pos', label: 'Cushion Position', value: '0.209 in', confidence: 0.94, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.28, y: 0.19, w: 0.18, h: 0.06 } },
+      { id: 'ocr-min-cushion', label: 'Min Cushion Position', value: '0.209 in', confidence: 0.93, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.28, y: 0.19, w: 0.18, h: 0.06 } },
+      { id: 'ocr-fill-time', label: 'Fill Injection Time', value: '0.51s', confidence: 0.93, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.48, y: 0.19, w: 0.18, h: 0.06 } },
+      { id: 'ocr-plast-time', label: 'Plasticizing Time', value: '14.37s', confidence: 0.91, frameTimestamp: 2.1, frameUrl: frameBase, bbox: { x: 0.68, y: 0.19, w: 0.18, h: 0.06 } },
     ],
-    detectedObjects: [],
+    detectedObjects: [
+      { id: 'obj-display', label: 'Machine Controller Display', count: 1, confidence: 0.98, frameTimestamp: 2.0, frameUrl: frameBase, details: 'Nissei SI-200-6S H450E Φ46, Controller No. 62, Monitor Data screen', bbox: { x: 0.05, y: 0.03, w: 0.90, h: 0.90 } },
+      { id: 'obj-data-table', label: 'Shot Data Table', count: 1, confidence: 0.94, frameTimestamp: 5.0, frameUrl: frameBase, details: '227 shots logged, columns: Cycle Time, Injection Time, Pack Press, Cushion Position, Plast. Time, Heater Temp', bbox: { x: 0.05, y: 0.30, w: 0.90, h: 0.60 } },
+    ],
   },
+  // --- vr2: Production Whiteboard ---
   {
     id: 'vr2',
+    title: 'Production Whiteboard — Shift Tracking',
+    templateName: 'Hour-by-Hour Production Report',
+    machine: 'MT 06 Tool 104 219',
+    location: 'Delta Faucet — Jackson, TN',
+    technician: 'Josh Lee',
+    date: 'Apr 07, 2026',
+    time: '4:15 PM CDT',
+    sourceVideoUrl: '/media/videos/whiteboard.mp4',
+    sourceVideoThumbnail: '/media/videos/whiteboard.mp4',
+    status: 'draft',
+    summary: 'Blue processed video of the hour-by-hour production whiteboard. OCR extracted hourly goal and cumulative goal counts for all 8 hours of the shift.',
+    ocrFields: [
+      { id: 'ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'ocr2', label: 'HR 1 — Cumulative Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'ocr3', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'ocr4', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'ocr5', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.79, w: 0.14, h: 0.05 } },
+      { id: 'ocr6', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.79, w: 0.16, h: 0.05 } },
+      { id: 'ocr7', label: 'HR 4 — Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.84, w: 0.14, h: 0.05 } },
+      { id: 'ocr8', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.84, w: 0.16, h: 0.05 } },
+      { id: 'ocr9', label: 'HR 5 — Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.89, w: 0.14, h: 0.05 } },
+      { id: 'ocr10', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.84, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.89, w: 0.16, h: 0.05 } },
+      { id: 'ocr11', label: 'HR 6 — Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.94, w: 0.14, h: 0.05 } },
+      { id: 'ocr12', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.78, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.94, w: 0.16, h: 0.05 } },
+      { id: 'ocr13', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'ocr14', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'ocr15', label: 'HR 8 — Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'ocr16', label: 'HR 8 — Cumulative Goal', value: '205', confidence: 0.81, frameTimestamp: 3.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+    ],
+    detectedObjects: [
+      { id: 'obj-whiteboard', label: 'Production Whiteboard', count: 1, confidence: 0.96, frameTimestamp: 3.0, frameUrl: frameBase, details: 'Hour-by-hour tracking board', bbox: { x: 0.05, y: 0.10, w: 0.90, h: 0.80 } },
+    ],
+  },
+  // --- vr3: Yard Equipment Inventory ---
+  {
+    id: 'vr3',
     title: 'Yard Equipment Inventory',
     templateName: 'Equipment Audit',
     location: 'Jackson Yard — Bay 1-2',
     technician: 'Josh Lee',
     date: 'Apr 07, 2026',
     time: '2:15 PM CDT',
-    sourceVideoUrl: '/media/videos/video-3.mp4',
-    sourceVideoThumbnail: '/media/videos/video-3.mp4',
+    sourceVideoUrl: '/media/videos/machine-yard.mp4',
+    sourceVideoThumbnail: '/media/videos/machine-yard.mp4',
     status: 'reviewed',
-    summary: 'Blue processed 32s of video from the equipment yard. Object detection identified 3 scissor lifts, 2 boom lifts, and 1 forklift. OCR captured serial number T169894 from a United Rentals scissor lift and bay numbers 1 and 2.',
+    summary: 'Blue processed video of equipment yard inspection. OCR identified rental source as United Rentals (800-UR-RENTS). Object detection cataloged 1 orange scissor lift under inspection, 3 boom lifts, 5 red scissor lifts, 1 forklift, and open battery compartment.',
     ocrFields: [
-      { id: 'yocr1', label: 'Bay Number (Left)', value: '2', confidence: 0.98, frameTimestamp: 2.0, frameUrl: frameBase },
-      { id: 'yocr2', label: 'Bay Number (Right)', value: '1', confidence: 0.99, frameTimestamp: 2.0, frameUrl: frameBase },
-      { id: 'yocr3', label: 'Scissor Lift Serial', value: 'T169894', confidence: 0.92, frameTimestamp: 24.5, frameUrl: frameBase },
-      { id: 'yocr4', label: 'Scissor Lift Brand', value: 'United Rentals', confidence: 0.95, frameTimestamp: 24.5, frameUrl: frameBase },
-      { id: 'yocr5', label: 'Dumpster Service', value: 'Republic Services', confidence: 0.97, frameTimestamp: 5.0, frameUrl: frameBase },
+      { id: 'yocr1', label: 'Rental Company Phone', value: '800-UR-RENTS', confidence: 0.94, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', bbox: { x: 0.22, y: 0.06, w: 0.50, h: 0.04 } },
     ],
     detectedObjects: [
-      { id: 'obj1', label: 'Scissor Lift', count: 3, confidence: 0.94, frameTimestamp: 12.0, frameUrl: frameBase, details: 'Orange/yellow, United Rentals' },
-      { id: 'obj2', label: 'Boom Lift', count: 2, confidence: 0.91, frameTimestamp: 14.5, frameUrl: frameBase, details: 'Blue Genie, Red MEC' },
-      { id: 'obj3', label: 'Forklift', count: 1, confidence: 0.96, frameTimestamp: 3.0, frameUrl: frameBase, details: 'Yellow, near Bay 2' },
-      { id: 'obj4', label: 'Dumpster', count: 1, confidence: 0.98, frameTimestamp: 5.0, frameUrl: frameBase, details: 'Republic Services, blue' },
-      { id: 'obj5', label: 'Traffic Cone', count: 1, confidence: 0.99, frameTimestamp: 4.0, frameUrl: frameBase },
+      { id: 'obj1', label: 'Scissor Lift (Underside)', count: 1, confidence: 0.98, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', details: 'Orange electric scissor lift, scissors raised, hydraulic cylinder and X-pattern linkage visible', bbox: { x: 0.05, y: 0.18, w: 0.90, h: 0.60 } },
+      { id: 'obj2', label: 'Scissor Lift (Side)', count: 1, confidence: 0.97, frameTimestamp: 24.5, frameUrl: '/images/yard4.png', details: 'Same unit, side/rear view — warning labels, non-marking rubber tires, hydraulic hoses along arms', bbox: { x: 0.0, y: 0.50, w: 0.85, h: 0.45 } },
+      { id: 'obj3', label: 'Battery Compartment', count: 1, confidence: 0.96, frameTimestamp: 5.0, frameUrl: '/images/yard2.png', details: 'Open battery bay with lead-acid cells, white terminal caps, black cable wiring', bbox: { x: 0.40, y: 0.52, w: 0.50, h: 0.28 } },
+      { id: 'obj4', label: 'Forklift', count: 1, confidence: 0.95, frameTimestamp: 5.0, frameUrl: '/images/yard4.png', details: 'Yellow, parked inside loading Bay 2', bbox: { x: 0.0, y: 0.08, w: 0.30, h: 0.38 } },
+      { id: 'obj5', label: 'Boom Lift Fleet', count: 3, confidence: 0.91, frameTimestamp: 12.0, frameUrl: '/images/yard3.png', details: 'Orange articulated and blue boom lifts in rental depot yard', bbox: { x: 0.05, y: 0.02, w: 0.75, h: 0.35 } },
+      { id: 'obj6', label: 'Red Scissor Lift Cluster', count: 5, confidence: 0.89, frameTimestamp: 12.0, frameUrl: '/images/yard3.png', details: 'Cluster of red scissor lifts (Genie/Skyjack style) in yard', bbox: { x: 0.20, y: 0.08, w: 0.50, h: 0.30 } },
+    ],
+  },
+  // --- vr4: Kelli Harper Hour-by-Hour Sheet ---
+  {
+    id: 'vr4',
+    title: 'Hour-by-Hour Production Sheet — Kelli Harper',
+    templateName: 'Hour-by-Hour Production Report',
+    machine: 'MT 06 Tool 104 219',
+    location: 'Delta Faucet — Jackson, TN',
+    technician: 'Kelli Harper',
+    date: 'Apr 07, 2026',
+    time: '5:30 PM CDT',
+    sourceVideoUrl: '/media/videos/hour-by-hour-sheet.mp4',
+    sourceVideoThumbnail: '/media/videos/hour-by-hour-sheet.mp4',
+    status: 'draft',
+    summary: 'Blue processed video of the hour-by-hour production sheet recorded by Kelli Harper. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for the shift.',
+    ocrFields: [
+      { id: 'kh-ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.96, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr2', label: 'HR 1 — Cumulative Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr3', label: 'HR 1 — Hourly Actual', value: '27', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr4', label: 'HR 1 — Cumulative Actual', value: '27', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr5', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr6', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr7', label: 'HR 2 — Hourly Actual', value: '30', confidence: 0.90, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr8', label: 'HR 2 — Cumulative Actual', value: '57', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr9', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.79, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr10', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.79, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr11', label: 'HR 3 — Hourly Actual', value: '22', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.79, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr12', label: 'HR 3 — Cumulative Actual', value: '79', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.79, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr13', label: 'HR 4 — Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.84, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr14', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.84, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr15', label: 'HR 4 — Hourly Actual', value: '26', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.84, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr16', label: 'HR 4 — Cumulative Actual', value: '105', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.84, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr17', label: 'HR 5 — Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.89, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr18', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.83, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.89, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr19', label: 'HR 5 — Hourly Actual', value: '24', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.89, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr20', label: 'HR 5 — Cumulative Actual', value: '129', confidence: 0.82, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.89, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr21', label: 'HR 6 — Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.94, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr22', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.79, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.94, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr23', label: 'HR 6 — Hourly Actual', value: '25', confidence: 0.86, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.94, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr24', label: 'HR 6 — Cumulative Actual', value: '154', confidence: 0.78, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.94, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr25', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr26', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr27', label: 'HR 7 — Hourly Actual', value: '29', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr28', label: 'HR 7 — Cumulative Actual', value: '183', confidence: 0.74, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr29', label: 'HR 8 — Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr30', label: 'HR 8 — Cumulative Goal', value: '205', confidence: 0.80, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr31', label: 'HR 8 — Hourly Actual', value: '23', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr32', label: 'HR 8 — Cumulative Actual', value: '206', confidence: 0.77, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
+    ],
+    detectedObjects: [
+      { id: 'kh-obj1', label: 'Production Sheet', count: 1, confidence: 0.97, frameTimestamp: 2.0, frameUrl: frameBase, details: 'Hour-by-hour production tracking sheet', bbox: { x: 0.05, y: 0.10, w: 0.90, h: 0.80 } },
     ],
   },
 ]
