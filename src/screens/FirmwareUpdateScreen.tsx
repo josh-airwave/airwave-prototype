@@ -47,8 +47,8 @@ function makeSteps(count: number): UpdateStep[] {
   for (let i = 0; i < count; i++) {
     const isLast = i === count - 1
     const phases: PhaseConfig[] = [
-      { key: 'downloading', label: 'Downloading Update', sublabel: 'Grabbing the latest software from the server...', duration: 3000 + Math.random() * 2000 },
-      { key: 'installing', label: 'Installing Update', sublabel: 'Keep your glasses nearby while we install.', duration: 4000 + Math.random() * 3000 },
+      { key: 'downloading', label: 'Downloading Update', sublabel: 'Grabbing the latest software from the server...', duration: 3500 + i * 500 },
+      { key: 'installing', label: 'Installing Update', sublabel: 'Keep your glasses nearby while we install.', duration: 5000 + i * 500 },
     ]
     if (isLast) {
       phases.push(
@@ -113,7 +113,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
   const [completedUpdates, setCompletedUpdates] = useState(initialCompletedUpdates)
   const [isRetrying, setIsRetrying] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
-  const [allDone, setAllDone] = useState(false)
+  const [allDone, setAllDone] = useState(params?.initialAllDone === true)
   const animRef = useRef<number>(0)
   const phaseTimerRef = useRef<number>(0)
 

@@ -7,56 +7,50 @@
  * Updated by Claude each time a feature is built or modified.
  */
 
-const blueBase = { screen: 'Blue', params: { channelId: 'blue', channelType: 'blue' } }
-const reportId = 'vr4'
+const fw = { freezeState: true, updatePreset: '3_updates' }
 
 export const CURRENT_EXPORT = {
-  feature: 'share-report-flow',
-  label: 'Share Report Flow',
+  feature: 'firmware-update-flow',
+  label: 'Firmware Update Flow',
   screens: [
-    // ── 1. Blue Feed — starting point ──
-    { screen: 'Blue', name: 'blue-feed', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500 },
+    // ── Happy path: 3 sequential updates ──
 
-    // ── 2. Share Drawer (overlay on Blue) ──
-    { screen: 'ShareFlow', name: 'share-drawer', params: { reportId, initialStep: 'drawer' }, base: blueBase, delay: 1500 },
+    // Update 1 of 3 — downloading
+    { screen: 'FirmwareUpdate', name: 'update-1-downloading', params: { ...fw, initialUpdateIndex: 0, initialPhaseIndex: 0, initialProgress: 40, initialCompletedUpdates: 0 }, delay: 1500 },
 
-    // ── 3. Share to Chat — channel picker ──
-    { screen: 'ShareFlow', name: 'share-to-chat', params: { reportId, initialStep: 'chat_list' }, base: blueBase, delay: 1500 },
+    // Update 1 of 3 — installing
+    { screen: 'FirmwareUpdate', name: 'update-1-installing', params: { ...fw, initialUpdateIndex: 0, initialPhaseIndex: 1, initialProgress: 65, initialCompletedUpdates: 0 }, delay: 1500 },
 
-    // ── 4. Share Externally — native share sheet ──
-    { screen: 'ShareFlow', name: 'share-sheet', params: { reportId, initialStep: 'share_sheet' }, base: blueBase, delay: 1500 },
+    // Update 2 of 3 — downloading (1 complete)
+    { screen: 'FirmwareUpdate', name: 'update-2-downloading', params: { ...fw, initialUpdateIndex: 1, initialPhaseIndex: 0, initialProgress: 30, initialCompletedUpdates: 1 }, delay: 1500 },
 
-    // ── 5. iMessage compose — before sending (full screen, no base needed) ──
-    { screen: 'ShareFlow', name: 'imessage-compose', params: { reportId, initialStep: 'imessage' }, delay: 2000 },
+    // Update 2 of 3 — installing (1 complete)
+    { screen: 'FirmwareUpdate', name: 'update-2-installing', params: { ...fw, initialUpdateIndex: 1, initialPhaseIndex: 1, initialProgress: 55, initialCompletedUpdates: 1 }, delay: 1500 },
 
-    // ── 6. iMessage sent — delivered message (full screen) ──
-    { screen: 'ShareFlow', name: 'imessage-sent', params: { reportId, initialStep: 'done', initialSent: true }, delay: 2000 },
+    // Update 3 of 3 — downloading (2 complete)
+    { screen: 'FirmwareUpdate', name: 'update-3-downloading', params: { ...fw, initialUpdateIndex: 2, initialPhaseIndex: 0, initialProgress: 45, initialCompletedUpdates: 2 }, delay: 1500 },
 
-    // ── 7. Report viewed notification (full screen) ──
-    { screen: 'ShareFlow', name: 'notif-viewed', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true }, delay: 2000 },
+    // Update 3 of 3 — installing (2 complete)
+    { screen: 'FirmwareUpdate', name: 'update-3-installing', params: { ...fw, initialUpdateIndex: 2, initialPhaseIndex: 1, initialProgress: 70, initialCompletedUpdates: 2 }, delay: 1500 },
 
-    // ── 8. Helpful feedback notification (full screen) ──
-    { screen: 'ShareFlow', name: 'notif-feedback', params: { reportId, initialStep: 'done', initialSent: true, initialShowViewed: true, initialShowFeedback: true }, delay: 2000 },
+    // Glasses restarting
+    { screen: 'FirmwareUpdate', name: 'glasses-restarting', params: { ...fw, initialUpdateIndex: 2, initialPhaseIndex: 2, initialProgress: 50, initialCompletedUpdates: 2 }, delay: 1500 },
 
-    // ── 9. External Report — top of page ──
-    { screen: 'ExternalReport', name: 'report-top', params: { reportId, skipLoading: true }, delay: 2000 },
+    // Reconnecting
+    { screen: 'FirmwareUpdate', name: 'reconnecting', params: { ...fw, initialUpdateIndex: 2, initialPhaseIndex: 3, initialProgress: 60, initialCompletedUpdates: 2 }, delay: 1500 },
 
-    // ── 10. External Report — helpful / not helpful buttons (scrolled to bottom) ──
-    { screen: 'ExternalReport', name: 'report-feedback-buttons', params: { reportId, skipLoading: true }, delay: 2000, scrollToBottom: true },
+    // All done — with What's New
+    { screen: 'FirmwareUpdate', name: 'all-done', params: { ...fw, initialAllDone: true, initialProgress: 100, initialCompletedUpdates: 3 }, delay: 1500 },
 
-    // ── 11. Helpful tapped — thank you confirmation (scrolled to bottom) ──
-    { screen: 'ExternalReport', name: 'report-helpful-submitted', params: { reportId, skipLoading: true, initialFeedbackState: 'submitted' }, delay: 2000, scrollToBottom: true },
+    // ── Error states ──
 
-    // ── 12. Not Helpful form — empty (scrolled to bottom) ──
-    { screen: 'ExternalReport', name: 'report-not-helpful-form', params: { reportId, skipLoading: true, initialFeedbackState: 'not_helpful_form' }, delay: 2000, scrollToBottom: true },
+    // Download failed — 0 of 3 complete
+    { screen: 'FirmwareUpdate', name: 'error-download-failed', params: { ...fw, initialUpdateIndex: 0, initialPhaseIndex: 0, initialProgress: 25, initialCompletedUpdates: 0, initialFailure: 'download_failed' }, delay: 1500 },
 
-    // ── 13. Not Helpful form — filled out (scrolled to bottom) ──
-    { screen: 'ExternalReport', name: 'report-not-helpful-filled', params: { reportId, skipLoading: true, initialFeedbackState: 'not_helpful_form', initialFeedbackName: 'Sarah Chen', initialFeedbackMessage: 'The hourly actuals for hours 5-8 are hard to read. Could you re-record that section of the board?' }, delay: 2000, scrollToBottom: true },
+    // Update interrupted — 1 of 3 complete (failed during update 2)
+    { screen: 'FirmwareUpdate', name: 'error-update-interrupted', params: { ...fw, initialUpdateIndex: 1, initialPhaseIndex: 1, initialProgress: 40, initialCompletedUpdates: 1, initialFailure: 'update_interrupted' }, delay: 1500 },
 
-    // ── 14. Not Helpful submitted — thank you + View in Blue Feed (scrolled to bottom) ──
-    { screen: 'ExternalReport', name: 'report-not-helpful-submitted', params: { reportId, skipLoading: true, initialFeedbackState: 'submitted' }, delay: 2000, scrollToBottom: true },
-
-    // ── 15. Blue Feed — Not Helpful feedback card visible ──
-    { screen: 'Blue', name: 'blue-feed-with-feedback', params: { channelId: 'blue', channelType: 'blue' }, delay: 3000, scrollToBottom: true, seedFeedback: { reportId: 'vr4', name: 'Sarah Chen', message: 'The hourly actuals for hours 5-8 are hard to read. Could you re-record that section of the board?' } },
+    // Reconnect failed — 2 of 3 complete (failed during restart)
+    { screen: 'FirmwareUpdate', name: 'error-reconnect-failed', params: { ...fw, initialUpdateIndex: 2, initialPhaseIndex: 2, initialProgress: 30, initialCompletedUpdates: 2, initialFailure: 'reconnect_failed' }, delay: 1500 },
   ] as { screen: string; name: string; params?: Record<string, unknown>; delay?: number; base?: { screen: string; params?: Record<string, unknown> }; seedFeedback?: { reportId: string; name: string; message: string }; scrollToBottom?: boolean }[],
 }
