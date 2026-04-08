@@ -11,7 +11,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
   const report = videoIntelReports.find(r => r.id === reportId) || videoIntelReports[0]
   const shortUrl = `awv.app/r/${report.id.replace('vr', '')}`
 
-  const [step, setStep] = useState<FlowStep>('drawer')
+  const [step, setStep] = useState<FlowStep>((params?.initialStep as FlowStep) || 'drawer')
   const [copied, setCopied] = useState(false)
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)

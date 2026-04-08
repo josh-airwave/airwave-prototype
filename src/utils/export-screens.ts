@@ -8,34 +8,43 @@
  */
 
 export const CURRENT_EXPORT = {
-  feature: 'fullscreen-viewer',
-  label: 'Fullscreen Media Viewer',
+  feature: 'share-report-flow',
+  label: 'Share Report Flow',
   screens: [
-    // ── Video states ──
-    { screen: 'ImageZoom', name: 'video-playing', params: { videoUrl: '/media/videos/video-1.mp4', freezeState: true, initialPaused: false, initialProgress: 0.35, initialDuration: 50 }, delay: 2500 },
-    { screen: 'ImageZoom', name: 'video-paused', params: { videoUrl: '/media/videos/video-1.mp4', freezeState: true, initialPaused: true, initialProgress: 0.52, initialDuration: 50 }, delay: 2500 },
+    // ── Blue Feed ──
+    { screen: 'Blue', name: 'blue-feed', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500 },
 
-    // ── Speed controls ──
-    { screen: 'ImageZoom', name: 'video-speed-1.5x', params: { videoUrl: '/media/videos/video-3.mp4', freezeState: true, initialPaused: false, initialSpeed: 1.5, initialProgress: 0.4, initialDuration: 15 }, delay: 2500 },
-    { screen: 'ImageZoom', name: 'video-speed-2x', params: { videoUrl: '/media/videos/video-3.mp4', freezeState: true, initialPaused: false, initialSpeed: 2, initialProgress: 0.6, initialDuration: 15 }, delay: 2500 },
-    { screen: 'ImageZoom', name: 'video-speed-0.5x', params: { videoUrl: '/media/videos/video-3.mp4', freezeState: true, initialPaused: false, initialSpeed: 0.5, initialProgress: 0.25, initialDuration: 15 }, delay: 2500 },
+    // ── Share Drawer ──
+    { screen: 'ShareFlow', name: 'share-drawer', params: { reportId: 'vr1', initialStep: 'drawer' }, delay: 1500 },
 
-    // ── Reverse playback ──
-    { screen: 'ImageZoom', name: 'video-reverse', params: { videoUrl: '/media/videos/video-5.mp4', freezeState: true, initialReversed: true, initialSpeed: 0.5, initialProgress: 0.7, initialDuration: 14 }, delay: 2500 },
+    // ── Share to Chat (channel list) ──
+    { screen: 'ShareFlow', name: 'share-to-chat', params: { reportId: 'vr1', initialStep: 'chat_list' }, delay: 1500 },
 
-    // ── Muted ──
-    { screen: 'ImageZoom', name: 'video-muted', params: { videoUrl: '/media/videos/video-5.mp4', freezeState: true, initialMuted: true, initialProgress: 0.45, initialDuration: 14 }, delay: 2500 },
+    // ── Share Externally (share sheet) ──
+    { screen: 'ShareFlow', name: 'share-externally', params: { reportId: 'vr1', initialStep: 'share_sheet' }, delay: 1500 },
 
-    // ── Zoomed in (pinch to zoom) ──
-    { screen: 'ImageZoom', name: 'video-zoomed-250', params: { videoUrl: '/media/videos/video-1.mp4', freezeState: true, initialScale: 2.5, initialProgress: 0.3, initialDuration: 50 }, delay: 2500 },
-    { screen: 'ImageZoom', name: 'video-zoomed-400', params: { videoUrl: '/media/videos/video-3.mp4', freezeState: true, initialScale: 4, initialProgress: 0.5, initialDuration: 15 }, delay: 2500 },
+    // ── iMessage share ──
+    { screen: 'ShareFlow', name: 'share-imessage', params: { reportId: 'vr1', initialStep: 'imessage' }, delay: 1500 },
 
-    // ── Image viewer ──
-    { screen: 'ImageZoom', name: 'image-viewer', params: { imageUrl: '/media/images/pexels-cottonbro-4489737.jpg' }, delay: 1500 },
-    { screen: 'ImageZoom', name: 'image-zoomed', params: { imageUrl: '/media/images/pexels-cottonbro-4489737.jpg', freezeState: true, initialScale: 2.5 }, delay: 1500 },
+    // ── Share done (notifications) ──
+    { screen: 'ShareFlow', name: 'share-done', params: { reportId: 'vr1', initialStep: 'done' }, delay: 2500 },
 
-    // ── Chat with video thumbnails ──
-    { screen: 'Chat', name: 'chat-backend-videos', params: { channelId: 'c1' }, delay: 1500 },
-    { screen: 'Chat', name: 'chat-voice-poc-videos', params: { channelId: 'c3' }, delay: 1500 },
+    // ── External Report (top) ──
+    { screen: 'ExternalReport', name: 'report-top', params: { reportId: 'vr1', skipLoading: true }, delay: 2000 },
+
+    // ── External Report (feedback: helpful/not helpful) ──
+    { screen: 'ExternalReport', name: 'report-feedback-default', params: { reportId: 'vr1', skipLoading: true }, delay: 2000 },
+
+    // ── External Report (not helpful form) ──
+    { screen: 'ExternalReport', name: 'report-feedback-form', params: { reportId: 'vr1', skipLoading: true, initialFeedbackState: 'not_helpful_form' }, delay: 2000 },
+
+    // ── External Report (not helpful form filled) ──
+    { screen: 'ExternalReport', name: 'report-feedback-form-filled', params: { reportId: 'vr1', skipLoading: true, initialFeedbackState: 'not_helpful_form', initialFeedbackName: 'Sarah Chen', initialFeedbackMessage: 'The report was missing the pressure readings from the second shift. Would be helpful to include all shifts.' }, delay: 2000 },
+
+    // ── External Report (submitted confirmation) ──
+    { screen: 'ExternalReport', name: 'report-feedback-submitted', params: { reportId: 'vr1', skipLoading: true, initialFeedbackState: 'submitted' }, delay: 2000 },
+
+    // ── Blue Feed with Not Helpful card ──
+    { screen: 'Blue', name: 'blue-feed-with-feedback', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500 },
   ] as { screen: string; name: string; params?: Record<string, unknown>; delay?: number }[],
 }

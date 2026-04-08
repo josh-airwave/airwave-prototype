@@ -263,13 +263,13 @@ export function ExternalReportScreen({ params }: { params?: Record<string, unkno
   const { sections, reportSummary, statusCounts } = getInspectionData(reportId)
 
   // Loading state
-  const [loaded, setLoaded] = useState(false)
-  useEffect(() => { setTimeout(() => setLoaded(true), 600) }, [])
+  const [loaded, setLoaded] = useState(params?.skipLoading ? true : false)
+  useEffect(() => { if (!loaded) setTimeout(() => setLoaded(true), 600) }, [])
 
   // Feedback state
-  const [feedbackState, setFeedbackState] = useState<'none' | 'not_helpful_form' | 'submitted'>('none')
-  const [feedbackName, setFeedbackName] = useState('')
-  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [feedbackState, setFeedbackState] = useState<'none' | 'not_helpful_form' | 'submitted'>((params?.initialFeedbackState as any) || 'none')
+  const [feedbackName, setFeedbackName] = useState((params?.initialFeedbackName as string) || '')
+  const [feedbackMessage, setFeedbackMessage] = useState((params?.initialFeedbackMessage as string) || '')
 
   const notifyTech = params?.onNotifyTech as ((type: string, message?: string) => void) | undefined
 
