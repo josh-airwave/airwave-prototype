@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { colors, fonts } from '../styles/theme'
 import { useNavigation } from '../navigation/Router'
-import { videoIntelReports } from '../data/mock'
+import { videoIntelReports, channels } from '../data/mock'
 
-type FlowStep = 'drawer' | 'share_sheet' | 'imessage' | 'done'
+type FlowStep = 'drawer' | 'chat_list' | 'share_sheet' | 'imessage' | 'done'
 
 export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }) {
-  const { push, pop } = useNavigation()
+  const { push, pop, reset } = useNavigation()
   const reportId = (params?.reportId as string) || 'vr3'
   const report = videoIntelReports.find(r => r.id === reportId) || videoIntelReports[0]
   const shortUrl = `awv.app/r/${report.id.replace('vr', '')}`
@@ -17,6 +17,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
   const [sent, setSent] = useState(false)
   const [showViewedNotif, setShowViewedNotif] = useState(false)
   const [showFeedbackNotif, setShowFeedbackNotif] = useState(false)
+  const [sharedTo, setSharedTo] = useState<string | null>(null)
 
   // Auto-advance: after sending iMessage, show "viewed" notification, then "helpful" feedback
   useEffect(() => {
@@ -34,70 +35,169 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
         onClick={() => pop()}
       >
         <div style={{
-          background: '#fff', borderRadius: '16px 16px 0 0', padding: '8px 0 24px',
+          background: '#fff', borderRadius: '10px 10px 0 0',
+          boxShadow: '0 3px 5px rgba(0,0,0,0.15)',
+          padding: '0 20px 32px',
         }} onClick={e => e.stopPropagation()}>
           {/* Drag handle */}
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 12px' }}>
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: colors.neutralGray }} />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '9px 0 20px' }}>
+            <div style={{ width: 29, height: 5, borderRadius: 100, background: '#909090' }} />
           </div>
 
-          <div style={{ padding: '0 16px 8px', fontSize: 16, fontWeight: 700, fontFamily: fonts.family, color: colors.almostBlack }}>
-            Share Report
+          {/* Title with icon */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87" />
+              <path d="M16 3.13a4 4 0 010 7.75" />
+            </svg>
+            <span style={{ fontSize: 24, fontWeight: 700, fontFamily: fonts.family, color: colors.almostBlack }}>
+              Share
+            </span>
           </div>
 
-          {/* Share to Chat */}
+          {/* How it works */}
+          <div style={{ fontSize: 18, fontWeight: 600, fontFamily: fonts.family, color: colors.almostBlack, marginBottom: 8 }}>
+            How it works
+          </div>
+          <p style={{
+            fontSize: 14, fontWeight: 400, fontFamily: fonts.family,
+            color: colors.coolText, lineHeight: 1.5, margin: '0 0 20px',
+          }}>
+            Share to Chat let's you share to anyone in your workspace, while Share Externally allows you to share this file outside your workspace.
+          </p>
+
+          {/* Share to Chat — outline pill */}
           <button
-            onClick={() => pop()}
+            onClick={() => setStep('chat_list')}
             style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              padding: '14px 16px', width: '100%',
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              borderBottom: `1px solid ${colors.border}`,
+              width: '100%', padding: '14px 0',
+              background: '#fff', border: `2px solid ${colors.coolMedium}`,
+              borderRadius: 100, cursor: 'pointer',
+              fontSize: 16, fontWeight: 600, fontFamily: fonts.family,
+              color: colors.almostBlack, marginBottom: 12,
             }}
           >
-            <div style={{
-              width: 42, height: 42, borderRadius: 10,
-              background: colors.primaryLight15,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-              </svg>
-            </div>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, fontFamily: fonts.family, color: colors.almostBlack }}>Share to Chat</div>
-              <div style={{ fontSize: 12, color: colors.coolText, fontFamily: fonts.family }}>Send to a channel or person in Airwave</div>
-            </div>
+            Share to Chat
           </button>
 
-          {/* Share Externally */}
+          {/* Share Externally — filled pill */}
           <button
             onClick={() => setStep('share_sheet')}
             style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              padding: '14px 16px', width: '100%',
-              background: 'transparent', border: 'none', cursor: 'pointer',
+              width: '100%', padding: '14px 0',
+              background: colors.almostBlack, border: 'none',
+              borderRadius: 100, cursor: 'pointer',
+              fontSize: 16, fontWeight: 600, fontFamily: fonts.family,
+              color: '#fff',
             }}
           >
-            <div style={{
-              width: 42, height: 42, borderRadius: 10,
-              background: 'rgba(73,174,123,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
-            </div>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: 15, fontWeight: 600, fontFamily: fonts.family, color: colors.almostBlack }}>Share Externally</div>
-              <div style={{ fontSize: 12, color: colors.coolText, fontFamily: fonts.family }}>Send link via text, email, or other apps</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.coolText} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto' }}>
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
+            Share Externally
           </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Share to Chat — channel/DM list
+  if (step === 'chat_list') {
+    const chatChannels = channels.filter(c => c.type !== 'blue')
+
+    return (
+      <div style={{ height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+        onClick={() => setStep('drawer')}
+      >
+        <div style={{
+          background: '#fff', borderRadius: '10px 10px 0 0',
+          boxShadow: '0 3px 5px rgba(0,0,0,0.15)',
+          maxHeight: '75%', display: 'flex', flexDirection: 'column',
+        }} onClick={e => e.stopPropagation()}>
+          {/* Drag handle */}
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '9px 0 0' }}>
+            <div style={{ width: 29, height: 5, borderRadius: 100, background: '#909090' }} />
+          </div>
+
+          {/* Header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 20px 10px',
+          }}>
+            <button onClick={() => setStep('drawer')} style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              fontSize: 15, fontFamily: fonts.family, color: colors.primary,
+            }}>Back</button>
+            <span style={{ fontSize: 17, fontWeight: 700, fontFamily: fonts.family, color: colors.almostBlack }}>
+              Share to Chat
+            </span>
+            <div style={{ width: 36 }} />
+          </div>
+
+          {/* Channel list */}
+          <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 24 }}>
+            {chatChannels.map(ch => {
+              const isShared = sharedTo === ch.id
+              const isDm = ch.type === 'dm'
+              return (
+                <div
+                  key={ch.id}
+                  onClick={() => {
+                    if (!sharedTo) {
+                      setSharedTo(ch.id)
+                      setTimeout(() => pop(), 1200)
+                    }
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 20px', cursor: sharedTo ? 'default' : 'pointer',
+                    borderBottom: `0.5px solid ${colors.neutralGray}`,
+                  }}
+                >
+                  {/* Avatar */}
+                  {isDm && ch.avatar.startsWith('http') ? (
+                    <img src={ch.avatar} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{
+                      width: 36, height: 36, borderRadius: isDm ? '50%' : 8,
+                      background: colors.coolLight,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, fontWeight: 700, color: colors.coolText, fontFamily: fonts.family,
+                    }}>
+                      {ch.name.charAt(0)}
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 14, fontWeight: 600, fontFamily: fonts.family,
+                      color: colors.almostBlack,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      {ch.name}
+                    </div>
+                    <div style={{ fontSize: 11, color: colors.coolText, fontFamily: fonts.family }}>
+                      {isDm ? 'Direct Message' : `#${ch.name.toLowerCase()}`}
+                    </div>
+                  </div>
+                  {/* Share / Sent indicator */}
+                  {isShared ? (
+                    <div style={{
+                      fontSize: 12, fontWeight: 600, fontFamily: fonts.family,
+                      color: colors.success, display: 'flex', alignItems: 'center', gap: 4,
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Sent
+                    </div>
+                  ) : !sharedTo ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.coolText} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  ) : null}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     )
@@ -141,14 +241,14 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
           }}>
             <div style={{
               width: 44, height: 44, borderRadius: 8,
-              background: colors.primary,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
+              overflow: 'hidden', flexShrink: 0,
+              background: '#000',
             }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
+              <video
+                src={report.sourceVideoUrl}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                playsInline muted
+              />
             </div>
             <div style={{ flex: 1, overflow: 'hidden' }}>
               <div style={{ fontSize: 14, fontWeight: 600, fontFamily: fonts.family, color: colors.almostBlack, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -313,7 +413,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
           {/* Sent message with OG preview */}
           {sent && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-              <div style={{ maxWidth: '80%' }}>
+              <div style={{ width: 200 }}>
                 {/* OG link preview card */}
                 <div
                   onClick={() => push('ExternalReport', { reportId })}
@@ -322,8 +422,8 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
                     marginBottom: 4, cursor: 'pointer',
                   }}
                 >
-                  {/* Thumbnail */}
-                  <div style={{ height: 120, background: '#000', position: 'relative', overflow: 'hidden' }}>
+                  {/* Portrait thumbnail */}
+                  <div style={{ height: 300, background: '#000', position: 'relative', overflow: 'hidden' }}>
                     <video
                       src={report.sourceVideoUrl}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -358,7 +458,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
                   padding: '8px 12px', borderRadius: '18px 18px 4px 18px',
                   fontSize: 15, fontFamily: fonts.family, lineHeight: 1.35,
                 }}>
-                  Here's the report from today's inspection. Let me know if you need anything else.
+                  Here's the report from today's inspection. Let me know if you need anything else. {shortUrl}
                 </div>
                 <div style={{ fontSize: 10, color: colors.coolText, fontFamily: fonts.family, textAlign: 'right', marginTop: 3 }}>
                   Delivered
@@ -368,44 +468,99 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
           )}
         </div>
 
-        {/* Compose bar */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '8px 12px 24px',
-          borderTop: `0.5px solid ${colors.neutralGray}`,
-          background: '#F6F6F6',
-        }}>
+        {/* Compose area */}
+        <div style={{ borderTop: `0.5px solid ${colors.neutralGray}`, background: '#F6F6F6' }}>
+          {/* OG link preview in compose (before sending) */}
+          {!sent && (
+            <div style={{
+              margin: '8px 12px 0',
+              background: '#E9E9EB', borderRadius: 12, overflow: 'hidden',
+              width: 200,
+            }}>
+              <div style={{ height: 280, background: '#000', position: 'relative', overflow: 'hidden' }}>
+                <video
+                  src={report.sourceVideoUrl}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  playsInline muted
+                />
+                <div style={{
+                  position: 'absolute', bottom: 6, left: 8,
+                  background: 'rgba(0,0,0,0.6)', color: 'white',
+                  fontSize: 9, fontWeight: 600, fontFamily: fonts.family,
+                  padding: '2px 6px', borderRadius: 4,
+                  display: 'flex', alignItems: 'center', gap: 3,
+                }}>
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                  </svg>
+                  Airwave
+                </div>
+              </div>
+              <div style={{ padding: '6px 10px' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, fontFamily: fonts.family, color: colors.almostBlack }}>
+                  {report.title}
+                </div>
+                <div style={{ fontSize: 10, color: colors.coolText, fontFamily: fonts.family, marginTop: 1 }}>
+                  {shortUrl}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Message input + send */}
           <div style={{
-            flex: 1, display: 'flex', alignItems: 'center',
-            background: '#fff', borderRadius: 20, border: `1px solid ${colors.neutralGray}`,
-            padding: '8px 12px', minHeight: 36,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 12px 24px',
           }}>
-            {!sent && (
-              <span style={{ fontSize: 14, fontFamily: fonts.family, color: colors.almostBlack }}>
-                Here's the report from today's inspection. Let me know if you need anything else.
-              </span>
-            )}
-            {sent && (
-              <span style={{ fontSize: 14, fontFamily: fonts.family, color: colors.neutral400 }}>iMessage</span>
-            )}
+            <div style={{
+              flex: 1, display: 'flex', alignItems: 'center',
+              background: '#fff', borderRadius: 20, border: `1px solid ${colors.neutralGray}`,
+              padding: '8px 12px', minHeight: 36,
+            }}>
+              {!sent && (
+                <span style={{ fontSize: 14, fontFamily: fonts.family, color: colors.almostBlack }}>
+                  Here's the report from today's inspection. Let me know if you need anything else. {shortUrl}
+                </span>
+              )}
+              {sent && (
+                <span style={{ fontSize: 14, fontFamily: fonts.family, color: colors.neutral400 }}>iMessage</span>
+              )}
+            </div>
+            {!sent ? (
+              <button
+                onClick={() => { setSending(true); setTimeout(() => { setSending(false); setSent(true) }, 800) }}
+                disabled={sending}
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: sending ? colors.neutralGray : '#007AFF',
+                  border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            ) : null}
           </div>
-          {!sent ? (
-            <button
-              onClick={() => { setSending(true); setTimeout(() => { setSending(false); setSent(true) }, 800) }}
-              disabled={sending}
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: sending ? colors.neutralGray : '#007AFF',
-                border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-              </svg>
-            </button>
-          ) : null}
         </div>
+
+        {/* Restart prototype button - shown after sending */}
+        {sent && (
+          <div
+            onClick={() => reset('ChannelList')}
+            style={{
+              position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)',
+              padding: '8px 20px', borderRadius: 8,
+              background: '#fff', border: `1px dashed ${colors.neutralGray}`,
+              cursor: 'pointer', fontSize: 12, fontWeight: 600,
+              fontFamily: fonts.family, color: colors.primary,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            }}
+          >
+            Restart Prototype
+          </div>
+        )}
 
         <style>{`
           @keyframes slideDown {

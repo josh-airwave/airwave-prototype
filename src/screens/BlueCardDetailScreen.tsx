@@ -276,7 +276,7 @@ export function BlueCardDetailScreen({ params }: { params?: Record<string, unkno
                     fontSize: fonts.size.md, fontWeight: fonts.weight.semibold,
                     color: colors.neutral500, cursor: 'pointer', minWidth: 100,
                   }}>View Report</button>
-                  <button onClick={() => setShowShareSheet(true)} style={{
+                  <button onClick={() => push('ShareFlow', { reportId: card.reportId || card.id })} style={{
                     paddingLeft: 20, paddingRight: 20, paddingTop: 10, paddingBottom: 10,
                     borderRadius: 8, background: colors.coolGray, border: 'none',
                     fontSize: fonts.size.md, fontWeight: fonts.weight.semibold,

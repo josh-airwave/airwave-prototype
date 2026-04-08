@@ -78,7 +78,9 @@ export function Router({ screens, initialScreen, children }: RouterProps) {
     }
   }, [animating])
 
-  const CurrentScreen = screens[current.screen]
+  // Overlay screens render on top of the previous screen
+  const overlayScreens = ['ShareFlow']
+  const topIsOverlay = overlayScreens.includes(current.screen) && stack.length > 1
 
   return (
     <NavigationContext.Provider
@@ -95,19 +97,27 @@ export function Router({ screens, initialScreen, children }: RouterProps) {
       }}
     >
       <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            transition: animating ? 'transform 0.3s ease-out' : 'none',
-            transform: animating && slideDirection === 'left'
-              ? 'translateX(0)'
-              : animating && slideDirection === 'right'
-              ? 'translateX(0)'
-              : 'translateX(0)',
-          }}
-        >
-          {CurrentScreen && <CurrentScreen key={current.screen + JSON.stringify(current.params ?? {})} params={current.params} />}
+        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+          {stack.map((entry, idx) => {
+            const Screen = screens[entry.screen]
+            if (!Screen) return null
+            const isTop = idx === stack.length - 1
+            const isUnderOverlay = idx === stack.length - 2 && topIsOverlay
+            const visible = isTop || isUnderOverlay
+            return (
+              <div
+                key={entry.screen + '-' + idx}
+                style={{
+                  position: 'absolute', inset: 0,
+                  zIndex: idx,
+                  display: visible ? 'block' : 'none',
+                  pointerEvents: isTop ? 'auto' : 'none',
+                }}
+              >
+                <Screen params={entry.params} />
+              </div>
+            )
+          })}
         </div>
         <AirwaveIsland
           mode={getIslandMode(current.screen)}
