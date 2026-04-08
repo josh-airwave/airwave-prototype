@@ -7,6 +7,8 @@
  * Updated by Claude each time a feature is built or modified.
  */
 
+const blueBase = { screen: 'Blue', params: { channelId: 'blue', channelType: 'blue' } }
+
 export const CURRENT_EXPORT = {
   feature: 'share-report-flow',
   label: 'Share Report Flow',
@@ -14,20 +16,20 @@ export const CURRENT_EXPORT = {
     // ── Blue Feed ──
     { screen: 'Blue', name: 'blue-feed', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500 },
 
-    // ── Share Drawer ──
-    { screen: 'ShareFlow', name: 'share-drawer', params: { reportId: 'vr1', initialStep: 'drawer' }, delay: 1500 },
+    // ── Share Drawer (overlay on Blue) ──
+    { screen: 'ShareFlow', name: 'share-drawer', params: { reportId: 'vr1', initialStep: 'drawer' }, base: blueBase, delay: 1500 },
 
-    // ── Share to Chat (channel list) ──
-    { screen: 'ShareFlow', name: 'share-to-chat', params: { reportId: 'vr1', initialStep: 'chat_list' }, delay: 1500 },
+    // ── Share to Chat (overlay on Blue) ──
+    { screen: 'ShareFlow', name: 'share-to-chat', params: { reportId: 'vr1', initialStep: 'chat_list' }, base: blueBase, delay: 1500 },
 
-    // ── Share Externally (share sheet) ──
-    { screen: 'ShareFlow', name: 'share-externally', params: { reportId: 'vr1', initialStep: 'share_sheet' }, delay: 1500 },
+    // ── Share Externally (overlay on Blue) ──
+    { screen: 'ShareFlow', name: 'share-externally', params: { reportId: 'vr1', initialStep: 'share_sheet' }, base: blueBase, delay: 1500 },
 
-    // ── iMessage share ──
-    { screen: 'ShareFlow', name: 'share-imessage', params: { reportId: 'vr1', initialStep: 'imessage' }, delay: 1500 },
+    // ── iMessage share (overlay on Blue) ──
+    { screen: 'ShareFlow', name: 'share-imessage', params: { reportId: 'vr1', initialStep: 'imessage' }, base: blueBase, delay: 1500 },
 
-    // ── Share done (notifications) ──
-    { screen: 'ShareFlow', name: 'share-done', params: { reportId: 'vr1', initialStep: 'done' }, delay: 2500 },
+    // ── Share done (overlay on Blue) ──
+    { screen: 'ShareFlow', name: 'share-done', params: { reportId: 'vr1', initialStep: 'done' }, base: blueBase, delay: 2500 },
 
     // ── External Report (top) ──
     { screen: 'ExternalReport', name: 'report-top', params: { reportId: 'vr1', skipLoading: true }, delay: 2000 },
@@ -46,5 +48,5 @@ export const CURRENT_EXPORT = {
 
     // ── Blue Feed with Not Helpful card ──
     { screen: 'Blue', name: 'blue-feed-with-feedback', params: { channelId: 'blue', channelType: 'blue' }, delay: 1500 },
-  ] as { screen: string; name: string; params?: Record<string, unknown>; delay?: number }[],
+  ] as { screen: string; name: string; params?: Record<string, unknown>; delay?: number; base?: { screen: string; params?: Record<string, unknown> } }[],
 }

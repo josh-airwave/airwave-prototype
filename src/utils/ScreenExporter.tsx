@@ -37,7 +37,7 @@ export function ScreenExporter() {
 }
 
 function ScreenExporterInner() {
-  const { reset } = useNavigation()
+  const { reset, push } = useNavigation()
   const [exporting, setExporting] = useState(false)
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
@@ -63,7 +63,14 @@ function ScreenExporterInner() {
       setStep(i + 1)
       setName(s.name)
 
-      reset(s.screen, s.params)
+      // For overlay screens, first navigate to the base screen, then push the overlay
+      if (s.base) {
+        reset(s.base.screen, s.base.params)
+        await waitForRender(800)
+        push(s.screen, s.params)
+      } else {
+        reset(s.screen, s.params)
+      }
       await waitForRender(s.delay ?? 1200)
       pauseAllVideos()
       await waitForRender(400)
@@ -137,7 +144,7 @@ function ScreenExporterInner() {
       setExporting(false)
       busyRef.current = false
     }
-  }, [reset])
+  }, [reset, push])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
