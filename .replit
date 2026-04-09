@@ -5,7 +5,9 @@ modules = ["nodejs-20"]
 channel = "stable-24_05"
 
 [deployment]
+build = ["sh", "-c", "npm run build:web"]
 run = ["sh", "-c", "npx vite --host --port 5000"]
+deploymentTarget = "cloudrun"
 
 [agent]
 expertMode = true
