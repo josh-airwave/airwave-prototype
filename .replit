@@ -6,7 +6,7 @@ channel = "stable-24_05"
 
 [deployment]
 build = ["sh", "-c", "npm run build:web"]
-run = ["sh", "-c", "npx vite --host --port 5000"]
+run = ["sh", "-c", "npx serve dist -s -l 5000"]
 deploymentTarget = "cloudrun"
 
 [agent]
