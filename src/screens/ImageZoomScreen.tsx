@@ -22,7 +22,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const videoSrc = directVideoUrl || item.videoUrl
   const imageSrc = directImageUrl || item.thumbnail
 
-  // Source frame mode — opened from a report source badge
+  // Source frame mode - opened from a report source badge
   const sourceTime = params?.sourceTime as number | undefined
   const sourceLabel = params?.sourceLabel as string | undefined
   const sourceValue = params?.sourceValue as string | undefined
@@ -42,11 +42,11 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
   const initialProgress = (params?.initialProgress as number) ?? 0
   const initialDuration = (params?.initialDuration as number) ?? 48
 
-  // Video content rect — where the actual video renders within the container (for object-fit: contain)
+  // Video content rect - where the actual video renders within the container (for object-fit: contain)
   const mediaContainerRef = useRef<HTMLDivElement>(null)
   const [videoContentRect, setVideoContentRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null)
 
-  // Source mode zoom — compute transform-origin mapped to element coords (accounting for object-fit: contain)
+  // Source mode zoom - compute transform-origin mapped to element coords (accounting for object-fit: contain)
   const sourceOrigin = (() => {
     if (!isSourceMode || !sourceBbox) return undefined
     const bboxCenterX = sourceBbox.x + sourceBbox.w / 2
@@ -232,11 +232,11 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
                     const videoRatio = vW / vH
                     let rLeft = 0, rTop = 0, rWidth = cW, rHeight = cH
                     if (videoRatio > containerRatio) {
-                      // Video is wider — letterbox top/bottom
+                      // Video is wider - letterbox top/bottom
                       rHeight = cW / videoRatio
                       rTop = (cH - rHeight) / 2
                     } else {
-                      // Video is taller — letterbox left/right
+                      // Video is taller - letterbox left/right
                       rWidth = cH * videoRatio
                       rLeft = (cW - rWidth) / 2
                     }
@@ -296,7 +296,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           />
         )}
 
-        {/* Bounding box highlight overlay — positioned within actual video content area */}
+        {/* Bounding box highlight overlay - positioned within actual video content area */}
         {isSourceMode && sourceBbox && videoContentRect && (
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -327,7 +327,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           </div>
         )}
 
-        {/* Timecode — top right, matching ShareView */}
+        {/* Timecode - top right, matching ShareView */}
         {isVideo && duration > 0 && (
           <div style={{
             position: 'absolute', top: 6, right: 6, background: '#1A1A1A', color: colors.white,
@@ -339,7 +339,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
           </div>
         )}
 
-        {/* Scrubber — matching ShareView style */}
+        {/* Scrubber - matching ShareView style */}
         {isVideo && (
           <div
             ref={scrubRef}
@@ -395,7 +395,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
         )}
       </div>
 
-      {/* Source frame card — verify and edit what Blue read */}
+      {/* Source frame card - verify and edit what Blue read */}
       {isSourceMode && sourceLabel && (
         <div style={{
           padding: '10px 16px 6px',
@@ -455,7 +455,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
                   fontSize: 22, fontWeight: 700, color: 'white',
                   fontFamily: fonts.family,
                 }}>
-                  {sourceEditValue || '—'}
+                  {sourceEditValue || '-'}
                 </span>
               )}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={sourceEditing ? '#60A5FA' : 'rgba(255,255,255,0.4)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -474,7 +474,7 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
         </div>
       )}
 
-      {/* Bottom controls — matching ShareView exactly */}
+      {/* Bottom controls - matching ShareView exactly */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '8px 20px 32px',

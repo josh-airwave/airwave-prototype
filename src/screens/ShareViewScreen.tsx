@@ -107,7 +107,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
         previewModelRef.current = await blazeface.load()
       }
 
-      // Detection loop — update liveFaces from BlazeFace
+      // Detection loop - update liveFaces from BlazeFace
       detectInterval = window.setInterval(async () => {
         if (video.paused || video.ended || !previewModelRef.current) return
         try {
@@ -126,7 +126,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
     }
     init()
 
-    // Render loop — draw blur at live detected positions
+    // Render loop - draw blur at live detected positions
     const draw = () => {
       canvas.width = video.clientWidth
       canvas.height = video.clientHeight
@@ -323,7 +323,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                     <img src={item.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   )}
                 </button>
-                {/* Remove button — 4px from top-right, white circle with Material close icon */}
+                {/* Remove button - 4px from top-right, white circle with Material close icon */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -354,7 +354,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
       case 'preview':
         return (
           <div style={{ margin: '0 24px', position: 'relative' }}>
-            {/* Video/image container — fixed aspect ratio from Figma: 342x582 (57/97) */}
+            {/* Video/image container - fixed aspect ratio from Figma: 342x582 (57/97) */}
             <div
               onClick={() => { fsSyncTime.current = videoRef.current?.currentTime || 0; videoRef.current?.pause(); setFullscreen(true) }}
               style={{
@@ -366,7 +366,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                 <>
                   <video ref={videoRef} key={activeItem.id} src={activeItem.videoUrl} autoPlay playsInline
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  {/* Blur overlay canvas — renders saved face blurs during playback */}
+                  {/* Blur overlay canvas - renders saved face blurs during playback */}
                   <canvas
                     ref={blurCanvasRef}
                     style={{
@@ -378,7 +378,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
               ) : (
                 <img src={activeItem.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               )}
-              {/* Timecode — inside the clipped container */}
+              {/* Timecode - inside the clipped container */}
               {isVideo && duration > 0 && (
                 <div style={{
                   position: 'absolute', top: 6, right: 6, background: '#1A1A1A', color: colors.white,
@@ -388,25 +388,25 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                   {formatTime(duration - currentTime)}
                 </div>
               )}
-              {/* Scrubber — inside the clipped container, 24px from bottom */}
+              {/* Scrubber - inside the clipped container, 24px from bottom */}
               {isVideo && (
                 <div ref={scrubRef} onMouseDown={handleScrubStart} onClick={(e) => e.stopPropagation()} style={{
                   position: 'absolute', bottom: 24, left: 16, right: 16, height: 20,
                   borderRadius: 100, cursor: 'pointer', zIndex: 5,
                 }}>
-                  {/* barBackground — white with blue border */}
+                  {/* barBackground - white with blue border */}
                   <div style={{
                     position: 'absolute', inset: 0, background: colors.white,
                     border: `2px solid ${colors.primary}`, borderRadius: 100,
                   }} />
-                  {/* barFilled — blue played portion */}
+                  {/* barFilled - blue played portion */}
                   <div style={{
                     position: 'absolute', top: 0, left: 0, bottom: 0,
                     width: `${progress * 100}%`, minWidth: 4,
                     background: '#2D81FF', border: '2px solid #ADCEFF',
                     borderRadius: '100px 0 0 100px',
                   }} />
-                  {/* thumb — 16x44, positioned so it extends above/below the track */}
+                  {/* thumb - 16x44, positioned so it extends above/below the track */}
                   <div style={{
                     position: 'absolute', top: -12,
                     left: `calc(${progress * 100}% - 8px)`,
@@ -427,7 +427,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 24px 20px', flexShrink: 0 }}>
             {/* Left: Play/Pause, Trim */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {/* Play/Pause — synced with video state */}
+              {/* Play/Pause - synced with video state */}
               <button onClick={isVideo ? togglePlay : undefined} style={{
                 width: 40, height: 40, borderRadius: radius.md, background: colors.primary,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -500,7 +500,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
       onMouseUp={handleScrubEnd}
       onMouseLeave={handleScrubEnd}
     >
-      {/* Header — Done + title only, Share moved to actions */}
+      {/* Header - Done + title only, Share moved to actions */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px', borderBottom: `1px solid ${colors.border}`,
@@ -659,7 +659,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
               />
             )}
 
-            {/* Timecode — top 6, right 6 (same as preview) */}
+            {/* Timecode - top 6, right 6 (same as preview) */}
             {isVideo && fsDuration > 0 && (
               <div style={{
                 position: 'absolute', top: 6, right: 6, background: '#1A1A1A', color: colors.white,
@@ -671,7 +671,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
               </div>
             )}
 
-            {/* Scrubber — 12px from bottom of video frame, 16px from edges */}
+            {/* Scrubber - 12px from bottom of video frame, 16px from edges */}
             {isVideo && (
               <div
                 ref={fsScrubRef}
@@ -738,12 +738,12 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                 <button onClick={() => {
                   const v = fsVideoRef.current; if (!v) return
                   if (fsPlaying) {
-                    // Pause — stop reverse interval if active, pause video
+                    // Pause - stop reverse interval if active, pause video
                     if (isReversed) clearInterval(reverseIntervalRef.current)
                     else v.pause()
                     setFsPlaying(false)
                   } else {
-                    // Resume — restart reverse interval if in reverse mode, otherwise play forward
+                    // Resume - restart reverse interval if in reverse mode, otherwise play forward
                     if (isReversed) {
                       startReverseInterval(v, playbackSpeed)
                     } else {
@@ -795,7 +795,7 @@ export function ShareViewScreen({ params }: { params?: Record<string, unknown> }
                   </svg>
                 </button>
               )}
-              {/* Mute/Unmute — use callback to avoid stale closure */}
+              {/* Mute/Unmute - use callback to avoid stale closure */}
               {isVideo && (
                 <button onClick={() => {
                   const next = !fsMuted

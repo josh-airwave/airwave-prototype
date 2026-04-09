@@ -1,5 +1,5 @@
 /**
- * ScreenExporter — Dev-only utility
+ * ScreenExporter - Dev-only utility
  *
  * Press 'E' to export the current feature's screens.
  * Claude keeps export-screens.ts updated as you work.

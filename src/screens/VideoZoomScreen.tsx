@@ -214,7 +214,7 @@ export function VideoZoomScreen({ params }: { params?: Record<string, unknown> }
           }}
         />
 
-        {/* Timecode — top 6, right 6 */}
+        {/* Timecode - top 6, right 6 */}
         {duration > 0 && (
           <div style={{
             position: 'absolute', top: 6, right: 6, background: '#1A1A1A', color: colors.white,
@@ -226,7 +226,7 @@ export function VideoZoomScreen({ params }: { params?: Record<string, unknown> }
           </div>
         )}
 
-        {/* Scrubber — 24px from bottom of video */}
+        {/* Scrubber - 24px from bottom of video */}
         <div
           ref={scrubRef}
           onMouseDown={handleScrubStart}

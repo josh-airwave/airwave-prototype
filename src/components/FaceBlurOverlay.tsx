@@ -33,7 +33,7 @@ interface FaceBlurOverlayProps {
 }
 
 const DETECT_INTERVAL = 150  // ms between detection runs
-const MATCH_THRESHOLD = 0.25 // normalized distance — much more generous for moving faces
+const MATCH_THRESHOLD = 0.25 // normalized distance - much more generous for moving faces
 const MAX_MISSED_FRAMES = 8  // remove face after this many consecutive misses
 const SMOOTH_FACTOR = 0.4    // how quickly position updates (0=no update, 1=instant)
 
@@ -58,7 +58,7 @@ export function FaceBlurOverlay({ videoUrl, initialRegions, onDone, onCancel }: 
   const [loading, setLoading] = useState(true)
   const [detecting, setDetecting] = useState(false)
 
-  // Core tracking state — lives in refs to avoid stale closures
+  // Core tracking state - lives in refs to avoid stale closures
   const trackedRef = useRef<TrackedFace[]>(
     (initialRegions || []).map(r => ({
       id: r.id,
@@ -137,7 +137,7 @@ export function FaceBlurOverlay({ videoUrl, initialRegions, onDone, onCancel }: 
           if (matchedTracked.has(ti) || matchedDet.has(di)) continue
           if (dist > MATCH_THRESHOLD) continue
 
-          // Match found — update tracked face position with smoothing
+          // Match found - update tracked face position with smoothing
           matchedTracked.add(ti)
           matchedDet.add(di)
 
@@ -196,7 +196,7 @@ export function FaceBlurOverlay({ videoUrl, initialRegions, onDone, onCancel }: 
     return () => clearInterval(detectRef.current)
   }, [loading])
 
-  // Draw blur canvas loop — runs every animation frame
+  // Draw blur canvas loop - runs every animation frame
   useEffect(() => {
     const video = videoRef.current
     const canvas = canvasRef.current

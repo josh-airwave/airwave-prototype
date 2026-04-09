@@ -22,7 +22,7 @@ function formatTimestamp(seconds: number) {
 function parseHourlyTable(fields: OcrField[]) {
   const hours: Record<number, Record<string, OcrField>> = {}
   for (const f of fields) {
-    const match = f.label.match(/HR (\d+) — (.+)/)
+    const match = f.label.match(/HR (\d+) - (.+)/)
     if (match) {
       const hr = parseInt(match[1])
       const col = match[2]
@@ -222,7 +222,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
   const hourlyTable = isHourlyReport ? parseHourlyTable(fields) : null
   const machineFields = isHourlyReport ? fields.filter(f => !f.label.match(/^HR \d+/)) : []
   // Detect which columns exist in the data
-  const hasActuals = isHourlyReport && fields.some(f => f.label.match(/— Hourly Actual$/))
+  const hasActuals = isHourlyReport && fields.some(f => f.label.match(/- Hourly Actual$/))
   const baseColumns = hasActuals
     ? ['Hourly Goal', 'Cumulative Goal', 'Hourly Actual', 'Cumulative Actual', 'Variance']
     : ['Hourly Goal', 'Cumulative Goal']
@@ -297,7 +297,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
           </div>
         </div>
 
-        {/* Source video — portrait orientation */}
+        {/* Source video - portrait orientation */}
         <div style={{ padding: '12px 16px 0' }}>
           <div
             onClick={() => push('ImageZoom', { videoUrl: report.sourceVideoUrl })}
@@ -348,7 +348,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
           />
         </div>
 
-        {/* Machine Parameters (for vr1 — controller screen OCR) */}
+        {/* Machine Parameters (for vr1 - controller screen OCR) */}
         {isHourlyReport && machineFields.length > 0 && (
           <div style={{ padding: '0 16px 12px' }}>
             <h2 style={{
@@ -453,7 +453,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
                       if (col === 'Variance') {
                         const goal = row['Hourly Goal']
                         const actual = row['Hourly Actual']
-                        if (!goal || !actual) return <div key={col} style={{ borderLeft: `1px solid ${colors.neutralGray}`, padding: 8, textAlign: 'center', fontSize: 14, color: colors.coolText }}>—</div>
+                        if (!goal || !actual) return <div key={col} style={{ borderLeft: `1px solid ${colors.neutralGray}`, padding: 8, textAlign: 'center', fontSize: 14, color: colors.coolText }}>-</div>
                         const diff = parseInt(actual.editedValue ?? actual.value) - parseInt(goal.editedValue ?? goal.value)
                         const varColor = diff >= 0 ? colors.success : colors.danger
                         return (
@@ -463,7 +463,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
                         )
                       }
                       const field = row[col]
-                      if (!field) return <div key={col} style={{ borderLeft: `1px solid ${colors.neutralGray}`, padding: 8, textAlign: 'center', fontSize: 14, color: colors.coolText }}>—</div>
+                      if (!field) return <div key={col} style={{ borderLeft: `1px solid ${colors.neutralGray}`, padding: 8, textAlign: 'center', fontSize: 14, color: colors.coolText }}>-</div>
                       return (
                         <div key={col} style={{
                           borderLeft: `1px solid ${colors.neutralGray}`,
@@ -619,7 +619,7 @@ export function ReportViewScreen({ params }: { params?: Record<string, unknown> 
         {/* Bottom padding */}
         <div style={{ height: 80 }} />
 
-        {/* Submitted success banner — shows inline at bottom of scroll */}
+        {/* Submitted success banner - shows inline at bottom of scroll */}
         {submitted && (
           <div style={{
             margin: '0 16px 20px', padding: '16px',

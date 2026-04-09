@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { colors, fonts } from '../styles/theme'
 import { useNavigation } from '../navigation/Router'
 import { videoIntelReports, channels } from '../data/mock'
+import { useStatusBar } from '../components/PhoneFrame'
 
 type FlowStep = 'drawer' | 'chat_list' | 'share_sheet' | 'imessage' | 'done'
 
 export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }) {
   const { push, pop, reset } = useNavigation()
+  const { setDark } = useStatusBar()
   const reportId = (params?.reportId as string) || 'vr3'
   const report = videoIntelReports.find(r => r.id === reportId) || videoIntelReports[0]
   const shortUrl = `awv.app/r/${report.id.replace('vr', '')}`
@@ -19,6 +21,13 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
   const [showFeedbackNotif, setShowFeedbackNotif] = useState(!!params?.initialShowFeedback)
   const [sharedTo, setSharedTo] = useState<string | null>(null)
 
+  // Dark status bar when overlay is showing
+  const hasOverlay = step === 'drawer' || step === 'chat_list' || step === 'share_sheet'
+  useEffect(() => {
+    if (hasOverlay) setDark(true)
+    return () => { if (hasOverlay) setDark(false) }
+  }, [hasOverlay])
+
   // Auto-advance: after sending iMessage, show "viewed" notification, then "helpful" feedback
   useEffect(() => {
     if (sent) {
@@ -28,10 +37,10 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
     }
   }, [sent])
 
-  // Drawer step — "Share to Chat" / "Share Externally"
+  // Drawer step - "Share to Chat" / "Share Externally"
   if (step === 'drawer') {
     return (
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 10 }}
+      <div style={{ position: 'absolute', top: -54, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 10 }}
         onClick={() => pop()}
       >
         <div style={{
@@ -70,7 +79,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
             <strong>Share Externally</strong> creates a public link with the video and report. Blue's notes are not included and stay in your workspace.
           </p>
 
-          {/* Share to Chat — outline pill */}
+          {/* Share to Chat - outline pill */}
           <button
             onClick={() => setStep('chat_list')}
             style={{
@@ -84,7 +93,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
             Share to Chat
           </button>
 
-          {/* Share Externally — filled pill */}
+          {/* Share Externally - filled pill */}
           <button
             onClick={() => setStep('share_sheet')}
             style={{
@@ -102,12 +111,12 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
     )
   }
 
-  // Share to Chat — channel/DM list
+  // Share to Chat - channel/DM list
   if (step === 'chat_list') {
     const chatChannels = channels.filter(c => c.type !== 'blue')
 
     return (
-      <div style={{ height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      <div style={{ position: 'absolute', top: -54, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
         onClick={() => setStep('drawer')}
       >
         <div style={{
@@ -223,7 +232,7 @@ export function ShareFlowScreen({ params }: { params?: Record<string, unknown> }
     ]
 
     return (
-      <div style={{ height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      <div style={{ position: 'absolute', top: -54, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
         onClick={() => setStep('drawer')}
       >
         <div style={{

@@ -3,6 +3,7 @@ import { colors, fonts, radius } from '../styles/theme'
 import { VideoThumbnail } from './VideoThumbnail'
 import { galleryItems } from '../data/mock'
 import { useNavigation } from '../navigation/Router'
+import { useStatusBar } from './PhoneFrame'
 
 interface SmartGlassesBottomSheetProps {
   open: boolean
@@ -11,7 +12,13 @@ interface SmartGlassesBottomSheetProps {
 
 export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomSheetProps) {
   const { push } = useNavigation()
+  const { setDark } = useStatusBar()
   const [durations, setDurations] = React.useState<Record<string, string>>({})
+
+  React.useEffect(() => {
+    if (open) setDark(true)
+    return () => { if (open) setDark(false) }
+  }, [open])
 
   if (!open) return null
 
@@ -29,10 +36,10 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
           zIndex: 200,
         }}
       />
-      {/* Sheet — full height up to status bar */}
+      {/* Sheet - full height, leaving room for status bar + dynamic island */}
       <div style={{
         position: 'absolute',
-        top: 44,
+        top: 54,
         bottom: 0,
         left: 0,
         right: 0,
@@ -92,7 +99,6 @@ export function SmartGlassesBottomSheet({ open, onClose }: SmartGlassesBottomShe
             onClick={(e) => {
               e.stopPropagation()
               push('FirmwareUpdate')
-              setTimeout(() => onClose(), 100)
             }}
             style={{
               width: '100%',

@@ -3,12 +3,12 @@ import { colors, fonts, radius } from '../styles/theme'
 import { useNavigation } from '../navigation/Router'
 
 /**
- * Firmware Update Screen — Multi-update sequential flow
+ * Firmware Update Screen - Multi-update sequential flow
  *
  * Handles up to 3 sequential firmware updates:
- *   1. MTK (Android system) — rare, complex
- *   2. APP (glasses Android application) — no restart required
- *   3. BES (BES microcontroller firmware) — requires glasses restart
+ *   1. MTK (Android system) - rare, complex
+ *   2. APP (glasses Android application) - no restart required
+ *   3. BES (BES microcontroller firmware) - requires glasses restart
  *
  * Shows clear progress per update (1 of 3, 2 of 3, etc.)
  * Handles interruptions with reassurance messaging about partial completion.
@@ -32,10 +32,10 @@ interface PhaseConfig {
   duration: number
 }
 
-// What's new in this update — shown to the tech
+// What's new in this update - shown to the tech
 const WHATS_NEW = [
   'Improved wake word tuning',
-  'Voice to Voice conversations with Blue from your glasses',
+  'Voice to Voice with Blue',
   'Performance and stability improvements',
 ]
 
@@ -79,7 +79,7 @@ const FAILURE_CONFIG: Record<string, { title: string; message: string }> = {
   },
   update_interrupted: {
     title: 'Update Interrupted',
-    message: 'The update was interrupted, but don\'t worry — your glasses are safe.',
+    message: 'The update was interrupted, but don\'t worry. Your glasses are safe.',
   },
   reconnect_failed: {
     title: 'Couldn\'t Reconnect',
@@ -92,13 +92,15 @@ const FAILURE_CONFIG: Record<string, { title: string; message: string }> = {
 export function FirmwareUpdateScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
 
-  // Which updates to run
-  const preset = (params?.updatePreset as string) || '2_updates'
-  const updates = UPDATE_PRESETS[preset] || UPDATE_PRESETS['2_updates']
-  const totalUpdates = updates.length
-
   // Freeze mode for screen exports
   const freezeState = params?.freezeState === true
+
+  // Which updates to run - selectable in prototype mode
+  const paramPreset = (params?.updatePreset as string) || '2_updates'
+  const [selectedPreset, setSelectedPreset] = useState(paramPreset)
+  const updates = UPDATE_PRESETS[selectedPreset] || UPDATE_PRESETS['2_updates']
+  const totalUpdates = updates.length
+
   const initialUpdateIndex = typeof params?.initialUpdateIndex === 'number' ? params.initialUpdateIndex : 0
   const initialPhaseIndex = typeof params?.initialPhaseIndex === 'number' ? params.initialPhaseIndex : 0
   const initialProgress = typeof params?.initialProgress === 'number' ? params.initialProgress : 0
@@ -114,6 +116,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
   const [isRetrying, setIsRetrying] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
   const [allDone, setAllDone] = useState(params?.initialAllDone === true)
+  const [started, setStarted] = useState(freezeState)
   const animRef = useRef<number>(0)
   const phaseTimerRef = useRef<number>(0)
 
@@ -143,7 +146,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
 
   // Animate progress within current phase
   useEffect(() => {
-    if (freezeState || allDone || isFailed || !currentPhase) return
+    if (!started || freezeState || allDone || isFailed || !currentPhase) return
 
     const { duration } = currentPhase
     const startTime = Date.now()
@@ -189,7 +192,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
       cancelAnimationFrame(animRef.current)
       clearTimeout(phaseTimerRef.current)
     }
-  }, [currentUpdateIndex, currentPhaseIndex, failure, retryKey, freezeState, allDone])
+  }, [currentUpdateIndex, currentPhaseIndex, failure, retryKey, freezeState, allDone, started])
 
   // Simulate failure on glasses tap
   const simulateFailure = () => {
@@ -208,7 +211,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
     setFailure(null)
     setTimeout(() => {
       setIsRetrying(false)
-      setCurrentPhaseIndex(0) // Restart current update from beginning
+      setProgress(0)
       setRetryKey(prev => prev + 1)
     }, 1000)
   }
@@ -232,8 +235,104 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
     }
     const done = completedUpdates
     const left = totalUpdates - completedUpdates
-    return `${done} of ${totalUpdates} update${done > 1 ? 's' : ''} already completed successfully. ${left} update${left > 1 ? 's' : ''} remaining — we'll continue right where we left off.`
+    return `${done} of ${totalUpdates} update${done > 1 ? 's' : ''} already completed successfully. ${left} update${left > 1 ? 's' : ''} remaining and we'll continue right where we left off.`
   }
+
+  const renderPicker = () => (
+    <>
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px 24px',
+        gap: 24,
+      }}>
+        <img src="/images/sg_welcome.png" alt="Airwave Glasses" style={{ width: 140, height: 'auto', objectFit: 'contain', opacity: 0.8 }} />
+
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: fonts.size.xxl,
+            fontWeight: fonts.weight.semibold,
+            fontFamily: fonts.family,
+            color: colors.almostBlack,
+            marginBottom: 8,
+          }}>
+            Firmware Update Available
+          </div>
+          <div style={{
+            fontSize: fonts.size.md,
+            color: colors.neutral,
+            fontFamily: fonts.family,
+            lineHeight: 1.5,
+          }}>
+            {totalUpdates === 1
+              ? 'There is 1 update to install.'
+              : `There are ${totalUpdates} updates to install.`
+            }
+          </div>
+        </div>
+
+        {/* Scenario selector */}
+        <div data-prototype-only style={{
+          display: 'flex',
+          gap: 8,
+          background: colors.coolLight,
+          borderRadius: 12,
+          padding: 4,
+        }}>
+          {(['1_update', '2_updates', '3_updates'] as const).map(p => {
+            const label = p === '1_update' ? '1 Update' : p === '2_updates' ? '2 Updates' : '3 Updates'
+            const isActive = selectedPreset === p
+            return (
+              <button
+                key={p}
+                onClick={() => setSelectedPreset(p)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: isActive ? colors.white : 'transparent',
+                  color: isActive ? colors.primary : colors.neutral,
+                  fontSize: fonts.size.sm,
+                  fontWeight: isActive ? fonts.weight.bold : fonts.weight.medium,
+                  fontFamily: fonts.family,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                }}
+              >
+                {label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div style={{
+          fontSize: fonts.size.xs, color: colors.neutral400,
+          fontFamily: fonts.family, fontStyle: 'italic',
+          whiteSpace: 'nowrap',
+        }}>
+          Select a scenario above to test different flows
+        </div>
+      </div>
+
+      <div style={{ padding: '16px 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button
+          onClick={() => setStarted(true)}
+          style={{
+            width: '100%', padding: '16px 0', borderRadius: radius.pill,
+            background: colors.primary, color: colors.white,
+            fontSize: fonts.size.xl, fontWeight: fonts.weight.bold, fontFamily: fonts.family,
+            cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
+          }}
+        >
+          Install Now
+        </button>
+      </div>
+    </>
+  )
 
   return (
     <div style={{
@@ -251,7 +350,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
         position: 'relative',
         borderBottom: `1px solid ${colors.coolMedium}`,
       }}>
-        {(allDone || isFailed) && (
+        {(!started || allDone || isFailed) && (
           <button
             onClick={pop}
             style={{
@@ -269,13 +368,13 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
           fontWeight: fonts.weight.semibold,
           fontFamily: fonts.family,
           color: colors.almostBlack,
+          whiteSpace: 'nowrap',
         }}>
           Firmware Update
         </span>
       </div>
 
-      {/* Content */}
-      <div style={{
+      {!started ? renderPicker() : <div style={{
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -291,6 +390,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             background: isFailed ? colors.dangerLight : colors.primaryLight15,
             padding: '6px 16px',
             borderRadius: 20,
+            whiteSpace: 'nowrap',
           }}>
             <span style={{
               fontSize: fonts.size.sm,
@@ -379,6 +479,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
           color: isFailed ? colors.danger : allDone ? colors.success : isRestartPhase ? '#F5A623' : colors.primary,
           lineHeight: 1,
           transition: 'color 0.5s ease',
+          whiteSpace: 'nowrap',
         }}>
           {isFailed ? '' : `${overallProgress}%`}
         </div>
@@ -391,6 +492,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             fontFamily: fonts.family,
             color: isFailed ? colors.danger : allDone ? colors.success : isRestartPhase ? '#F5A623' : colors.almostBlack,
             marginBottom: 8,
+            whiteSpace: 'nowrap',
           }}>
             {allDone ? "You're All Set!" : isFailed ? failureInfo?.title : isRetrying ? 'Retrying...' : currentPhase?.label}
           </div>
@@ -399,35 +501,38 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             color: colors.neutral,
             fontFamily: fonts.family,
             lineHeight: 1.5,
-            maxWidth: 300,
-            margin: '0 auto',
-          }}>
+            whiteSpace: (allDone || isRetrying || (!isFailed && currentPhase)) ? 'nowrap' : 'normal',
+            textWrap: isFailed ? 'balance' : undefined,
+          } as React.CSSProperties}>
             {allDone
-              ? `${totalUpdates === 1 ? 'Your update is' : `All ${totalUpdates} updates are`} installed and your glasses are ready to go.`
+              ? `${totalUpdates === 1 ? 'Update' : `All ${totalUpdates} updates`} installed. You're good to go.`
               : isFailed
                 ? failureInfo?.message
                 : isRetrying
-                  ? 'Reconnecting and restarting...'
+                  ? currentPhase?.key === 'downloading' ? 'Retrying download...'
+                    : currentPhase?.key === 'installing' ? 'Resuming installation...'
+                    : currentPhase?.key === 'restarting' ? 'Restarting your glasses...'
+                    : 'Reconnecting to your glasses...'
                   : currentPhase?.sublabel
             }
           </div>
         </div>
 
-        {/* What's New — shown when done */}
+        {/* What's New - shown when done */}
         {allDone && (
           <div style={{
             background: colors.coolLight,
             borderRadius: 12,
             padding: '14px 18px',
-            maxWidth: 320,
             width: '100%',
           }}>
             <div style={{
-              fontSize: fonts.size.sm,
+              fontSize: fonts.size.md,
               fontWeight: fonts.weight.bold,
               fontFamily: fonts.family,
               color: colors.almostBlack,
               marginBottom: 8,
+              whiteSpace: 'nowrap',
             }}>
               What's New
             </div>
@@ -438,14 +543,15 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
                 alignItems: 'flex-start',
                 marginBottom: i < WHATS_NEW.length - 1 ? 6 : 0,
               }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <span style={{
-                  fontSize: fonts.size.sm,
+                  fontSize: fonts.size.md,
                   fontFamily: fonts.family,
                   color: colors.neutral,
                   lineHeight: 1.4,
+                  whiteSpace: 'nowrap',
                 }}>
                   {item}
                 </span>
@@ -461,7 +567,6 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             border: '1px solid #FFE0B2',
             borderRadius: 12,
             padding: '12px 16px',
-            maxWidth: 320,
             display: 'flex',
             gap: 10,
             alignItems: 'flex-start',
@@ -476,7 +581,8 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
               fontFamily: fonts.family,
               color: '#7A5400',
               lineHeight: 1.5,
-            }}>
+              textWrap: 'balance',
+            } as React.CSSProperties}>
               {getFailureReassurance()}
             </span>
           </div>
@@ -531,14 +637,15 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
           <div data-prototype-only style={{
             fontSize: fonts.size.xs, color: colors.neutral400,
             fontFamily: fonts.family, fontStyle: 'italic',
+            whiteSpace: 'nowrap',
           }}>
             Tap the glasses to simulate a failure
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Bottom buttons */}
-      <div style={{ padding: '16px 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {started ? <div style={{ padding: '16px 24px 36px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {allDone ? (
           <button
             onClick={pop}
@@ -546,7 +653,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
               width: '100%', padding: '16px 0', borderRadius: radius.pill,
               background: colors.success, color: colors.white,
               fontSize: fonts.size.xl, fontWeight: fonts.weight.bold, fontFamily: fonts.family,
-              cursor: 'pointer', border: 'none',
+              cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
             }}
           >
             Done
@@ -559,7 +666,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
                 width: '100%', padding: '16px 0', borderRadius: radius.pill,
                 background: colors.primary, color: colors.white,
                 fontSize: fonts.size.xl, fontWeight: fonts.weight.bold, fontFamily: fonts.family,
-                cursor: 'pointer', border: 'none',
+                cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
               }}
             >
               Try Again
@@ -570,7 +677,7 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
                 width: '100%', padding: '14px 0', borderRadius: radius.pill,
                 background: 'none', color: colors.neutral,
                 fontSize: fonts.size.lg, fontWeight: fonts.weight.medium, fontFamily: fonts.family,
-                cursor: 'pointer', border: 'none',
+                cursor: 'pointer', border: 'none', whiteSpace: 'nowrap',
               }}
             >
               Cancel Update
@@ -581,12 +688,12 @@ export function FirmwareUpdateScreen({ params }: { params?: Record<string, unkno
             width: '100%', padding: '16px 0', borderRadius: radius.pill,
             background: colors.coolLight, color: colors.neutral400,
             fontSize: fonts.size.lg, fontWeight: fonts.weight.medium, fontFamily: fonts.family,
-            textAlign: 'center',
+            textAlign: 'center', whiteSpace: 'nowrap',
           }}>
-            {isRestartPhase ? 'Glasses are restarting — please wait...' : 'Please don\'t close the app...'}
+            {isRestartPhase ? 'Glasses are restarting, please wait...' : 'Please don\'t close the app...'}
           </div>
         )}
-      </div>
+      </div> : null}
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

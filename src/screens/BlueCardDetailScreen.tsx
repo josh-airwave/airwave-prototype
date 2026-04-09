@@ -55,7 +55,7 @@ export function BlueCardDetailScreen({ params }: { params?: Record<string, unkno
       const replies = [
         "Based on the report, I identified 3 key action items. Would you like me to list them?",
         "I found several safety observations in the video. The framing inspection on floor 2 needs follow-up.",
-        "The transcription is complete. I noticed mentions of electrical rough-in delays — want me to flag those for the team?",
+        "The transcription is complete. I noticed mentions of electrical rough-in delays - want me to flag those for the team?",
         "I've cross-referenced this with previous reports. There's a recurring issue with the elevator shaft alignment.",
       ]
       const reply: ChatMsg = {
@@ -95,7 +95,7 @@ export function BlueCardDetailScreen({ params }: { params?: Record<string, unkno
       height: '100%', display: 'flex', flexDirection: 'column',
       background: '#F6F6F6',
     }}>
-      {/* Header — AI-generated title summarizing the conversation */}
+      {/* Header - AI-generated title summarizing the conversation */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 16px',
@@ -351,7 +351,7 @@ export function BlueCardDetailScreen({ params }: { params?: Record<string, unkno
           }}
         >
           {isRecording ? (
-            // Recording indicator — pulsing dot
+            // Recording indicator - pulsing dot
             <div style={{ width: 14, height: 14, borderRadius: '50%', background: 'white' }} />
           ) : (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white">

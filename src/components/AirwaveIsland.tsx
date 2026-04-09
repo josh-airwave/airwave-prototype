@@ -83,7 +83,7 @@ export function AirwaveIsland({ mode, channelType, onLeaderboardPress, onRecordP
         )}
       </div>
 
-      {/* Center: Record / Push-to-Talk button — absolutely centered horizontally */}
+      {/* Center: Record / Push-to-Talk button - absolutely centered horizontally */}
       <button
         onClick={onRecordPress}
         style={{
@@ -112,7 +112,7 @@ export function AirwaveIsland({ mode, channelType, onLeaderboardPress, onRecordP
         </svg>
       </button>
 
-      {/* Right element — changes per mode */}
+      {/* Right element - changes per mode */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, zIndex: 1 }}>
         {mode === 'blue' ? (
           <>

@@ -213,7 +213,7 @@ export function TrimOverlay({ videoUrl, initialStart = 0, initialEnd = 1, onSave
           userSelect: 'none',
         }}
       >
-        {/* Filmstrip frames — full width between handles */}
+        {/* Filmstrip frames - full width between handles */}
         <div style={{
           position: 'absolute',
           top: 4,
@@ -251,7 +251,7 @@ export function TrimOverlay({ videoUrl, initialStart = 0, initialEnd = 1, onSave
           pointerEvents: 'none', zIndex: 2,
         }} />
 
-        {/* Yellow selection frame — connects the two handles */}
+        {/* Yellow selection frame - connects the two handles */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -264,7 +264,7 @@ export function TrimOverlay({ videoUrl, initialStart = 0, initialEnd = 1, onSave
           zIndex: 3,
         }} />
 
-        {/* Left handle — attached to yellow frame */}
+        {/* Left handle - attached to yellow frame */}
         <div
           onMouseDown={(e) => { e.preventDefault(); setDragging('start') }}
           style={{
@@ -283,7 +283,7 @@ export function TrimOverlay({ videoUrl, initialStart = 0, initialEnd = 1, onSave
           <div style={{ width: 3, height: 24, background: '#000', borderRadius: 2, opacity: 0.3 }} />
         </div>
 
-        {/* Right handle — attached to yellow frame */}
+        {/* Right handle - attached to yellow frame */}
         <div
           onMouseDown={(e) => { e.preventDefault(); setDragging('end') }}
           style={{
@@ -302,7 +302,7 @@ export function TrimOverlay({ videoUrl, initialStart = 0, initialEnd = 1, onSave
           <div style={{ width: 3, height: 24, background: '#000', borderRadius: 2, opacity: 0.3 }} />
         </div>
 
-        {/* Playhead — draggable, moves with playback */}
+        {/* Playhead - draggable, moves with playback */}
         <div
           onMouseDown={(e) => { e.preventDefault(); setDragging('playhead') }}
           style={{

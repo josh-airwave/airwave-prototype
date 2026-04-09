@@ -48,7 +48,7 @@ export function MessageBubble({
   const bubbleBg = isOwn ? colors.blurpleLightSolid : colors.white
   const textColor = colors.almostBlack
 
-  // Parse @mentions and URLs — make mentions bold, URLs blue
+  // Parse @mentions and URLs - make mentions bold, URLs blue
   const renderMessageText = (text: string) => {
     if (!text) return null
     // Split on @mentions and URLs
@@ -65,7 +65,7 @@ export function MessageBubble({
     })
   }
 
-  // Read/heard counts — use message data or fallback
+  // Read/heard counts - use message data or fallback
   const readCount = message.readCount != null ? message.readCount : Math.floor(Math.random() * 12) + 3
   const heardCount = message.heardCount != null ? message.heardCount : 0
 
@@ -125,7 +125,7 @@ export function MessageBubble({
         padding: isGrouped && !isFirstInGroup ? '1px 8px' : '0 8px',
         alignItems: 'flex-end',
       }}>
-        {/* Avatar column — 30px wide */}
+        {/* Avatar column - 30px wide */}
         {isLeft && (
           <div style={{ width: 30, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
             {showAvatar && <Avatar emoji={sender?.avatar || ''} size={28} name={sender?.name} />}
@@ -151,7 +151,7 @@ export function MessageBubble({
             overflow: 'hidden',
           }}>
 
-            {/* Image messages — tappable, with optional text below */}
+            {/* Image messages - tappable, with optional text below */}
             {message.type === 'image' && message.imageUrl && (
               <div>
                 <div
@@ -204,7 +204,7 @@ export function MessageBubble({
               </div>
             )}
 
-            {/* Video messages — video thumbnail with play overlay, tap opens fullscreen */}
+            {/* Video messages - video thumbnail with play overlay, tap opens fullscreen */}
             {message.type === 'video' && message.videoUrl && (
               <div>
                 <div
@@ -225,7 +225,7 @@ export function MessageBubble({
                     }}
                     style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block', pointerEvents: 'none', background: '#000' }}
                   />
-                  {/* Play button — 40x40, gray, centered (matches production) */}
+                  {/* Play button - 40x40, gray, centered (matches production) */}
                   <div style={{
                     position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -241,7 +241,7 @@ export function MessageBubble({
                       </svg>
                     </div>
                   </div>
-                  {/* Duration label — bottom right (matches production) */}
+                  {/* Duration label - bottom right (matches production) */}
                   {message.videoDuration && (
                     <div style={{
                       position: 'absolute', bottom: 8, right: 8,
@@ -287,7 +287,7 @@ export function MessageBubble({
               </div>
             )}
 
-            {/* Link preview card — rendered separately, no play button */}
+            {/* Link preview card - rendered separately, no play button */}
             {message.type === 'link' && message.linkPreview && (
               <div style={{ overflow: 'hidden' }}>
                 {message.linkPreview.image && (
@@ -321,7 +321,7 @@ export function MessageBubble({
               </div>
             )}
 
-            {/* Text / audio messages — play button layout */}
+            {/* Text / audio messages - play button layout */}
             {message.type !== 'image' && message.type !== 'video' && message.type !== 'system' && message.type !== 'link' && (
               <div style={{
                 display: 'flex',
@@ -415,7 +415,7 @@ export function MessageBubble({
         </div>
       </div>
 
-      {/* Read + Heard receipts — shown below the last message in a group */}
+      {/* Read + Heard receipts - shown below the last message in a group */}
       {(isStandalone || isLastInGroup) && (
         <div style={{
           display: 'flex',

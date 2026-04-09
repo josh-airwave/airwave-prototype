@@ -134,7 +134,7 @@ export function GalleryScreen() {
                   if (selectMode) {
                     toggleSelectAll(items)
                   } else {
-                    // Share All — select all in batch and go to ShareView
+                    // Share All - select all in batch and go to ShareView
                     const ids = items.map(i => i.id)
                     push('ShareView', { itemId: ids[0], batchIds: ids })
                   }
@@ -224,7 +224,7 @@ export function GalleryScreen() {
                       }}
                     />
                   )}
-                  {/* Selection checkmark — top right corner */}
+                  {/* Selection checkmark - top right corner */}
                   {selectMode && (
                     <div style={{
                       position: 'absolute',
@@ -254,7 +254,7 @@ export function GalleryScreen() {
         ))}
       </div>
 
-      {/* Next button — slides up when items selected in select mode */}
+      {/* Next button - slides up when items selected in select mode */}
       {selectMode && selectedIds.size > 0 && (
         <div style={{
           position: 'absolute',

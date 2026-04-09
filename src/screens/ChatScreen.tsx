@@ -104,7 +104,7 @@ export function ChatScreen({ params }: { params?: Record<string, unknown> }) {
         ))}
       </div>
 
-      {/* Bottom spacer — Airwave Island renders via Router */}
+      {/* Bottom spacer - Airwave Island renders via Router */}
       <div style={{ height: 80 }} />
     </div>
   )

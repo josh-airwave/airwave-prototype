@@ -25,7 +25,7 @@ export function BlueScreen() {
       height: '100%', display: 'flex', flexDirection: 'column',
       background: '#EFF3F8',
     }}>
-      {/* Header — back arrow, Blue avatar + name + Online status */}
+      {/* Header - back arrow, Blue avatar + name + Online status */}
       <div style={{
         display: 'flex', alignItems: 'center',
         padding: '10px 16px',
@@ -104,7 +104,7 @@ export function BlueScreen() {
               </div>
             </div>
 
-            {/* Remind callout — above the red container */}
+            {/* Remind callout - above the red container */}
             <div style={{
               display: 'flex', alignItems: 'flex-start', gap: 8,
               padding: '10px 12px', marginBottom: 12,
@@ -144,12 +144,12 @@ export function BlueScreen() {
                 <div style={{
                   fontSize: 14, color: colors.textPrimary, fontFamily: fonts.family, fontWeight: 600,
                 }}>
-                  {fb.reportTitle.replace(/\s*[—]\s*[A-Z][a-z].*$/, '')}
+                  {fb.reportTitle.replace(/\s*[-]\s*[A-Z][a-z].*$/, '')}
                 </div>
               </div>
             )}
 
-            {/* View Report button — same style as BlueCard buttons */}
+            {/* View Report button - same style as BlueCard buttons */}
             <button
               onClick={() => push('ReportView', { reportId: fb.reportId })}
               style={{

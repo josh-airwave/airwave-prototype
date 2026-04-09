@@ -111,7 +111,7 @@ export function Router({ screens, initialScreen, children }: RouterProps) {
               <div
                 key={entry.screen + '-' + idx}
                 style={{
-                  position: 'absolute', inset: 0,
+                  position: 'absolute', top: 54, left: 0, right: 0, bottom: 0,
                   zIndex: idx,
                   display: visible ? 'block' : 'none',
                   pointerEvents: isTop ? 'auto' : 'none',

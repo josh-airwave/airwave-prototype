@@ -19,7 +19,7 @@ export interface Channel {
   muted?: boolean
 }
 
-// Blue AI card — generated from shared media
+// Blue AI card - generated from shared media
 export interface BlueCard {
   id: string
   title: string
@@ -199,7 +199,7 @@ export const channels: Channel[] = [
 
 // --- Mock Messages ---
 export const chatMessages: Record<string, Message[]> = {
-  // Backend channel — matches production app screenshots
+  // Backend channel - matches production app screenshots
   c1: [
     // --- Friday, Apr 03 ---
     { id: 'b1', senderId: '6', type: 'video', content: '@Vijai anand can you pls check? for some question, Blue isn\'t giving the right answers', timestamp: '10:15 PM', date: 'Friday, Apr 03', videoUrl: '/media/videos/video-1.mp4', videoDuration: '0:50', replyCount: 8, readCount: 15 },
@@ -306,7 +306,7 @@ export const chatMessages: Record<string, Message[]> = {
 export const blueCards: BlueCard[] = [
   {
     id: 'bc1',
-    title: 'MT 06 Tool 104 219 — Machine Audit',
+    title: 'MT 06 Tool 104 219 - Machine Audit',
     summary: 'Blue processed 1:23 of video from the injection molding controller display at MT 06 Tool 104 219. OCR extracted cycle parameters including injection speed, pressure, cushion time, fill time, plasticizing time, and cycle time from the Nissei controller screen.',
     videoUrl: '/media/videos/mma-audit.mp4',
     fileCount: 1,
@@ -317,7 +317,7 @@ export const blueCards: BlueCard[] = [
   },
   {
     id: 'bc2',
-    title: 'Production Whiteboard — Shift Tracking',
+    title: 'Production Whiteboard - Shift Tracking',
     summary: 'Blue processed video of the hour-by-hour production whiteboard at Delta Faucet Jackson. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for all 8 hours of the shift from the handwritten tracking board.',
     videoUrl: '/media/videos/whiteboard.mp4',
     fileCount: 1,
@@ -339,7 +339,7 @@ export const blueCards: BlueCard[] = [
   },
   {
     id: 'bc4',
-    title: 'Hour-by-Hour Production Sheet — Kelli Harper',
+    title: 'Hour-by-Hour Production Sheet - Kelli Harper',
     summary: 'Blue processed video of the hour-by-hour production sheet recorded by Kelli Harper at Delta Faucet Jackson. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for all 8 hours of the shift.',
     videoUrl: '/media/videos/hour-by-hour-sheet.mp4',
     fileCount: 1,
@@ -532,10 +532,10 @@ export const videoIntelReports: VideoIntelReport[] = [
   // --- vr1: MMA Machine Controller Display ---
   {
     id: 'vr1',
-    title: 'MT 06 Tool 104 219 — Machine Audit',
+    title: 'MT 06 Tool 104 219 - Machine Audit',
     templateName: 'Injection Molding Machine Audit',
     machine: 'MT 06 Tool 104 219',
-    location: 'Delta Faucet — Jackson, TN',
+    location: 'Delta Faucet - Jackson, TN',
     technician: 'Josh Lee',
     date: 'Apr 07, 2026',
     time: '3:42 PM CDT',
@@ -544,14 +544,14 @@ export const videoIntelReports: VideoIntelReport[] = [
     status: 'draft',
     summary: 'Blue processed 1:23 of video from the Nissei SI-200-6S H450E Φ46 controller (No. 62, Monitor Data screen) at MT 06 Tool 104 219. OCR extracted cycle parameters, process settings, and 227 shots of cycle data from the controller screen.',
     ocrFields: [
-      // Row 1 — top parameter bar on controller display
+      // Row 1 - top parameter bar on controller display
       { id: 'ocr-screw-pos', label: 'Screw Position', value: '2.057 in', confidence: 0.95, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.03, y: 0.035, w: 0.13, h: 0.03 } },
       { id: 'ocr-inj-speed', label: 'Injection Speed', value: '-0.11 in/s', confidence: 0.96, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.16, y: 0.035, w: 0.14, h: 0.03 } },
       { id: 'ocr-inj-pressure', label: 'Injection Pressure', value: '125 in/10Pa', confidence: 0.78, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.30, y: 0.035, w: 0.16, h: 0.03 } },
       { id: 'ocr-rev', label: 'REV', value: '35 rpm', confidence: 0.97, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.48, y: 0.035, w: 0.10, h: 0.03 } },
       { id: 'ocr-clamp-pos', label: 'Clamp Position', value: '0.000 in', confidence: 0.87, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.60, y: 0.035, w: 0.14, h: 0.03 } },
       { id: 'ocr-ej-pos', label: 'Ejector Position', value: '0.000 in', confidence: 0.97, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.76, y: 0.035, w: 0.14, h: 0.03 } },
-      // Row 2 — second parameter bar
+      // Row 2 - second parameter bar
       { id: 'ocr-cycle-time', label: 'Cycle Time (Objective)', value: '59.34s', confidence: 0.95, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.03, y: 0.068, w: 0.13, h: 0.03 } },
       { id: 'ocr-cushion-pos', label: 'Cushion Position', value: '0.209 in', confidence: 0.94, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.16, y: 0.068, w: 0.14, h: 0.03 } },
       { id: 'ocr-min-cushion', label: 'Min Cushion Position', value: '0.209 in', confidence: 0.93, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.30, y: 0.068, w: 0.14, h: 0.03 } },
@@ -566,10 +566,10 @@ export const videoIntelReports: VideoIntelReport[] = [
   // --- vr2: Production Whiteboard ---
   {
     id: 'vr2',
-    title: 'Production Whiteboard — Shift Tracking',
+    title: 'Production Whiteboard - Shift Tracking',
     templateName: 'Hour-by-Hour Production Report',
     machine: 'MT 06 Tool 104 219',
-    location: 'Delta Faucet — Jackson, TN',
+    location: 'Delta Faucet - Jackson, TN',
     technician: 'Josh Lee',
     date: 'Apr 07, 2026',
     time: '4:15 PM CDT',
@@ -578,22 +578,22 @@ export const videoIntelReports: VideoIntelReport[] = [
     status: 'draft',
     summary: 'Blue processed video of the hour-by-hour production whiteboard. OCR extracted hourly goal and cumulative goal counts for all 8 hours of the shift.',
     ocrFields: [
-      { id: 'ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.38, w: 0.18, h: 0.055 } },
-      { id: 'ocr2', label: 'HR 1 — Cumulative Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.38, w: 0.22, h: 0.055 } },
-      { id: 'ocr3', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.44, w: 0.18, h: 0.055 } },
-      { id: 'ocr4', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.44, w: 0.22, h: 0.055 } },
-      { id: 'ocr5', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.50, w: 0.18, h: 0.055 } },
-      { id: 'ocr6', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.50, w: 0.22, h: 0.055 } },
-      { id: 'ocr7', label: 'HR 4 — Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.56, w: 0.18, h: 0.055 } },
-      { id: 'ocr8', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.56, w: 0.22, h: 0.055 } },
-      { id: 'ocr9', label: 'HR 5 — Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.62, w: 0.18, h: 0.055 } },
-      { id: 'ocr10', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.84, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.62, w: 0.22, h: 0.055 } },
-      { id: 'ocr11', label: 'HR 6 — Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.68, w: 0.18, h: 0.055 } },
-      { id: 'ocr12', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.78, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.68, w: 0.22, h: 0.055 } },
-      { id: 'ocr13', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.74, w: 0.18, h: 0.055 } },
-      { id: 'ocr14', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.74, w: 0.22, h: 0.055 } },
-      { id: 'ocr15', label: 'HR 8 — Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.80, w: 0.18, h: 0.055 } },
-      { id: 'ocr16', label: 'HR 8 — Cumulative Goal', value: '205', confidence: 0.81, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.80, w: 0.22, h: 0.055 } },
+      { id: 'ocr1', label: 'HR 1 - Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.38, w: 0.18, h: 0.055 } },
+      { id: 'ocr2', label: 'HR 1 - Cumulative Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.38, w: 0.22, h: 0.055 } },
+      { id: 'ocr3', label: 'HR 2 - Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.44, w: 0.18, h: 0.055 } },
+      { id: 'ocr4', label: 'HR 2 - Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.44, w: 0.22, h: 0.055 } },
+      { id: 'ocr5', label: 'HR 3 - Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.50, w: 0.18, h: 0.055 } },
+      { id: 'ocr6', label: 'HR 3 - Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.50, w: 0.22, h: 0.055 } },
+      { id: 'ocr7', label: 'HR 4 - Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.56, w: 0.18, h: 0.055 } },
+      { id: 'ocr8', label: 'HR 4 - Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.56, w: 0.22, h: 0.055 } },
+      { id: 'ocr9', label: 'HR 5 - Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.62, w: 0.18, h: 0.055 } },
+      { id: 'ocr10', label: 'HR 5 - Cumulative Goal', value: '129', confidence: 0.84, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.62, w: 0.22, h: 0.055 } },
+      { id: 'ocr11', label: 'HR 6 - Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.68, w: 0.18, h: 0.055 } },
+      { id: 'ocr12', label: 'HR 6 - Cumulative Goal', value: '152', confidence: 0.78, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.68, w: 0.22, h: 0.055 } },
+      { id: 'ocr13', label: 'HR 7 - Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.74, w: 0.18, h: 0.055 } },
+      { id: 'ocr14', label: 'HR 7 - Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.74, w: 0.22, h: 0.055 } },
+      { id: 'ocr15', label: 'HR 8 - Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.80, w: 0.18, h: 0.055 } },
+      { id: 'ocr16', label: 'HR 8 - Cumulative Goal', value: '205', confidence: 0.81, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.80, w: 0.22, h: 0.055 } },
     ],
     detectedObjects: [
       { id: 'obj-whiteboard', label: 'Production Whiteboard', count: 1, confidence: 0.96, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', details: 'Hour-by-hour tracking board', bbox: { x: 0.14, y: 0.28, w: 0.76, h: 0.58 } },
@@ -604,7 +604,7 @@ export const videoIntelReports: VideoIntelReport[] = [
     id: 'vr3',
     title: 'Yard Equipment Inventory',
     templateName: 'Equipment Audit',
-    location: 'Jackson Yard — Bay 1-2',
+    location: 'Jackson Yard - Bay 1-2',
     technician: 'Josh Lee',
     date: 'Apr 07, 2026',
     time: '2:15 PM CDT',
@@ -617,7 +617,7 @@ export const videoIntelReports: VideoIntelReport[] = [
     ],
     detectedObjects: [
       { id: 'obj1', label: 'Scissor Lift (Underside)', count: 1, confidence: 0.98, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', details: 'Orange electric scissor lift, scissors raised, hydraulic cylinder and X-pattern linkage visible', bbox: { x: 0.05, y: 0.18, w: 0.90, h: 0.60 } },
-      { id: 'obj2', label: 'Scissor Lift (Side)', count: 1, confidence: 0.97, frameTimestamp: 24.5, frameUrl: '/images/yard4.png', details: 'Same unit, side/rear view — warning labels, non-marking rubber tires, hydraulic hoses along arms', bbox: { x: 0.0, y: 0.50, w: 0.85, h: 0.45 } },
+      { id: 'obj2', label: 'Scissor Lift (Side)', count: 1, confidence: 0.97, frameTimestamp: 24.5, frameUrl: '/images/yard4.png', details: 'Same unit, side/rear view - warning labels, non-marking rubber tires, hydraulic hoses along arms', bbox: { x: 0.0, y: 0.50, w: 0.85, h: 0.45 } },
       { id: 'obj3', label: 'Battery Compartment', count: 1, confidence: 0.96, frameTimestamp: 5.0, frameUrl: '/images/yard2.png', details: 'Open battery bay with lead-acid cells, white terminal caps, black cable wiring', bbox: { x: 0.40, y: 0.52, w: 0.50, h: 0.28 } },
       { id: 'obj4', label: 'Forklift', count: 1, confidence: 0.95, frameTimestamp: 5.0, frameUrl: '/images/yard4.png', details: 'Yellow, parked inside loading Bay 2', bbox: { x: 0.0, y: 0.08, w: 0.30, h: 0.38 } },
       { id: 'obj5', label: 'Boom Lift Fleet', count: 3, confidence: 0.91, frameTimestamp: 12.0, frameUrl: '/images/yard3.png', details: 'Orange articulated and blue boom lifts in rental depot yard', bbox: { x: 0.05, y: 0.02, w: 0.75, h: 0.35 } },
@@ -627,10 +627,10 @@ export const videoIntelReports: VideoIntelReport[] = [
   // --- vr4: Kelli Harper Hour-by-Hour Sheet ---
   {
     id: 'vr4',
-    title: 'Hour-by-Hour Production Sheet — Kelli Harper',
+    title: 'Hour-by-Hour Production Sheet - Kelli Harper',
     templateName: 'Hour-by-Hour Production Report',
     machine: 'MT 06 Tool 104 219',
-    location: 'Delta Faucet — Jackson, TN',
+    location: 'Delta Faucet - Jackson, TN',
     technician: 'Kelli Harper',
     date: 'Apr 07, 2026',
     time: '5:30 PM CDT',
@@ -639,38 +639,38 @@ export const videoIntelReports: VideoIntelReport[] = [
     status: 'draft',
     summary: 'Blue processed video of the hour-by-hour production sheet recorded by Kelli Harper. OCR extracted hourly goal, cumulative goal, hourly actual, and cumulative actual counts for the shift.',
     ocrFields: [
-      { id: 'kh-ocr1', label: 'HR 1 — Hourly Goal', value: '25', confidence: 0.96, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr2', label: 'HR 1 — Cumulative Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr3', label: 'HR 1 — Hourly Actual', value: '27', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr4', label: 'HR 1 — Cumulative Actual', value: '27', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr5', label: 'HR 2 — Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr6', label: 'HR 2 — Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr7', label: 'HR 2 — Hourly Actual', value: '30', confidence: 0.90, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr8', label: 'HR 2 — Cumulative Actual', value: '57', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr9', label: 'HR 3 — Hourly Goal', value: '23', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.79, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr10', label: 'HR 3 — Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.79, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr11', label: 'HR 3 — Hourly Actual', value: '22', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.79, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr12', label: 'HR 3 — Cumulative Actual', value: '79', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.79, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr13', label: 'HR 4 — Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.84, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr14', label: 'HR 4 — Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.84, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr15', label: 'HR 4 — Hourly Actual', value: '26', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.84, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr16', label: 'HR 4 — Cumulative Actual', value: '105', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.84, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr17', label: 'HR 5 — Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.89, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr18', label: 'HR 5 — Cumulative Goal', value: '129', confidence: 0.83, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.89, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr19', label: 'HR 5 — Hourly Actual', value: '24', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.89, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr20', label: 'HR 5 — Cumulative Actual', value: '129', confidence: 0.82, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.89, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr21', label: 'HR 6 — Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.94, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr22', label: 'HR 6 — Cumulative Goal', value: '152', confidence: 0.79, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.94, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr23', label: 'HR 6 — Hourly Actual', value: '25', confidence: 0.86, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.94, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr24', label: 'HR 6 — Cumulative Actual', value: '154', confidence: 0.78, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.94, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr25', label: 'HR 7 — Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr26', label: 'HR 7 — Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr27', label: 'HR 7 — Hourly Actual', value: '29', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr28', label: 'HR 7 — Cumulative Actual', value: '183', confidence: 0.74, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr29', label: 'HR 8 — Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr30', label: 'HR 8 — Cumulative Goal', value: '205', confidence: 0.80, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
-      { id: 'kh-ocr31', label: 'HR 8 — Hourly Actual', value: '23', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
-      { id: 'kh-ocr32', label: 'HR 8 — Cumulative Actual', value: '206', confidence: 0.77, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr1', label: 'HR 1 - Hourly Goal', value: '25', confidence: 0.96, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr2', label: 'HR 1 - Cumulative Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr3', label: 'HR 1 - Hourly Actual', value: '27', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr4', label: 'HR 1 - Cumulative Actual', value: '27', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr5', label: 'HR 2 - Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr6', label: 'HR 2 - Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr7', label: 'HR 2 - Hourly Actual', value: '30', confidence: 0.90, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr8', label: 'HR 2 - Cumulative Actual', value: '57', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr9', label: 'HR 3 - Hourly Goal', value: '23', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.79, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr10', label: 'HR 3 - Cumulative Goal', value: '76', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.79, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr11', label: 'HR 3 - Hourly Actual', value: '22', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.79, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr12', label: 'HR 3 - Cumulative Actual', value: '79', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.79, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr13', label: 'HR 4 - Hourly Goal', value: '28', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.84, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr14', label: 'HR 4 - Cumulative Goal', value: '104', confidence: 0.87, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.84, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr15', label: 'HR 4 - Hourly Actual', value: '26', confidence: 0.89, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.84, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr16', label: 'HR 4 - Cumulative Actual', value: '105', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.84, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr17', label: 'HR 5 - Hourly Goal', value: '25', confidence: 0.95, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.89, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr18', label: 'HR 5 - Cumulative Goal', value: '129', confidence: 0.83, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.89, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr19', label: 'HR 5 - Hourly Actual', value: '24', confidence: 0.88, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.89, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr20', label: 'HR 5 - Cumulative Actual', value: '129', confidence: 0.82, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.89, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr21', label: 'HR 6 - Hourly Goal', value: '23', confidence: 0.94, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.94, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr22', label: 'HR 6 - Cumulative Goal', value: '152', confidence: 0.79, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.94, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr23', label: 'HR 6 - Hourly Actual', value: '25', confidence: 0.86, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.94, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr24', label: 'HR 6 - Cumulative Actual', value: '154', confidence: 0.78, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.94, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr25', label: 'HR 7 - Hourly Goal', value: '28', confidence: 0.92, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr26', label: 'HR 7 - Cumulative Goal', value: '180', confidence: 0.76, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr27', label: 'HR 7 - Hourly Actual', value: '29', confidence: 0.85, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.69, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr28', label: 'HR 7 - Cumulative Actual', value: '183', confidence: 0.74, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.69, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr29', label: 'HR 8 - Hourly Goal', value: '25', confidence: 0.93, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.12, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr30', label: 'HR 8 - Cumulative Goal', value: '205', confidence: 0.80, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.28, y: 0.74, w: 0.16, h: 0.05 } },
+      { id: 'kh-ocr31', label: 'HR 8 - Hourly Actual', value: '23', confidence: 0.84, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.46, y: 0.74, w: 0.14, h: 0.05 } },
+      { id: 'kh-ocr32', label: 'HR 8 - Cumulative Actual', value: '206', confidence: 0.77, frameTimestamp: 2.0, frameUrl: frameBase, bbox: { x: 0.62, y: 0.74, w: 0.16, h: 0.05 } },
     ],
     detectedObjects: [
       { id: 'kh-obj1', label: 'Production Sheet', count: 1, confidence: 0.97, frameTimestamp: 2.0, frameUrl: frameBase, details: 'Hour-by-hour production tracking sheet', bbox: { x: 0.05, y: 0.10, w: 0.90, h: 0.80 } },

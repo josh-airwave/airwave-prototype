@@ -1,4 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createContext, useContext } from 'react'
+
+// Status bar dark mode context - overlays set this to true for white icons/text
+const StatusBarContext = createContext<{
+  dark: boolean
+  setDark: (v: boolean) => void
+}>({ dark: false, setDark: () => {} })
+
+export function useStatusBar() {
+  return useContext(StatusBarContext)
+}
 
 interface PhoneFrameProps {
   children: React.ReactNode
@@ -7,6 +17,7 @@ interface PhoneFrameProps {
 export function PhoneFrame({ children }: PhoneFrameProps) {
   const computeScale = () => Math.min(1, (window.innerHeight - 80) / 852, (window.innerWidth - 40) / 393)
   const [scaleFactor, setScaleFactor] = useState(computeScale)
+  const [dark, setDark] = useState(false)
 
   useEffect(() => {
     const onResize = () => setScaleFactor(computeScale())
@@ -14,7 +25,11 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  const iconColor = dark ? '#fff' : '#111'
+  const textColor = dark ? '#fff' : '#000'
+
   return (
+    <StatusBarContext.Provider value={{ dark, setDark }}>
     <div style={{ transform: `scale(${scaleFactor})`, transformOrigin: 'center center' }}>
     <div
       data-screen-export="phone-frame"
@@ -28,18 +43,22 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
         boxShadow: '0 0 0 3px #1a1a2e, 0 25px 80px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Status bar */}
+      {/* Status bar - absolute overlay, transparent background */}
       <div style={{
         height: 54,
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         padding: '0 28px 6px',
-        background: '#fff',
-        position: 'relative',
-        zIndex: 100,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 300,
+        pointerEvents: 'none',
+        transition: 'color 0.2s ease',
       }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>9:41</span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: textColor, transition: 'color 0.2s ease' }}>9:41</span>
         {/* Dynamic island */}
         <div style={{
           position: 'absolute',
@@ -53,23 +72,24 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
         }} />
         <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
           <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
-            <path d="M1 8.5h2v3H1zM5 6h2v5.5H5zM9 3.5h2V12H9zM13 1h2v10.5h-2z" fill="#111"/>
+            <path d="M1 8.5h2v3H1zM5 6h2v5.5H5zM9 3.5h2V12H9zM13 1h2v10.5h-2z" fill={iconColor} style={{ transition: 'fill 0.2s ease' }}/>
           </svg>
           <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
-            <path d="M8 3.3a6.4 6.4 0 014.5 1.9l1.1-1.1A8.2 8.2 0 008 1.2a8.2 8.2 0 00-5.6 2.9l1.1 1.1A6.4 6.4 0 018 3.3zm0 3.2c1.1 0 2.1.4 2.8 1.2l1.1-1.1A5.4 5.4 0 008 4.8a5.4 5.4 0 00-3.9 1.8l1.1 1.1c.7-.8 1.7-1.2 2.8-1.2zM8 8.7c.6 0 1.2.3 1.6.7l1.1-1.1A3.5 3.5 0 008 7a3.5 3.5 0 00-2.7 1.3l1.1 1.1c.4-.4 1-.7 1.6-.7zM8 10.4a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" fill="#111"/>
+            <path d="M8 3.3a6.4 6.4 0 014.5 1.9l1.1-1.1A8.2 8.2 0 008 1.2a8.2 8.2 0 00-5.6 2.9l1.1 1.1A6.4 6.4 0 018 3.3zm0 3.2c1.1 0 2.1.4 2.8 1.2l1.1-1.1A5.4 5.4 0 008 4.8a5.4 5.4 0 00-3.9 1.8l1.1 1.1c.7-.8 1.7-1.2 2.8-1.2zM8 8.7c.6 0 1.2.3 1.6.7l1.1-1.1A3.5 3.5 0 008 7a3.5 3.5 0 00-2.7 1.3l1.1 1.1c.4-.4 1-.7 1.6-.7zM8 10.4a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" fill={iconColor} style={{ transition: 'fill 0.2s ease' }}/>
           </svg>
           <div style={{
-            width: 27, height: 13, border: '1.5px solid #111', borderRadius: 4,
+            width: 27, height: 13, border: `1.5px solid ${iconColor}`, borderRadius: 4,
             display: 'flex', alignItems: 'center', padding: 1.5,
+            transition: 'border-color 0.2s ease',
           }}>
             <div style={{ width: '100%', height: '100%', background: '#34C759', borderRadius: 2 }} />
           </div>
         </div>
       </div>
 
-      {/* Screen content */}
+      {/* Screen content - full height, screens handle their own top offset */}
       <div style={{
-        height: 'calc(100% - 54px)',
+        height: '100%',
         overflow: 'hidden',
         position: 'relative',
       }}>
@@ -77,5 +97,6 @@ export function PhoneFrame({ children }: PhoneFrameProps) {
       </div>
     </div>
     </div>
+    </StatusBarContext.Provider>
   )
 }

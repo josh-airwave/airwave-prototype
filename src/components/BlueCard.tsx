@@ -26,7 +26,7 @@ export function BlueCard({ card, onCardPress, onVideoPress, onViewReport, onShar
         cursor: onCardPress ? 'pointer' : 'default',
       }}
     >
-      {/* Video thumbnail — blurry bg + portrait center */}
+      {/* Video thumbnail - blurry bg + portrait center */}
       {card.videoUrl && (
         <button
           onClick={(e) => {
@@ -78,7 +78,7 @@ export function BlueCard({ card, onCardPress, onVideoPress, onViewReport, onShar
         {card.title}
       </div>
 
-      {/* Summary — 4 lines max */}
+      {/* Summary - 4 lines max */}
       <div style={{
         fontSize: fonts.size.md, fontWeight: fonts.weight.regular,
         color: colors.almostBlack, lineHeight: '1.5',

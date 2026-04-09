@@ -3,20 +3,30 @@ import { colors, fonts, radius } from '../styles/theme'
 import { Avatar } from './Avatar'
 import { useNavigation } from '../navigation/Router'
 import { currentUser, workspaces } from '../data/mock'
+import { useStatusBar } from './PhoneFrame'
 
 export function SideDrawer() {
   const { drawerOpen, setDrawerOpen, push } = useNavigation()
+  const { setDark } = useStatusBar()
+
+  React.useEffect(() => {
+    if (drawerOpen) setDark(true)
+    return () => { if (drawerOpen) setDark(false) }
+  }, [drawerOpen])
 
   if (!drawerOpen) return null
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay - extends up behind status bar */}
       <div
         onClick={() => setDrawerOpen(false)}
         style={{
           position: 'absolute',
-          inset: 0,
+          top: -54,
+          left: 0,
+          right: 0,
+          bottom: 0,
           background: colors.overlay,
           zIndex: 200,
         }}
@@ -24,7 +34,7 @@ export function SideDrawer() {
       {/* Drawer */}
       <div style={{
         position: 'absolute',
-        top: 0,
+        top: -54,
         left: 0,
         bottom: 0,
         width: 'calc(100% - 70px)',
@@ -34,8 +44,8 @@ export function SideDrawer() {
         flexDirection: 'column',
         overflowY: 'auto',
       }}>
-        {/* User profile - avatar + name side by side */}
-        <div style={{ padding: '56px 20px 16px' }}>
+        {/* User profile - avatar + name side by side (extra top padding for status bar) */}
+        <div style={{ padding: '110px 20px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ position: 'relative' }}>
               <Avatar emoji={currentUser.avatar} size={64} name={currentUser.name} />

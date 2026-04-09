@@ -30,7 +30,7 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, showR
       borderBottom: `1px solid ${colors.border}`,
       minHeight: 40,
     }}>
-      {/* Left slot — absolute so it doesn't affect title centering */}
+      {/* Left slot - absolute so it doesn't affect title centering */}
       <div style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 12 }}>
         {showBack && canGoBack && (
           <button onClick={onBack || pop} style={{ fontSize: 22, color: colors.primary, padding: 4 }}>
@@ -46,7 +46,7 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, showR
         )}
       </div>
 
-      {/* Center title — always centered */}
+      {/* Center title - always centered */}
       <div>
         <div style={{
           fontSize: fonts.size.lg,
@@ -68,7 +68,7 @@ export function Header({ title, subtitle, showBack, showMenu, showCompose, showR
         )}
       </div>
 
-      {/* Right slot — absolute so it doesn't affect title centering */}
+      {/* Right slot - absolute so it doesn't affect title centering */}
       <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 8 }}>
         {showCompose && (
           <button style={{ padding: 4, display: 'flex', alignItems: 'center' }}>
