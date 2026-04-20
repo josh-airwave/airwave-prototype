@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bbox Placement Tool</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #eee; font-family: -apple-system, system-ui, sans-serif; display: flex; height: 100vh; }
+
+  /* Sidebar */
+  #sidebar { width: 320px; background: #1a1a1a; border-right: 1px solid #333; overflow-y: auto; flex-shrink: 0; }
+  #sidebar h2 { padding: 16px; font-size: 14px; color: #888; border-bottom: 1px solid #333; }
+  .report-group { border-bottom: 1px solid #222; }
+  .report-group h3 { padding: 12px 16px 4px; font-size: 13px; color: #60A5FA; cursor: pointer; }
+  .field-btn {
+    display: block; width: 100%; text-align: left; padding: 8px 16px; border: none;
+    background: none; color: #ccc; font-size: 13px; cursor: pointer; transition: background 0.15s;
+  }
+  .field-btn:hover { background: #2a2a2a; }
+  .field-btn.active { background: #1e3a5f; color: #60A5FA; }
+  .field-btn .field-value { color: #888; font-size: 11px; }
+  .field-btn .field-status { float: right; font-size: 11px; }
+  .field-btn .field-status.placed { color: #4ade80; }
+  .field-btn .field-status.unplaced { color: #f87171; }
+
+  /* Main area */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #toolbar {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    background: #1a1a1a; border-bottom: 1px solid #333; flex-shrink: 0;
+  }
+  #toolbar label { font-size: 13px; color: #888; }
+  #toolbar .info { font-size: 13px; color: #60A5FA; flex: 1; }
+  #toolbar button {
+    padding: 6px 14px; border: 1px solid #444; border-radius: 4px;
+    background: #222; color: #eee; font-size: 13px; cursor: pointer;
+  }
+  #toolbar button:hover { background: #333; }
+  #toolbar button.primary { background: #2563eb; border-color: #2563eb; }
+  #toolbar button.primary:hover { background: #1d4ed8; }
+
+  /* Viewport */
+  #viewport { flex: 1; position: relative; overflow: hidden; cursor: crosshair; }
+  #viewport.panning { cursor: grab; }
+  #viewport.panning:active { cursor: grabbing; }
+  #canvas-container {
+    position: absolute; transform-origin: 0 0;
+  }
+  #canvas-container video {
+    display: block; max-width: none;
+  }
+  #canvas-container canvas {
+    position: absolute; top: 0; left: 0; pointer-events: none;
+  }
+
+  /* Coords display */
+  #coords {
+    position: absolute; bottom: 16px; left: 16px; right: 16px;
+    background: rgba(0,0,0,0.85); border: 1px solid #333; border-radius: 8px;
+    padding: 12px 16px; font-family: 'SF Mono', monospace; font-size: 13px;
+    display: flex; gap: 24px; align-items: center;
+  }
+  #coords .coord-label { color: #888; }
+  #coords .coord-value { color: #4ade80; }
+  #coords #copy-btn {
+    margin-left: auto; padding: 4px 12px; border: 1px solid #4ade80; border-radius: 4px;
+    background: none; color: #4ade80; font-size: 12px; cursor: pointer;
+  }
+  #coords #copy-btn:hover { background: rgba(74,222,128,0.1); }
+
+  /* Export modal */
+  #export-modal {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  #export-modal.show { display: flex; }
+  #export-modal .modal-content {
+    background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
+    padding: 24px; width: 600px; max-height: 80vh; overflow-y: auto;
+  }
+  #export-modal textarea {
+    width: 100%; height: 400px; background: #111; border: 1px solid #333;
+    color: #4ade80; font-family: 'SF Mono', monospace; font-size: 12px;
+    padding: 12px; border-radius: 6px; resize: vertical;
+  }
+  #export-modal h3 { margin-bottom: 12px; }
+  #export-modal .modal-actions { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Zoom indicator */
+  #zoom-indicator {
+    position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.7);
+    padding: 6px 12px; border-radius: 4px; font-size: 13px; color: #888;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>OCR Fields</h2>
+  <div id="field-list"></div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <span class="info" id="current-field">Select a field from the sidebar</span>
+    <label>Mode:</label>
+    <button id="draw-mode-btn" class="primary" onclick="setMode('draw')">Draw Box</button>
+    <button id="pan-mode-btn" onclick="setMode('pan')">Pan</button>
+    <button onclick="resetZoom()">Reset Zoom</button>
+    <button onclick="zoomIn()">Zoom +</button>
+    <button onclick="zoomOut()">Zoom -</button>
+    <button class="primary" onclick="showExport()">Export All</button>
+  </div>
+  <div id="viewport">
+    <div id="canvas-container">
+      <video id="video" muted style="display:none"></video>
+      <img id="image" style="display:none" draggable="false" />
+      <canvas id="overlay"></canvas>
+    </div>
+    <div id="zoom-indicator">100%</div>
+    <div id="coords">
+      <span><span class="coord-label">x:</span> <span class="coord-value" id="cx">-</span></span>
+      <span><span class="coord-label">y:</span> <span class="coord-value" id="cy">-</span></span>
+      <span><span class="coord-label">w:</span> <span class="coord-value" id="cw">-</span></span>
+      <span><span class="coord-label">h:</span> <span class="coord-value" id="ch">-</span></span>
+      <button id="copy-btn" onclick="copyCoords()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<div id="export-modal">
+  <div class="modal-content">
+    <h3>Export Bbox Coordinates</h3>
+    <textarea id="export-text" readonly></textarea>
+    <div class="modal-actions">
+      <button onclick="copyExport()">Copy All</button>
+      <button onclick="closeExport()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- OCR field definitions from mock.ts ---
+const fields = [
+  // MMA Controller — using clean screenshot
+  { id: 'ocr-screw-pos', label: 'Screw Position', value: '2.057 in', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-inj-speed', label: 'Injection Speed', value: '-0.11 in/s', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-inj-pressure', label: 'Injection Pressure', value: '125 in/10Pa', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-rev', label: 'REV', value: '35 rpm', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-clamp-pos', label: 'Clamp Position', value: '0.000 in', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-ej-pos', label: 'Ejector Position', value: '0.000 in', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-cycle-time', label: 'Cycle Time (Objective)', value: '59.34s', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-cushion-pos', label: 'Cushion Position', value: '0.209 in', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-min-cushion', label: 'Min Cushion Position', value: '0.209 in', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-fill-time', label: 'Fill Injection Time', value: '0.51s', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  { id: 'ocr-plast-time', label: 'Plasticizing Time', value: '14.37s', image: '/images/clean-mma-screen.png', group: 'MMA Controller', bbox: null },
+  // Whiteboard — Hourly Goal + Cumulative Goal only
+  { id: 'ocr1', label: 'HR 1 - Hourly Goal', value: '25', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr2', label: 'HR 1 - Cumulative Goal', value: '25', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr3', label: 'HR 2 - Hourly Goal', value: '28', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr4', label: 'HR 2 - Cumulative Goal', value: '53', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr5', label: 'HR 3 - Hourly Goal', value: '23', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr6', label: 'HR 3 - Cumulative Goal', value: '76', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr7', label: 'HR 4 - Hourly Goal', value: '28', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr8', label: 'HR 4 - Cumulative Goal', value: '104', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr9', label: 'HR 5 - Hourly Goal', value: '25', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr10', label: 'HR 5 - Cumulative Goal', value: '129', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr11', label: 'HR 6 - Hourly Goal', value: '23', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr12', label: 'HR 6 - Cumulative Goal', value: '152', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr13', label: 'HR 7 - Hourly Goal', value: '28', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr14', label: 'HR 7 - Cumulative Goal', value: '180', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr15', label: 'HR 8 - Hourly Goal', value: '25', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  { id: 'ocr16', label: 'HR 8 - Cumulative Goal', value: '205', image: '/images/whiteboard.png', group: 'Whiteboard', bbox: null },
+  // Yard Equipment — OCR
+  { id: 'yocr1', label: 'Rental Company Phone', value: '800-UR-RENTS', image: '/images/yard1.png', group: 'Yard Equipment', bbox: null },
+  // Yard Equipment — Detected Objects
+  { id: 'obj1', label: 'Scissor Lift (Underside)', value: 'Orange electric scissor lift', image: '/images/yard1.png', group: 'Yard Equipment', bbox: null },
+  { id: 'obj2', label: 'Scissor Lift (Side)', value: 'Side/rear view, warning labels', image: '/images/yard4.png', group: 'Yard Equipment', bbox: null },
+  { id: 'obj3', label: 'Battery Compartment', value: 'Open bay, lead-acid cells', image: '/images/yard2.png', group: 'Yard Equipment', bbox: null },
+  { id: 'obj4', label: 'Forklift', value: 'Yellow, in Bay 2', image: '/images/yard4.png', group: 'Yard Equipment', bbox: null },
+  { id: 'obj5', label: 'Boom Lift Fleet', value: '3 units, orange + blue', image: '/images/yard3.png', group: 'Yard Equipment', bbox: null },
+  { id: 'obj6', label: 'Red Scissor Lift Cluster', value: '~5 units', image: '/images/yard3.png', group: 'Yard Equipment', bbox: null },
+];
+
+// --- State ---
+let activeField = null;
+let mode = 'draw'; // 'draw' | 'pan'
+let zoom = 1;
+let panX = 0, panY = 0;
+let drawing = false;
+let drawStart = null;
+let currentRect = null;
+let panStart = null;
+let lastVideoSrc = null;
+let lastImageSrc = null;
+let mediaMode = null; // 'video' | 'image'
+
+const video = document.getElementById('video');
+const image = document.getElementById('image');
+const overlay = document.getElementById('overlay');
+const ctx = overlay.getContext('2d');
+const container = document.getElementById('canvas-container');
+const viewport = document.getElementById('viewport');
+
+// --- Build sidebar ---
+function buildSidebar() {
+  const list = document.getElementById('field-list');
+  const groups = {};
+  fields.forEach(f => {
+    if (!groups[f.group]) groups[f.group] = [];
+    groups[f.group].push(f);
+  });
+  for (const [group, items] of Object.entries(groups)) {
+    const div = document.createElement('div');
+    div.className = 'report-group';
+    div.innerHTML = `<h3>${group} (${items.length})</h3>`;
+    items.forEach(f => {
+      const btn = document.createElement('button');
+      btn.className = 'field-btn';
+      btn.dataset.id = f.id;
+      btn.innerHTML = `
+        <span class="field-status ${f.bbox ? 'placed' : 'unplaced'}">${f.bbox ? 'placed' : 'unplaced'}</span>
+        ${f.label}
+        <div class="field-value">${f.value}${f.timestamp != null ? ` @ ${f.timestamp}s` : ''}</div>
+      `;
+      btn.onclick = () => selectField(f);
+      div.appendChild(btn);
+    });
+    list.appendChild(div);
+  }
+}
+
+// --- Load media (video at timestamp, or static image) ---
+function loadMedia(field) {
+  return new Promise((resolve) => {
+    if (field.image) {
+      // Static image mode
+      video.style.display = 'none';
+      image.style.display = 'block';
+      mediaMode = 'image';
+      if (lastImageSrc === field.image) { fitMedia(); resolve(); return; }
+      lastImageSrc = field.image;
+      image.onload = () => { fitMedia(); resolve(); };
+      image.src = field.image;
+    } else {
+      // Video mode
+      image.style.display = 'none';
+      video.style.display = 'block';
+      mediaMode = 'video';
+      const src = field.video;
+      const timestamp = field.timestamp;
+      if (video.src.endsWith(src) && lastVideoSrc === src) {
+        video.currentTime = timestamp;
+        video.onseeked = () => { fitMedia(); resolve(); };
+        return;
+      }
+      lastVideoSrc = src;
+      video.src = src;
+      video.onloadedmetadata = () => {
+        video.currentTime = timestamp;
+        video.onseeked = () => { fitMedia(); resolve(); };
+      };
+    }
+  });
+}
+
+function getMediaSize() {
+  if (mediaMode === 'image') return { w: image.naturalWidth, h: image.naturalHeight };
+  return { w: video.videoWidth, h: video.videoHeight };
+}
+
+function fitMedia() {
+  const { w: vW, h: vH } = getMediaSize();
+  overlay.width = vW;
+  overlay.height = vH;
+  overlay.style.width = vW + 'px';
+  overlay.style.height = vH + 'px';
+  if (mediaMode === 'image') {
+    image.style.width = vW + 'px';
+    image.style.height = vH + 'px';
+  } else {
+    video.style.width = vW + 'px';
+    video.style.height = vH + 'px';
+  }
+
+  // Fit to viewport
+  const vpW = viewport.clientWidth;
+  const vpH = viewport.clientHeight - 80; // leave room for coords bar
+  const fitZoom = Math.min(vpW / vW, vpH / vH, 1);
+  zoom = fitZoom;
+  panX = (vpW - vW * zoom) / 2;
+  panY = (vpH - vH * zoom) / 2;
+  applyTransform();
+  drawOverlay();
+}
+
+function applyTransform() {
+  container.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  document.getElementById('zoom-indicator').textContent = Math.round(zoom * 100) + '%';
+}
+
+// --- Select field ---
+async function selectField(field) {
+  activeField = field;
+  document.querySelectorAll('.field-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.field-btn[data-id="${field.id}"]`).classList.add('active');
+  const src = field.image ? field.image : `${field.video} @ ${field.timestamp}s`;
+  document.getElementById('current-field').textContent = `${field.label}: "${field.value}" — ${src}`;
+
+  await loadMedia(field);
+
+  if (field.bbox) {
+    currentRect = { ...field.bbox };
+    updateCoords(currentRect);
+  } else {
+    currentRect = null;
+    updateCoords(null);
+  }
+  drawOverlay();
+}
+
+// --- Drawing ---
+function getVideoCoords(e) {
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const vx = (mx - panX) / zoom;
+  const vy = (my - panY) / zoom;
+  const { w, h } = getMediaSize();
+  return {
+    nx: vx / w,
+    ny: vy / h,
+    vx, vy
+  };
+}
+
+viewport.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  if (mode === 'pan') {
+    panStart = { x: e.clientX - panX, y: e.clientY - panY };
+    return;
+  }
+  if (!activeField) return;
+  const coords = getVideoCoords(e);
+  drawing = true;
+  drawStart = coords;
+});
+
+viewport.addEventListener('mousemove', (e) => {
+  if (mode === 'pan' && panStart) {
+    panX = e.clientX - panStart.x;
+    panY = e.clientY - panStart.y;
+    applyTransform();
+    return;
+  }
+  if (!drawing) return;
+  const coords = getVideoCoords(e);
+  const x = Math.min(drawStart.nx, coords.nx);
+  const y = Math.min(drawStart.ny, coords.ny);
+  const w = Math.abs(coords.nx - drawStart.nx);
+  const h = Math.abs(coords.ny - drawStart.ny);
+  currentRect = { x: +x.toFixed(4), y: +y.toFixed(4), w: +w.toFixed(4), h: +h.toFixed(4) };
+  updateCoords(currentRect);
+  drawOverlay();
+});
+
+window.addEventListener('mouseup', () => {
+  if (panStart) { panStart = null; return; }
+  if (!drawing) return;
+  drawing = false;
+  if (currentRect && activeField) {
+    // Round to 2 decimal places for clean output
+    currentRect.x = +currentRect.x.toFixed(2);
+    currentRect.y = +currentRect.y.toFixed(2);
+    currentRect.w = +currentRect.w.toFixed(2);
+    currentRect.h = +currentRect.h.toFixed(2);
+    activeField.bbox = { ...currentRect };
+    updateCoords(currentRect);
+    saveBboxes();
+    // Update sidebar status
+    const btn = document.querySelector(`.field-btn[data-id="${activeField.id}"]`);
+    const status = btn.querySelector('.field-status');
+    status.textContent = 'placed';
+    status.className = 'field-status placed';
+    drawOverlay();
+
+    // Auto-advance to next unplaced field
+    const idx = fields.indexOf(activeField);
+    for (let i = idx + 1; i < fields.length; i++) {
+      if (!fields[i].bbox) {
+        // Only auto-advance if same video + timestamp
+        if (fields[i].video === activeField.video && fields[i].timestamp === activeField.timestamp) {
+          setTimeout(() => selectField(fields[i]), 300);
+        }
+        break;
+      }
+    }
+  }
+});
+
+// --- Zoom ---
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const oldZoom = zoom;
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  zoom = Math.max(0.1, Math.min(20, zoom * delta));
+
+  // Zoom towards mouse position
+  panX = mx - (mx - panX) * (zoom / oldZoom);
+  panY = my - (my - panY) * (zoom / oldZoom);
+  applyTransform();
+}, { passive: false });
+
+// --- Draw overlay ---
+function drawOverlay() {
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+  if (!currentRect) return;
+
+  const { w: vW, h: vH } = getMediaSize();
+  const x = currentRect.x * vW;
+  const y = currentRect.y * vH;
+  const w = currentRect.w * vW;
+  const h = currentRect.h * vH;
+
+  // Dim everything outside the box
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  ctx.fillRect(0, 0, vW, vH);
+  ctx.clearRect(x, y, w, h);
+
+  // Box border
+  ctx.strokeStyle = '#60A5FA';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+
+  // Light fill
+  ctx.fillStyle = 'rgba(96, 165, 250, 0.08)';
+  ctx.fillRect(x, y, w, h);
+
+  // Label
+  if (activeField) {
+    ctx.font = '14px -apple-system, system-ui, sans-serif';
+    ctx.fillStyle = '#60A5FA';
+    ctx.fillText(`${activeField.label}: ${activeField.value}`, x, y - 6);
+  }
+}
+
+// --- Coords display ---
+function updateCoords(rect) {
+  if (!rect) {
+    document.getElementById('cx').textContent = '-';
+    document.getElementById('cy').textContent = '-';
+    document.getElementById('cw').textContent = '-';
+    document.getElementById('ch').textContent = '-';
+    return;
+  }
+  document.getElementById('cx').textContent = rect.x.toFixed(2);
+  document.getElementById('cy').textContent = rect.y.toFixed(2);
+  document.getElementById('cw').textContent = rect.w.toFixed(2);
+  document.getElementById('ch').textContent = rect.h.toFixed(2);
+}
+
+function copyCoords() {
+  if (!currentRect || !activeField) return;
+  const text = `bbox: { x: ${currentRect.x.toFixed(2)}, y: ${currentRect.y.toFixed(2)}, w: ${currentRect.w.toFixed(2)}, h: ${currentRect.h.toFixed(2)} }`;
+  navigator.clipboard.writeText(text);
+  document.getElementById('copy-btn').textContent = 'Copied!';
+  setTimeout(() => document.getElementById('copy-btn').textContent = 'Copy', 1500);
+}
+
+// --- Mode ---
+function setMode(m) {
+  mode = m;
+  document.getElementById('draw-mode-btn').className = m === 'draw' ? 'primary' : '';
+  document.getElementById('pan-mode-btn').className = m === 'pan' ? 'primary' : '';
+  viewport.className = m === 'pan' ? 'panning' : '';
+}
+
+// --- Zoom buttons ---
+function zoomIn() {
+  const cx = viewport.clientWidth / 2;
+  const cy = viewport.clientHeight / 2;
+  const oldZoom = zoom;
+  zoom = Math.min(20, zoom * 1.5);
+  panX = cx - (cx - panX) * (zoom / oldZoom);
+  panY = cy - (cy - panY) * (zoom / oldZoom);
+  applyTransform();
+}
+function zoomOut() {
+  const cx = viewport.clientWidth / 2;
+  const cy = viewport.clientHeight / 2;
+  const oldZoom = zoom;
+  zoom = Math.max(0.1, zoom / 1.5);
+  panX = cx - (cx - panX) * (zoom / oldZoom);
+  panY = cy - (cy - panY) * (zoom / oldZoom);
+  applyTransform();
+}
+function resetZoom() { fitMedia(); }
+
+// --- Export ---
+function showExport() {
+  const placed = fields.filter(f => f.bbox);
+  let text = '// Bbox coordinates placed via tool\n// Paste these into mock.ts\n\n';
+  const groups = {};
+  placed.forEach(f => {
+    if (!groups[f.group]) groups[f.group] = [];
+    groups[f.group].push(f);
+  });
+  for (const [group, items] of Object.entries(groups)) {
+    text += `// --- ${group} ---\n`;
+    items.forEach(f => {
+      text += `// ${f.id}: ${f.label} = "${f.value}"\n`;
+      text += `bbox: { x: ${f.bbox.x.toFixed(2)}, y: ${f.bbox.y.toFixed(2)}, w: ${f.bbox.w.toFixed(2)}, h: ${f.bbox.h.toFixed(2)} }\n\n`;
+    });
+  }
+
+  const unplaced = fields.filter(f => !f.bbox);
+  if (unplaced.length > 0) {
+    text += `\n// --- UNPLACED (${unplaced.length}) ---\n`;
+    unplaced.forEach(f => text += `// ${f.id}: ${f.label} = "${f.value}"\n`);
+  }
+
+  document.getElementById('export-text').value = text;
+  document.getElementById('export-modal').classList.add('show');
+}
+function closeExport() { document.getElementById('export-modal').classList.remove('show'); }
+function copyExport() {
+  const ta = document.getElementById('export-text');
+  ta.select();
+  navigator.clipboard.writeText(ta.value);
+}
+
+// --- Keyboard shortcuts ---
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeExport(); return; }
+  if (e.key === ' ') { e.preventDefault(); setMode(mode === 'pan' ? 'draw' : 'pan'); }
+  if (e.key === '=' || e.key === '+') zoomIn();
+  if (e.key === '-') zoomOut();
+  if (e.key === '0') resetZoom();
+});
+
+// --- LocalStorage persistence ---
+function saveBboxes() {
+  const data = {};
+  fields.forEach(f => { if (f.bbox) data[f.id] = f.bbox; });
+  localStorage.setItem('bbox-placements', JSON.stringify(data));
+}
+
+function loadBboxes() {
+  try {
+    const raw = localStorage.getItem('bbox-placements');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    fields.forEach(f => { if (data[f.id]) f.bbox = data[f.id]; });
+  } catch (e) { /* ignore */ }
+}
+
+// --- Seed bboxes from mock.ts (source of truth for placements already committed) ---
+async function seedFromMock() {
+  try {
+    const res = await fetch('/src/data/mock.ts');
+    if (!res.ok) return;
+    const text = await res.text();
+    // Match entries like: { id: 'ocr-screw-pos', ..., bbox: { x: 0.03, y: 0.035, w: 0.13, h: 0.03 } }
+    // Vite serves compiled TS with double-quoted strings, so allow either quote style.
+    const entryRegex = /id:\s*["']([^"']+)["'][^}]*?bbox:\s*\{\s*x:\s*(-?[\d.]+)\s*,\s*y:\s*(-?[\d.]+)\s*,\s*w:\s*(-?[\d.]+)\s*,\s*h:\s*(-?[\d.]+)\s*\}/g;
+    let match;
+    let count = 0;
+    while ((match = entryRegex.exec(text)) !== null) {
+      const id = match[1];
+      const bbox = { x: +match[2], y: +match[3], w: +match[4], h: +match[5] };
+      const field = fields.find(f => f.id === id);
+      // mock.ts is the source of truth - only override if field doesn't already have a bbox from localStorage
+      if (field && !field.bbox) {
+        field.bbox = bbox;
+        count++;
+      }
+    }
+    if (count > 0) console.log(`Seeded ${count} bboxes from mock.ts`);
+  } catch (e) { console.warn('Failed to seed from mock.ts:', e); }
+}
+
+// --- Init ---
+// Order matters: localStorage first (in-progress work wins), then mock.ts for anything not in localStorage.
+loadBboxes();
+seedFromMock().then(() => {
+  // Rebuild sidebar to reflect seeded bboxes
+  document.getElementById('field-list').innerHTML = '';
+  buildSidebar();
+});
+buildSidebar();
+</script>
+</body>
+</html>

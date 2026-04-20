@@ -13,14 +13,27 @@ const SPEEDS = [1, 1.5, 2, 0.5]
 
 export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }) {
   const { pop } = useNavigation()
-  const itemId = (params?.itemId as string) || galleryItems[0].id
+  const itemId = params?.itemId as string | undefined
   const directImageUrl = params?.imageUrl as string | undefined
   const directVideoUrl = params?.videoUrl as string | undefined
-  const item = galleryItems.find(i => i.id === itemId) || galleryItems[0]
+  // Only look up a gallery item if an itemId was explicitly provided (report source links
+  // pass imageUrl/videoUrl directly and should NOT fall back to a random gallery video)
+  const item = itemId ? (galleryItems.find(i => i.id === itemId) || galleryItems[0]) : undefined
 
-  const isVideo = !!directVideoUrl || (!directImageUrl && item.type === 'video')
-  const videoSrc = directVideoUrl || item.videoUrl
-  const imageSrc = directImageUrl || item.thumbnail
+  // Support a playlist of video URLs for reports with appended context - plays sequentially
+  const videoUrlsParam = params?.videoUrls as string[] | undefined
+  const videoPlaylist = (videoUrlsParam && videoUrlsParam.length > 0)
+    ? videoUrlsParam
+    : (directVideoUrl ? [directVideoUrl] : (item?.videoUrl ? [item.videoUrl] : []))
+  const hasMultipleClips = videoPlaylist.length > 1
+  const [clipIndex, setClipIndex] = useState(0)
+
+  // If caller explicitly passed an image URL, render in image mode - never fall back to a video.
+  const isVideo = directImageUrl
+    ? false
+    : !!directVideoUrl || videoPlaylist.length > 0 || (item?.type === 'video')
+  const videoSrc = videoPlaylist[clipIndex] || directVideoUrl || item?.videoUrl
+  const imageSrc = directImageUrl || item?.thumbnail
 
   // Source frame mode - opened from a report source badge
   const sourceTime = params?.sourceTime as number | undefined
@@ -202,7 +215,14 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             muted={isMuted || !!freezeState}
             onPlay={() => { if (!freezeState) setIsPlaying(true) }}
             onPause={() => { if (!freezeState) setIsPlaying(false) }}
-            onEnded={() => setIsPlaying(false)}
+            onEnded={() => {
+              // Advance to next clip in the playlist if there is one
+              if (clipIndex < videoPlaylist.length - 1) {
+                setClipIndex(clipIndex + 1)
+              } else {
+                setIsPlaying(false)
+              }
+            }}
             onLoadedMetadata={() => {
               if (videoRef.current) {
                 if (isSourceMode && sourceTime != null) {
@@ -336,6 +356,28 @@ export function ImageZoomScreen({ params }: { params?: Record<string, unknown> }
             pointerEvents: 'none',
           }}>
             {formatTime(duration - currentTime)}
+          </div>
+        )}
+
+        {/* Clip indicator - when multiple clips are chained (source + appended context) */}
+        {isVideo && hasMultipleClips && (
+          <div style={{
+            position: 'absolute', top: 6, left: 6,
+            background: clipIndex === 0 ? 'rgba(26,26,26,0.8)' : colors.primary,
+            color: colors.white,
+            fontSize: 11, fontFamily: fonts.family, fontWeight: 600,
+            padding: '4px 10px', borderRadius: 6,
+            pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            {clipIndex > 0 && (
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+            {clipIndex === 0
+              ? `Source · 1 of ${videoPlaylist.length}`
+              : `Added · ${clipIndex + 1} of ${videoPlaylist.length}`}
           </div>
         )}
 

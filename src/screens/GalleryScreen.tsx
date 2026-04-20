@@ -4,11 +4,14 @@ import { Header } from '../components/Header'
 import { VideoThumbnail } from '../components/VideoThumbnail'
 import { useNavigation } from '../navigation/Router'
 import { galleryItems } from '../data/mock'
+import { addContextStore } from '../utils/addContextStore'
 
-export function GalleryScreen() {
+export function GalleryScreen({ params }: { params?: Record<string, unknown> }) {
   const { push, pop } = useNavigation()
+  const pickerMode = params?.pickerMode === true
   const [durations, setDurations] = useState<Record<string, string>>({})
-  const [selectMode, setSelectMode] = useState(false)
+  // In picker mode, start already in select mode so user can tap items directly to select
+  const [selectMode, setSelectMode] = useState(pickerMode)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   const handleDuration = useCallback((id: string, dur: string) => {
@@ -71,32 +74,66 @@ export function GalleryScreen() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 16px 8px', position: 'relative',
         }}>
-          {/* Left: Delete */}
-          <button
-            onClick={() => setSelectedIds(new Set())}
-            style={{
-              color: selectedIds.size > 0 ? colors.danger : colors.neutral400,
-              fontSize: fonts.size.md, fontWeight: fonts.weight.medium,
-              minWidth: 60, textAlign: 'left',
-            }}
-          >
-            Delete
-          </button>
+          {/* Left: Cancel (picker) / Delete (normal) */}
+          {pickerMode ? (
+            <button
+              onClick={pop}
+              style={{
+                color: colors.primary,
+                fontSize: fonts.size.md, fontWeight: fonts.weight.medium,
+                minWidth: 60, textAlign: 'left',
+              }}
+            >
+              Cancel
+            </button>
+          ) : (
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              style={{
+                color: selectedIds.size > 0 ? colors.danger : colors.neutral400,
+                fontSize: fonts.size.md, fontWeight: fonts.weight.medium,
+                minWidth: 60, textAlign: 'left',
+              }}
+            >
+              Delete
+            </button>
+          )}
           {/* Center: Title */}
           <span style={{
             position: 'absolute', left: '50%', transform: 'translateX(-50%)',
             fontSize: fonts.size.xl, fontWeight: fonts.weight.bold, color: colors.textPrimary,
             whiteSpace: 'nowrap',
           }}>
-            {selectedIds.size > 0 ? `Selected (${selectedIds.size})` : 'Select'}
+            {pickerMode
+              ? (selectedIds.size > 0 ? `Add ${selectedIds.size}` : 'Add to Report')
+              : (selectedIds.size > 0 ? `Selected (${selectedIds.size})` : 'Select')
+            }
           </span>
-          {/* Right: Cancel */}
-          <button
-            onClick={() => { setSelectMode(false); setSelectedIds(new Set()) }}
-            style={{ color: colors.primary, fontSize: fonts.size.md, fontWeight: fonts.weight.medium }}
-          >
-            Cancel
-          </button>
+          {/* Right: Add (picker) / Cancel (normal) */}
+          {pickerMode ? (
+            <button
+              onClick={() => {
+                if (selectedIds.size === 0) return
+                addContextStore.publish(Array.from(selectedIds))
+                pop()
+              }}
+              disabled={selectedIds.size === 0}
+              style={{
+                color: selectedIds.size > 0 ? colors.primary : colors.neutral400,
+                fontSize: fonts.size.md, fontWeight: fonts.weight.semibold,
+                cursor: selectedIds.size > 0 ? 'pointer' : 'default',
+              }}
+            >
+              Add
+            </button>
+          ) : (
+            <button
+              onClick={() => { setSelectMode(false); setSelectedIds(new Set()) }}
+              style={{ color: colors.primary, fontSize: fonts.size.md, fontWeight: fonts.weight.medium }}
+            >
+              Cancel
+            </button>
+          )}
         </div>
       ) : (
         <Header
@@ -254,8 +291,8 @@ export function GalleryScreen() {
         ))}
       </div>
 
-      {/* Next button - slides up when items selected in select mode */}
-      {selectMode && selectedIds.size > 0 && (
+      {/* Next button - slides up when items selected in select mode (hidden in picker mode) */}
+      {selectMode && !pickerMode && selectedIds.size > 0 && (
         <div style={{
           position: 'absolute',
           bottom: 24,

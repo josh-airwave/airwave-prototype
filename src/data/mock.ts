@@ -545,7 +545,7 @@ export const videoIntelReports: VideoIntelReport[] = [
     summary: 'Blue processed 1:23 of video from the Nissei SI-200-6S H450E Φ46 controller (No. 62, Monitor Data screen) at MT 06 Tool 104 219. OCR extracted cycle parameters, process settings, and 227 shots of cycle data from the controller screen.',
     ocrFields: [
       // Row 1 - top parameter bar on controller display
-      { id: 'ocr-screw-pos', label: 'Screw Position', value: '2.057 in', confidence: 0.95, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.03, y: 0.035, w: 0.13, h: 0.03 } },
+      { id: 'ocr-screw-pos', label: 'Screw Position', value: '2.057 in', confidence: 0.95, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.04, y: 0.2, w: 0.14, h: 0.04 } },
       { id: 'ocr-inj-speed', label: 'Injection Speed', value: '-0.11 in/s', confidence: 0.96, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.16, y: 0.035, w: 0.14, h: 0.03 } },
       { id: 'ocr-inj-pressure', label: 'Injection Pressure', value: '125 in/10Pa', confidence: 0.78, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.30, y: 0.035, w: 0.16, h: 0.03 } },
       { id: 'ocr-rev', label: 'REV', value: '35 rpm', confidence: 0.97, frameTimestamp: 2.1, frameUrl: '/images/clean-mma-screen.png', bbox: { x: 0.48, y: 0.035, w: 0.10, h: 0.03 } },
@@ -578,8 +578,8 @@ export const videoIntelReports: VideoIntelReport[] = [
     status: 'draft',
     summary: 'Blue processed video of the hour-by-hour production whiteboard. OCR extracted hourly goal and cumulative goal counts for all 8 hours of the shift.',
     ocrFields: [
-      { id: 'ocr1', label: 'HR 1 - Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.38, w: 0.18, h: 0.055 } },
-      { id: 'ocr2', label: 'HR 1 - Cumulative Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.38, w: 0.22, h: 0.055 } },
+      { id: 'ocr1', label: 'HR 1 - Hourly Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.41, y: 0.48, w: 0.16, h: 0.06 } },
+      { id: 'ocr2', label: 'HR 1 - Cumulative Goal', value: '25', confidence: 0.97, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.61, y: 0.49, w: 0.21, h: 0.07 } },
       { id: 'ocr3', label: 'HR 2 - Hourly Goal', value: '28', confidence: 0.94, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.44, w: 0.18, h: 0.055 } },
       { id: 'ocr4', label: 'HR 2 - Cumulative Goal', value: '53', confidence: 0.91, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.45, y: 0.44, w: 0.22, h: 0.055 } },
       { id: 'ocr5', label: 'HR 3 - Hourly Goal', value: '23', confidence: 0.96, frameTimestamp: 3.0, frameUrl: '/images/whiteboard.png', bbox: { x: 0.25, y: 0.50, w: 0.18, h: 0.055 } },
@@ -613,7 +613,7 @@ export const videoIntelReports: VideoIntelReport[] = [
     status: 'reviewed',
     summary: 'Blue processed video of equipment yard inspection. OCR identified rental source as United Rentals (800-UR-RENTS). Object detection cataloged 1 orange scissor lift under inspection, 3 boom lifts, 5 red scissor lifts, 1 forklift, and open battery compartment.',
     ocrFields: [
-      { id: 'yocr1', label: 'Rental Company Phone', value: '800-UR-RENTS', confidence: 0.94, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', bbox: { x: 0.22, y: 0.06, w: 0.50, h: 0.04 } },
+      { id: 'yocr1', label: 'Rental Company Phone', value: '800-UR-RENTS', confidence: 0.94, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', bbox: { x: 0.35, y: 0.13, w: 0.35, h: 0.06 } },
     ],
     detectedObjects: [
       { id: 'obj1', label: 'Scissor Lift (Underside)', count: 1, confidence: 0.98, frameTimestamp: 2.0, frameUrl: '/images/yard1.png', details: 'Orange electric scissor lift, scissors raised, hydraulic cylinder and X-pattern linkage visible', bbox: { x: 0.05, y: 0.18, w: 0.90, h: 0.60 } },
